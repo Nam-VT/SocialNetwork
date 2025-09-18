@@ -1,0 +1,37 @@
+server:
+  port: 8088
+
+spring:
+  application:
+    name: chat-service
+  datasource:
+    url: jdbc:mysql://localhost:3306/chat_db?createDatabaseIfNotExist=true
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+  kafka:
+    bootstrap-servers: localhost:9092 # Trỏ đến Kafka trong Docker
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      # Sử dụng JsonSerializer để tự động chuyển object Java thành JSON
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+# Định nghĩa tên topic để dễ quản lý
+app:
+  kafka:
+    notification-topic: "notifications"
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    prefer-ip-address: true

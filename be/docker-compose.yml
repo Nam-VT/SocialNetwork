@@ -1,0 +1,42 @@
+networks:
+  microservice-net:
+    driver: bridge
+
+services:
+  zookeeper:
+    image: bitnami/zookeeper:3.9
+    container_name: zookeeper
+    hostname: zookeeper
+    networks:
+      - microservice-net
+    ports:
+      - "2181:2181"
+    environment:
+      ALLOW_ANONYMOUS_LOGIN: yes
+
+  kafka:
+    image: bitnami/kafka:3.5
+    container_name: kafka
+    hostname: kafka
+    networks:
+      - microservice-net
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+
+      # Kết nối đến Zookeeper
+      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
+
+      # Hostname quảng cáo cho client
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
+
+      # Cho phép khởi tạo topic tự động (dành cho dev)
+      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+      # Cho phép kết nối ẩn danh (không cần auth)
+      ALLOW_PLAINTEXT_LISTENER: yes
