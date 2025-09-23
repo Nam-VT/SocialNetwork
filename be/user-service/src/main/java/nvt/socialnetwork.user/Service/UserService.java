@@ -1,7 +1,9 @@
 package nvt.socialnetwork.user.Service;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -14,14 +16,21 @@ import nvt.socialnetwork.user.DTO.Request.UserRequest;
 import nvt.socialnetwork.user.DTO.Response.UserResponse;
 import nvt.socialnetwork.user.Repository.UserRepo;
 import nvt.socialnetwork.user.Entity.User;
-// Giả sử bạn có exception này, nếu không hãy dùng RuntimeException
-// import nvt.socialnetwork.user.Exception.ResourceNotFoundException;
+import nvt.socialnetwork.common.dto.NotificationType;
+import nvt.socialnetwork.common.dto.NotificationEvent;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepo userRepo;
     private final MediaClient mediaClient;
+
+    private final KafkaTemplate<String, NotificationEvent> kafkaTemplate;
+
+    @Value("${app.kafka.user-topic}")
+    private String userTopic;
 
     @Transactional
     public UserResponse createUserProfile(UserRequest userRequest) {
@@ -44,6 +53,8 @@ public class UserService {
         newUser.setCoverId(null);
 
         User savedUser = userRepo.save(newUser);
+
+        sendUserEvent(savedUser, NotificationType.USER_CREATED);
 
         return mapUserToUserResponse(savedUser);
     }
@@ -111,6 +122,7 @@ public class UserService {
         user.setPrivateProfile(userRequest.isPrivateProfile());
 
         User updatedUser = userRepo.save(user);
+        sendUserEvent(updatedUser, NotificationType.USER_UPDATED);
         return mapUserToUserResponse(updatedUser);
     }
 
@@ -120,6 +132,13 @@ public class UserService {
             throw new RuntimeException("User not found with id: " + userId);
         }
         userRepo.deleteById(userId);
+        NotificationEvent event = NotificationEvent.builder()
+                .eventId(UUID.randomUUID().toString())
+                .eventTimestamp(Instant.now())
+                .type(NotificationType.USER_DELETED)
+                .payload(Map.of("userId", userId))
+                .build();
+        kafkaTemplate.send(userTopic, event);
     }
 
     public boolean checkIfUserExists(String id) {
@@ -135,7 +154,23 @@ public class UserService {
     public boolean validateUserIds(Set<String> userIds) {
     if (userIds == null || userIds.isEmpty()) return false;
     return userRepo.countByIdIn(userIds) == userIds.size();
-}
+    }
+
+    private void sendUserEvent(User user, NotificationType type) {
+        String avatarUrl = (user.getAvatarId() != null) ? "/media/" + user.getAvatarId().toString() : null;
+        NotificationEvent event = NotificationEvent.builder()
+                .eventId(UUID.randomUUID().toString())
+                .eventTimestamp(Instant.now())
+                .type(type)
+                .payload(Map.of(
+                    "userId", user.getId(),
+                    "displayName", user.getDisplayName(),
+                    "email", user.getPublicEmail(), // Hoặc email chính nếu có
+                    "avatarUrl", avatarUrl
+                ))
+                .build();
+        kafkaTemplate.send(userTopic, event);
+    }
 
     // Phương thức private để tái sử dụng, giúp code sạch sẽ và nhất quán
     private UserResponse mapUserToUserResponse(User user) {

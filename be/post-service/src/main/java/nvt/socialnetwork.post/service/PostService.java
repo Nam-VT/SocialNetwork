@@ -10,10 +10,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
+import nvt.socialnetwork.common.dto.NotificationEvent;
+import nvt.socialnetwork.common.dto.NotificationType;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -23,6 +29,11 @@ public class PostService {
 
         private final PostRepo postRepo;
         private final MediaClient mediaClient;
+
+        private final KafkaTemplate<String, NotificationEvent> kafkaTemplate;
+
+        @Value("${app.kafka.post-topic}")
+        private String postTopic;
 
         @Transactional
         public PostResponse createPost(PostRequest request, Authentication authentication) {
@@ -43,6 +54,7 @@ public class PostService {
                                 .build();
 
                 Post savedPost = postRepo.save(post);
+                sendPostEvent(savedPost, NotificationType.POST_CREATED);
                 return mapPostToPostResponse(savedPost);
         }
 
@@ -64,6 +76,7 @@ public class PostService {
                 post.setUpdatedAt(LocalDateTime.now());
 
                 Post updatedPost = postRepo.save(post);
+                sendPostEvent(updatedPost, NotificationType.POST_UPDATED);
                 return mapPostToPostResponse(updatedPost);
         }
 
@@ -76,7 +89,15 @@ public class PostService {
                 if (!post.getUserId().equals(currentUserId)) {
                         throw new RuntimeException("User does not have permission to delete this post.");
                 }
+                
                 postRepo.deleteById(id);
+                NotificationEvent event = NotificationEvent.builder()
+                        .eventId(UUID.randomUUID().toString())
+                        .eventTimestamp(Instant.now())
+                        .type(NotificationType.POST_DELETED)
+                        .payload(Map.of("postId", id))
+                        .build();
+                kafkaTemplate.send(postTopic, event);
         }
 
         @Transactional(readOnly = true)
@@ -115,6 +136,21 @@ public class PostService {
                                                 "Failed to validate media IDs. Media service may be unavailable.", e);
                         }
                 }
+        }
+
+        private void sendPostEvent(Post post, NotificationType type) {
+        NotificationEvent event = NotificationEvent.builder()
+                .eventId(UUID.randomUUID().toString())
+                .eventTimestamp(Instant.now())
+                .type(type)
+                .payload(Map.of(
+                    "postId", post.getId(),
+                    "content", post.getContent(),
+                    "userId", post.getUserId(),
+                    "createdAt", post.getCreatedAt()
+                ))
+                .build();
+        kafkaTemplate.send(postTopic, event);
         }
 
         private PostResponse mapPostToPostResponse(Post post) {

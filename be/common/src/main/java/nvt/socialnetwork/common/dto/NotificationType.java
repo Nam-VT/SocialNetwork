@@ -16,6 +16,12 @@ public enum NotificationType {
     REPLY_TO_COMMENT,
     COMMENT_ON_POST,
     POST_LIKE,
-    NEW_MESSAGE
+    NEW_MESSAGE,
+    USER_CREATED,
+    USER_UPDATED,
+    USER_DELETED,
+    POST_CREATED,
+    POST_UPDATED,
+    POST_DELETED
     // You can add other notification types here
 }

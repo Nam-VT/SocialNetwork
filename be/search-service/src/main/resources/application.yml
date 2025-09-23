@@ -1,0 +1,33 @@
+server:
+  port: 8090 # Chọn một cổng mới
+
+spring:
+  application:
+    name: search-service
+
+  # Cấu hình kết nối tới Elasticsearch trong Docker
+  elasticsearch:
+    uris: http://localhost:9200
+  
+  # Cấu hình Kafka Consumer
+  kafka:
+    bootstrap-servers: localhost:9202
+    consumer:
+      group-id: search-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        # Cho phép deserialize các DTO từ module 'common'
+        spring.json.trusted.packages: "nvt.socialnetwork.common.dto"
+
+# Tên các topic mà service này sẽ lắng nghe
+app:
+  kafka:
+    user-topic: "user-events"
+    post-topic: "post-events"
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
