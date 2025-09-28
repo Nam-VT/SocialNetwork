@@ -1,0 +1,220 @@
+.profile-header {
+    background-color: white;
+    border: 1px solid #e5e7eb; /* border border-gray-200 */
+    border-radius: 0.5rem; /* rounded-lg */
+    overflow: hidden; /* Để cover bo góc */
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); /* shadow-sm */
+    margin-bottom: 1.5rem; /* mb-6 */
+    transition: box-shadow 0.2s ease;
+}
+
+.profile-header:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* hover:shadow-md */
+}
+
+.cover-section {
+    position: relative;
+    height: 12rem; /* h-48 */
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Gradient fallback đẹp */
+}
+
+.cover-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.2s ease;
+}
+
+.cover-img:hover {
+    opacity: 0.9;
+}
+
+.cover-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 2rem; /* text-2xl */
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.cover-placeholder::before {
+    content: attr(--user-initial);
+}
+
+.profile-info {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    padding: 1rem; /* p-4 */
+    margin-top: -3rem; /* -mt-12 để avatar overlap cover */
+    gap: 1rem; /* space-x-4 */
+}
+
+.avatar-section {
+    flex-shrink: 0;
+}
+
+.avatar-wrapper {
+    position: relative;
+    z-index: 1; /* Đẩy lên trên cover */
+}
+
+.avatar-img {
+    width: 8rem; /* w-32 */
+    height: 8rem; /* h-32 */
+    border-radius: 50%; /* rounded-full */
+    border: 4px solid white; /* border-4 border-white */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+    object-fit: cover;
+    transition: all 0.2s ease;
+}
+
+.avatar-img:hover {
+    transform: scale(1.05); /* Hover zoom nhẹ */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+}
+
+.name-section {
+    flex: 1;
+    min-width: 0; /* Để text wrap nếu tên dài */
+}
+
+.profile-name {
+    font-size: 1.5rem; /* text-2xl */
+    font-weight: 700; /* font-bold */
+    color: #111827; /* text-gray-900 */
+    margin: 0;
+    line-height: 1.25;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; /* Không wrap tên dài */
+}
+
+/* Bio section */
+.bio-section {
+    padding: 0 1rem 1rem; /* px-4 pb-4 */
+    border-top: 1px solid #e5e7eb; /* border-t border-gray-200 */
+}
+
+.profile-bio {
+    color: #4b5563; /* text-gray-600 */
+    font-size: 0.875rem; /* text-sm */
+    line-height: 1.5;
+    margin: 0;
+    max-height: 4rem; /* Giới hạn 2-3 dòng */
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Truncate sau 3 dòng với ellipsis */
+    -webkit-box-orient: vertical;
+}
+
+/* Loading state */
+.profile-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem; /* p-8 */
+    background-color: #f9fafb; /* bg-gray-50 */
+    border-radius: 0.5rem; /* rounded-lg */
+    border: 1px solid #e5e7eb; /* border border-gray-200 */
+    color: #6b7280; /* text-gray-500 */
+    font-size: 1rem; /* text-base */
+    min-height: 12rem; /* Giữ height như header */
+}
+
+.spinner-medium {
+    width: 2rem; /* w-8 */
+    height: 2rem;
+    border: 3px solid #e5e7eb; /* border border-gray-300 */
+    border-top: 3px solid #3b82f6; /* border-t-blue-500 */
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 0.5rem; /* mb-2 */
+}
+
+.loading-text {
+    margin: 0;
+}
+
+/* Error state */
+.profile-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem; /* space-x-3 */
+    padding: 2rem; /* p-8 */
+    background-color: #fef2f2; /* bg-red-50 */
+    border: 1px solid #fecaca; /* border border-red-200 */
+    border-radius: 0.5rem; /* rounded-lg */
+    color: #991b1b; /* text-red-800 */
+    font-size: 1rem; /* text-base */
+    min-height: 12rem; /* Giữ height */
+}
+
+.error-icon {
+    flex-shrink: 0;
+}
+
+.error-svg {
+    height: 1.25rem; /* h-5 */
+    width: 1.25rem;
+    color: #f87171; /* text-red-400 */
+}
+
+.error-text {
+    margin: 0;
+}
+
+/* Spinner animation (tái sử dụng) */
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive: Điều chỉnh trên mobile */
+@media (max-width: 640px) {
+    .cover-section {
+        height: 8rem; /* Giảm height cover trên mobile */
+    }
+
+    .profile-info {
+        margin-top: -2.5rem; /* Giảm overlap */
+        padding: 0.75rem; /* p-3 */
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 0.75rem;
+    }
+
+    .avatar-img {
+        width: 6rem; /* w-24 nhỏ hơn */
+        height: 6rem;
+    }
+
+    .profile-name {
+        font-size: 1.25rem; /* text-xl */
+    }
+
+    .bio-section {
+        padding: 0 0.75rem 0.75rem;
+    }
+
+    .profile-loading,
+    .profile-error {
+        padding: 1.5rem; /* Giảm p */
+        min-height: 8rem;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .profile-loading .spinner-medium {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+}

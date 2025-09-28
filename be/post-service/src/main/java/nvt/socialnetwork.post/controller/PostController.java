@@ -17,6 +17,8 @@ import nvt.socialnetwork.post.dto.response.PostResponse;
 import nvt.socialnetwork.post.dto.request.PostRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/posts")
@@ -31,14 +33,20 @@ public class PostController {
     }
 
     @GetMapping
-    public List<PostResponse> getAllPosts() {
-        return postService.getAllPosts();
+    public Page<PostResponse> getAllPosts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return postService.getAllPosts(page, size);
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<PostResponse>> getPostsByUserId(@PathVariable String userId) {
-        List<PostResponse> responses = postService.getPostsByUserId(userId);
-        return ResponseEntity.ok(responses);
+    public Page<PostResponse> getPostsByUserId(
+            @PathVariable String userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return postService.getPostsByUserId(userId, page, size);
     }
 
     @GetMapping("/{id}")

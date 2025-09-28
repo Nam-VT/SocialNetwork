@@ -22,6 +22,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 @Service
 @RequiredArgsConstructor
@@ -108,21 +112,19 @@ public class PostService {
         }
 
         @Transactional(readOnly = true)
-        public List<PostResponse> getPostsByUserId(String userId) {
-                // Giả sử repository có phương thức này
-                List<Post> posts = postRepo.findByUserIdAndIsDeletedFalseOrderByCreatedAtDesc(userId);
-                return posts.stream()
-                                .map(this::mapPostToPostResponse)
-                                .collect(Collectors.toList());
+        public Page<PostResponse> getPostsByUserId(String userId, int page, int size) {
+                Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+                Page<Post> posts = postRepo.findByUserIdAndIsDeletedFalse(userId, pageable);
+                return posts.map(this::mapPostToPostResponse);
         }
 
         @Transactional(readOnly = true)
-        public List<PostResponse> getAllPosts() {
-                List<Post> posts = postRepo.findAll();
-                return posts.stream()
-                                .map(this::mapPostToPostResponse)
-                                .collect(Collectors.toList());
+        public Page<PostResponse> getAllPosts(int page, int size) {
+                Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+                Page<Post> posts = postRepo.findByIsDeletedFalse(pageable);
+                return posts.map(this::mapPostToPostResponse);
         }
+
 
         private void validateMedia(List<UUID> mediaIds) {
                 if (mediaIds != null && !mediaIds.isEmpty()) {

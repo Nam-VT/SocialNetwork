@@ -7,10 +7,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import nvt.socialnetwork.post.entity.Post;
 
 import org.springframework.stereotype.Repository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Repository
 public interface PostRepo extends JpaRepository<Post, UUID> {
 
     List<Post> findByUserIdAndIsDeletedFalseOrderByCreatedAtDesc(String userId);
+
+    Page<Post> findByUserIdAndIsDeletedFalse(String userId, Pageable pageable);
+
+    Page<Post> findByIsDeletedFalse(Pageable pageable);
 
 }

@@ -1,0 +1,203 @@
+/* src/styles/CommentItem.css */
+
+/* Comment item chính */
+.comment-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem; /* space-x-3 */
+    padding: 0.75rem 0; /* py-3 */
+    border-bottom: 1px solid #e5e7eb; /* border-b border-gray-200 */
+    transition: background-color 0.2s ease;
+}
+
+.comment-item:hover {
+    background-color: #f9fafb; /* hover:bg-gray-50 nhẹ */
+}
+
+/* Avatar */
+.comment-avatar {
+    flex-shrink: 0;
+}
+
+.avatar-img {
+    width: 2.5rem; /* w-10 */
+    height: 2.5rem; /* h-10 */
+    border-radius: 50%; /* rounded-full */
+    object-fit: cover;
+    border: 2px solid #e5e7eb; /* border nhẹ */
+    transition: border-color 0.2s ease;
+}
+
+.avatar-img:hover {
+    border-color: #3b82f6; /* hover:border-blue-500 */
+}
+
+/* Content */
+.comment-content {
+    flex: 1;
+    min-width: 0; /* Để text wrap đúng */
+}
+
+/* Header (author và time) */
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem; /* mb-1 */
+}
+
+.author-name {
+    font-weight: 600; /* font-semibold */
+    color: #111827; /* text-gray-900 */
+    font-size: 0.875rem; /* text-sm */
+}
+
+.comment-time {
+    font-size: 0.75rem; /* text-xs */
+    color: #6b7280; /* text-gray-500 */
+    white-space: nowrap;
+}
+
+/* Comment text */
+.comment-text {
+    color: #1f2937; /* text-gray-800 */
+    font-size: 0.875rem; /* text-sm */
+    line-height: 1.5;
+    margin-bottom: 0.75rem; /* mb-3 */
+    word-wrap: break-word;
+}
+
+/* Actions */
+.comment-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem; /* space-x-4 */
+    font-size: 0.75rem; /* text-xs */
+    color: #6b7280; /* text-gray-500 */
+}
+
+/* Action buttons chung */
+.action-button {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border: none;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+    border-radius: 0.25rem; /* rounded nhỏ */
+    transition: all 0.2s ease;
+    font-size: 0.75rem; /* text-xs */
+    font-weight: 500;
+    outline: none;
+}
+
+.action-button:hover:not(:disabled) {
+    background-color: #f3f4f6; /* hover:bg-gray-100 */
+    color: #374151; /* hover:text-gray-700 */
+}
+
+.action-button:focus {
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); /* focus:ring-2 focus:ring-blue-500/20 */
+}
+
+.action-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    color: #9ca3af; /* disabled:text-gray-400 */
+}
+
+/* Like button cụ thể */
+.like-button {
+    color: #6b7280;
+}
+
+.like-button.liked {
+    color: #ef4444; /* liked: text-red-500 */
+}
+
+.like-button:hover:not(:disabled) {
+    color: #ef4444; /* hover:text-red-500 */
+}
+
+.heart-icon {
+    width: 1rem;
+    height: 1rem;
+}
+
+.action-text {
+    transition: color 0.2s ease;
+}
+
+/* Reply button */
+.reply-button {
+    color: #6b7280;
+}
+
+.reply-icon {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Delete button */
+.delete-button {
+    color: #ef4444; /* text-red-500 */
+}
+
+.delete-button:hover:not(:disabled) {
+    background-color: #fef2f2; /* hover:bg-red-50 */
+    color: #dc2626; /* hover:text-red-600 */
+}
+
+.delete-icon {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Spinner nhỏ cho actions */
+.action-icon {
+    display: flex;
+    align-items: center;
+}
+
+.spinner-small {
+    width: 1rem; /* h-4 w-4 nhỏ */
+    height: 1rem;
+    animation: spin 1s linear infinite;
+}
+
+.spinner-circle {
+    opacity: 0.25;
+}
+
+.spinner-path {
+    opacity: 0.75;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive: Trên mobile, stack avatar và content nếu cần */
+@media (max-width: 640px) {
+    .comment-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+
+    .comment-avatar {
+        align-self: flex-start;
+    }
+
+    .comment-actions {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+}
