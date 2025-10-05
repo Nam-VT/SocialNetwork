@@ -1,0 +1,253 @@
+// src/features/user/EditProfileForm.jsx
+
+import { useState, useEffect } from 'react';
+import { useUpdateUserProfileMutation } from './userApiSlice';
+import { useUploadMediaMutation } from '../media/mediaApiSlice';
+import Modal from '../../components/ui/Modal';
+import '../../styles/EditProfileForm.css';
+
+const EditProfileForm = ({ user, onClose }) => {
+    const [formData, setFormData] = useState({
+        displayName: '',
+        bio: '',
+        avatarUrl: '',
+        coverUrl: '',
+    });
+    const [errors, setErrors] = useState({}); // State cho errors
+    const [updateUserProfile, { isLoading: isUpdating }] = useUpdateUserProfileMutation();
+    const [uploadMedia, { isLoading: isUploading }] = useUploadMediaMutation();
+    const maxBioLength = 160;
+
+    // Điền dữ liệu ban đầu
+    useEffect(() => {
+        if (user) {
+            setFormData({
+                displayName: user.displayName || '',
+                bio: user.bio || '',
+                avatarUrl: user.avatarUrl || '',
+                coverUrl: user.coverUrl || '',
+            });
+            setErrors({}); // Clear errors khi load
+        }
+    }, [user]);
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+        // Clear error khi user type
+        if (errors[name]) {
+            setErrors(prev => ({ ...prev, [name]: '' }));
+        }
+    };
+
+    const validateForm = () => {
+        const newErrors = {};
+        if (!formData.displayName.trim()) {
+            newErrors.displayName = 'Display name is required.';
+        }
+        if (formData.bio.length > maxBioLength) {
+            newErrors.bio = `Bio must be ${maxBioLength} characters or less.`;
+        }
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleFileUpload = async (e, fieldName) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Reset input để chọn lại file giống
+        e.target.value = '';
+
+        try {
+            const mediaResponse = await uploadMedia(file).unwrap();
+            setFormData(prev => ({ ...prev, [fieldName]: mediaResponse.url }));
+        } catch (err) {
+            console.error(`Failed to upload ${fieldName}:`, err);
+            setErrors(prev => ({ ...prev, [fieldName]: `Failed to upload ${fieldName}.` }));
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!validateForm()) return;
+
+        // Chỉ gửi fields không rỗng (tối ưu API)
+        const submitData = { id: user.id };
+        if (formData.displayName.trim()) submitData.displayName = formData.displayName.trim();
+        if (formData.bio) submitData.bio = formData.bio;
+        if (formData.avatarUrl) submitData.avatarUrl = formData.avatarUrl;
+        if (formData.coverUrl) submitData.coverUrl = formData.coverUrl;
+
+        try {
+            await updateUserProfile(submitData).unwrap();
+            onClose(); // Đóng modal sau success
+        } catch (err) {
+            console.error('Failed to update profile:', err);
+            setErrors({ general: 'Failed to update profile. Please try again.' });
+        }
+    };
+
+    const isLoading = isUpdating || isUploading;
+    const bioCharCount = formData.bio.length;
+    const isBioWarning = bioCharCount > maxBioLength - 20;
+
+    return (
+        <Modal title="Edit Profile" onClose={onClose}>
+            <form onSubmit={handleSubmit} className="edit-form">
+                {errors.general && (
+                    <div className="error-alert">
+                        <div className="error-icon">
+                            <svg className="error-svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                            </svg>
+                        </div>
+                        <p className="error-message">{errors.general}</p>
+                    </div>
+                )}
+
+                {/* Display Name */}
+                <div className="form-group">
+                    <label htmlFor="displayName" className="form-label">
+                        <span className="label-icon">👤</span>
+                        Display Name <span className="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="displayName"
+                        name="displayName"
+                        value={formData.displayName}
+                        onChange={handleInputChange}
+                        className={`form-input ${errors.displayName ? 'error' : ''}`}
+                        placeholder="Enter your display name"
+                        aria-required="true"
+                        aria-describedby={errors.displayName ? "displayName-error" : undefined}
+                        disabled={isLoading}
+                    />
+                    {errors.displayName && (
+                        <p id="displayName-error" className="field-error">{errors.displayName}</p>
+                    )}
+                </div>
+
+                {/* Bio */}
+                <div className="form-group">
+                    <label htmlFor="bio" className="form-label">
+                        <span className="label-icon">📝</span>
+                        Bio
+                    </label>
+                    <textarea 
+                        id="bio"
+                        name="bio"
+                        value={formData.bio}
+                        onChange={handleInputChange}
+                        className={`form-textarea ${errors.bio ? 'error' : ''} ${isBioWarning ? 'warning' : ''}`}
+                        placeholder="Tell us about yourself..."
+                        maxLength={maxBioLength}
+                        rows={3}
+                        disabled={isLoading}
+                        aria-describedby={errors.bio ? "bio-error" : undefined}
+                    />
+                    <div className="bio-counter">
+                        <span className={isBioWarning ? 'warning' : ''}>{bioCharCount}/{maxBioLength}</span>
+                    </div>
+                    {errors.bio && (
+                        <p id="bio-error" className="field-error">{errors.bio}</p>
+                    )}
+                </div>
+
+                {/* Avatar */}
+                <div className="form-group">
+                    <label htmlFor="avatar" className="form-label file-label">
+                        <span className="label-icon">🖼️</span>
+                        Avatar
+                    </label>
+                    <input 
+                        type="file" 
+                        id="avatar" 
+                        accept="image/*" 
+                        onChange={(e) => handleFileUpload(e, 'avatarUrl')}
+                        className="file-input"
+                        disabled={isLoading}
+                    />
+                    <label htmlFor="avatar" className="file-upload-label" disabled={isLoading}>
+                        {isUploading ? 'Uploading...' : formData.avatarUrl ? 'Change Avatar' : 'Upload Avatar'}
+                    </label>
+                    {formData.avatarUrl && (
+                        <div className="preview-container">
+                            <img src={formData.avatarUrl} alt="Avatar preview" className="preview-img avatar-preview" />
+                            <button 
+                                type="button" 
+                                onClick={() => setFormData(prev => ({ ...prev, avatarUrl: '' }))}
+                                className="remove-preview"
+                                disabled={isLoading}
+                                title="Remove avatar"
+                            >
+                                ×
+                            </button>
+                        </div>
+                    )}
+                    {errors.avatarUrl && <p className="field-error">{errors.avatarUrl}</p>}
+                </div>
+
+                {/* Cover Photo */}
+                <div className="form-group">
+                    <label htmlFor="cover" className="form-label file-label">
+                        <span className="label-icon">🖼️</span>
+                        Cover Photo
+                    </label>
+                    <input 
+                        type="file" 
+                        id="cover" 
+                        accept="image/*" 
+                        onChange={(e) => handleFileUpload(e, 'coverUrl')}
+                        className="file-input"
+                        disabled={isLoading}
+                    />
+                    <label htmlFor="cover" className="file-upload-label" disabled={isLoading}>
+                        {isUploading ? 'Uploading...' : formData.coverUrl ? 'Change Cover' : 'Upload Cover'}
+                    </label>
+                    {formData.coverUrl && (
+                        <div className="preview-container">
+                            <img src={formData.coverUrl} alt="Cover preview" className="preview-img cover-preview" />
+                            <button 
+                                type="button" 
+                                onClick={() => setFormData(prev => ({ ...prev, coverUrl: '' }))}
+                                className="remove-preview"
+                                disabled={isLoading}
+                                title="Remove cover"
+                            >
+                                ×
+                            </button>
+                        </div>
+                    )}
+                    {errors.coverUrl && <p className="field-error">{errors.coverUrl}</p>}
+                </div>
+
+                {/* Buttons */}
+                <div className="form-actions">
+                    <button type="button" onClick={onClose} className="cancel-button" disabled={isLoading}>
+                        <span className="button-icon">✕</span>
+                        Cancel
+                    </button>
+                    <button type="submit" className="save-button" disabled={isLoading || !formData.displayName.trim()}>
+                        <span className="button-content">
+                            {isLoading ? (
+                                <>
+                                    <div className="spinner-small"></div>
+                                    <span>Saving...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <span className="button-icon">💾</span>
+                                    <span>Save Changes</span>
+                                </>
+                            )}
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </Modal>
+    );
+};
+
+export default EditProfileForm;

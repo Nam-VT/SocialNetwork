@@ -1,0 +1,71 @@
+.reply-form {
+    margin-left: 50px;
+    margin-top: 10px;
+}
+
+.reply-textarea {
+    width: 100%;
+    display: block;
+    resize: vertical;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-family: inherit;
+    transition: border-color 0.2s ease;
+}
+
+.reply-textarea:focus {
+    outline: none;
+    border-color: #3b82f6; /* màu xanh dương */
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+.reply-textarea:disabled {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+}
+
+.reply-form-actions {
+    margin-top: 5px;
+    display: flex;
+    gap: 8px;
+}
+
+/* Nút chính */
+.btn {
+    padding: 6px 14px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s ease;
+}
+
+.btn-primary {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled),
+.btn-primary:focus:not(:disabled) {
+    background-color: #2563eb;
+    outline: none;
+}
+
+.btn-primary:disabled {
+    background-color: #93c5fd;
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    background-color: #e5e7eb;
+    color: #374151;
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus {
+    background-color: #d1d5db;
+    outline: none;
+}

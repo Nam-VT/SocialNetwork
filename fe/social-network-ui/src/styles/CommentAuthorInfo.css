@@ -1,0 +1,31 @@
+.comment-author-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.comment-author-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.comment-author-link {
+    font-weight: 600;
+    color: #1e40af; /* màu xanh đậm */
+    text-decoration: none;
+    user-select: none;
+}
+
+.comment-author-link:hover,
+.comment-author-link:focus {
+    text-decoration: underline;
+    outline: none;
+}
+
+.comment-author-loading,
+.comment-author-unknown {
+    font-style: italic;
+    color: #6b7280; /* màu xám */
+}

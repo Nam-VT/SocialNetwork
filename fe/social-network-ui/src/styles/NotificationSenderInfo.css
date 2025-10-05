@@ -1,0 +1,52 @@
+.notification-sender-info {
+    display: flex;
+    align-items: center;
+}
+
+.avatar-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    /* Thêm hiệu ứng chuyển màu nhẹ khi hover nếu muốn */
+    transition: filter 0.3s ease;
+}
+
+.avatar-image:hover {
+    filter: brightness(0.9);
+}
+
+/* Skeleton loading hình tròn */
+.avatar-skeleton {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 37%, #f0f0f0 63%);
+    background-size: 400% 100%;
+    animation: shimmer 1.4s ease infinite;
+}
+
+/* Hiệu ứng shimmer loading */
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Fallback avatar container */
+.avatar-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar-fallback .avatar-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    opacity: 0.6;
+}

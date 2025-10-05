@@ -1,14 +1,47 @@
-// src/features/user/UserProfileHeader.jsx
-
 import { useGetUserByIdQuery } from './userApiSlice';
-import '../../styles/UserProfileHeader.css'; // Import từ folder styles tập trung (điều chỉnh path nếu cần)
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '../auth/authSlice';
+import { 
+    useGetFollowStatusQuery, 
+    useFollowUserMutation, 
+    useUnfollowUserMutation 
+} from '../follow/followApiSlice';
+import '../../styles/UserProfileHeader.css';
 
 const UserProfileHeader = ({ userId }) => {
     const { 
         data: user, 
         isLoading, 
         isError 
-    } = useGetUserByIdQuery(userId, { skip: !userId }); // Skip nếu !userId để tránh fetch không cần
+    } = useGetUserByIdQuery(userId, { skip: !userId });
+
+    const currentUser = useSelector(selectCurrentUser);
+
+    const isOwnProfile = currentUser?.id === userId;
+
+    const { data: followStatus, isLoading: isLoadingStatus } = useGetFollowStatusQuery(
+        userId, 
+        { skip: isOwnProfile }
+    );
+
+    const [followUser, { isLoading: isFollowing }] = useFollowUserMutation();
+    const [unfollowUser, { isLoading: isUnfollowing }] = useUnfollowUserMutation();
+
+    // Biến tổng hợp trạng thái loading cho nút follow/unfollow
+    const isLoadingAction = isFollowing || isUnfollowing || isLoadingStatus;
+
+    const handleFollowToggle = async () => {
+        try {
+            if (followStatus?.isFollowing) {
+                await unfollowUser(userId).unwrap();
+            } else {
+                await followUser(userId).unwrap();
+            }
+        } catch (err) {
+            console.error('Failed to toggle follow status:', err);
+            // TODO: Thêm toast notification hoặc xử lý lỗi phù hợp
+        }
+    };
 
     if (isLoading) {
         return (
@@ -32,7 +65,6 @@ const UserProfileHeader = ({ userId }) => {
         );
     }
 
-    // Sử dụng chính xác các trường từ UserResponse
     const { displayName, bio, avatarUrl, coverUrl } = user;
 
     return (
@@ -45,11 +77,11 @@ const UserProfileHeader = ({ userId }) => {
                         alt={`${displayName}'s cover photo`} 
                         className="cover-img"
                         onError={(e) => { 
-                            e.target.style.display = 'none'; // Ẩn nếu load lỗi, fallback gradient
+                            e.target.style.display = 'none';
                         }}
                     />
                 ) : (
-                    <div className="cover-placeholder" style={{ '--user-initial': displayName.charAt(0).toUpperCase() }}></div>
+                    <div className="cover-placeholder" style={{ '--user-initial': `'${displayName.charAt(0).toUpperCase()}'` }}></div>
                 )}
             </div>
 
@@ -59,10 +91,10 @@ const UserProfileHeader = ({ userId }) => {
                     <div className="avatar-wrapper">
                         <img 
                             src={avatarUrl || `https://via.placeholder.com/128x128/6B7280/FFFFFF?text=${displayName.charAt(0).toUpperCase()}`} 
-                            alt={displayName || 'User  avatar'} 
+                            alt={displayName || 'User avatar'} 
                             className="avatar-img"
                             onError={(e) => { 
-                                e.target.src = `https://via.placeholder.com/128x128/6B7280/FFFFFF?text=U`; // Fallback nếu load lỗi
+                                e.target.src = `https://via.placeholder.com/128x128/6B7280/FFFFFF?text=U`;
                             }}
                         />
                     </div>
@@ -76,6 +108,29 @@ const UserProfileHeader = ({ userId }) => {
             {bio && (
                 <div className="bio-section">
                     <p className="profile-bio">{bio}</p>
+                </div>
+            )}
+
+            {/* Nút Follow/Unfollow (không hiện với chính chủ) */}
+            <div className="follow-button-wrapper">
+                {!isOwnProfile && (
+                    <button 
+                        onClick={handleFollowToggle} 
+                        disabled={isLoadingAction}
+                        className={`follow-button ${followStatus?.isFollowing ? 'following' : 'not-following'}`}
+                        aria-pressed={followStatus?.isFollowing}
+                    >
+                        {isLoadingAction 
+                            ? '...' 
+                            : (followStatus?.isFollowing ? 'Following' : 'Follow')}
+                    </button>
+                )}
+            </div>
+
+            {/* Thông báo "Follows you" nếu người này đang theo dõi bạn */}
+            {!isOwnProfile && followStatus?.isFollowedBy && (
+                <div className="follows-you-text">
+                    <span>Follows you</span>
                 </div>
             )}
         </div>

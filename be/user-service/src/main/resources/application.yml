@@ -23,6 +23,10 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
+app:
+  kafka:
+    user-topic: "user-events"
+
 eureka:
   client:
     service-url:

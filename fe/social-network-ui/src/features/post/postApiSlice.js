@@ -44,7 +44,7 @@ export const postApiSlice = apiSlice.injectEndpoints({
                 method: 'POST',
                 body: postData,
             }),
-            invalidatesTags: [{ type: 'Post', id: 'LIST' }],
+            invalidatesTags: [{ type: 'Post', id: 'LIST' }, { type: 'Post', id: 'FEED' }],
         }),
 
         updatePost: builder.mutation({
@@ -82,10 +82,23 @@ export const postApiSlice = apiSlice.injectEndpoints({
                 { type: 'Post', id: postId },
             ],
         }),
+
+        getFeedPosts: builder.query({
+            // Chỉ cần định nghĩa query và providesTags
+            query: ({ page = 0, size = 10 }) => `${VITE_POST_SERVICE_URL}/feed?page=${page}&size=${size}`,
+            providesTags: (result) =>
+                result && result.content
+                    ? [
+                          { type: 'Post', id: 'FEED' },
+                          ...result.content.map((post) => ({ type: 'Post', id: post.id })),
+                      ]
+                    : [{ type: 'Post', id: 'FEED' }],
+        }),
     }),
 });
 
 export const {
+    useGetFeedPostsQuery,
     useGetPostsQuery,
     useGetPostByIdQuery,
     useGetPostsByUserIdQuery,

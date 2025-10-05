@@ -15,12 +15,17 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
-  kafka:
+  kafka:  
     bootstrap-servers: localhost:9092
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
       notification-topic: "notifications"
+
+app:
+  kafka:
+    post-topic: "post-events"
+
 eureka:
   client:
     service-url:

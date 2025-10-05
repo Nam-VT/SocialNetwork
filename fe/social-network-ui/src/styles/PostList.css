@@ -1,262 +1,79 @@
-/* src/styles/PostList.css */
-
-/* List wrapper chính */
 .post-list {
-    background-color: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
-    padding: 1.5rem;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    transition: box-shadow 0.2s ease;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 16px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
 }
 
-.post-list:hover {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+.loading-text,
+.error-text,
+.empty-text,
+.end-text {
+    text-align: center;
+    font-size: 16px;
+    color: #666;
+    margin-top: 20px;
+    font-style: italic;
 }
 
-/* Posts container */
+/* Container bài viết */
 .posts-container {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+    gap: 16px;
+    /* Hiệu ứng fade-in cho từng bài */
+    animation: fadeIn 0.5s ease-in;
 }
 
-/* Load more section */
+/* Nút Load More */
 .load-more-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid #e5e7eb;
+    margin-top: 24px;
+    text-align: center;
 }
 
-/* Load more button */
 .load-more-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    background-color: #3b82f6;
-    color: white;
+    background-color: #007bff;
     border: none;
-    border-radius: 0.375rem;
+    color: white;
+    padding: 10px 24px;
+    font-size: 16px;
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 0.875rem;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    min-width: 120px;
-}
-
-.load-more-button:hover:not(:disabled) {
-    background-color: #2563eb;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
-}
-
-.load-more-button:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    transition: background-color 0.3s ease;
 }
 
 .load-more-button:disabled {
-    opacity: 0.7;
+    background-color: #6c757d;
     cursor: not-allowed;
-    background-color: #9ca3af;
-    transform: none;
-    box-shadow: none;
 }
 
-.button-content {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+.load-more-button:hover:not(:disabled) {
+    background-color: #0056b3;
 }
 
-.button-icon {
-    display: flex;
-    align-items: center;
+/* Animation fade-in */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-.load-icon {
-    width: 1rem;
-    height: 1rem;
-}
-
-/* Loading state */
-.list-loading {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-    color: #6b7280;
-    font-size: 1rem;
-    min-height: 10rem;
-}
-
-.spinner-medium {
-    width: 2rem;
-    height: 2rem;
-    border: 3px solid #e5e7eb;
-    border-top: 3px solid #3b82f6;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 0.5rem;
-}
-
-.loading-text {
-    margin: 0;
-}
-
-.spinner-small {
-    width: 1rem;
-    height: 1rem;
-    border: 2px solid #e5e7eb;
-    border-top: 2px solid white;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-/* Empty state */
-.empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 3rem 1rem;
-    color: #6b7280;
-    text-align: center;
-    min-height: 10rem;
-}
-
-.empty-icon {
-    margin-bottom: 1rem;
-}
-
-.empty-svg {
-    height: 3rem;
-    width: 3rem;
-    color: #d1d5db;
-}
-
-.empty-text {
-    font-size: 1rem;
-    margin: 0;
-    line-height: 1.5;
-}
-
-/* End state */
-.end-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    padding: 2rem 1rem;
-    color: #6b7280;
-    text-align: center;
-}
-
-.end-icon {
-    flex-shrink: 0;
-}
-
-.end-svg {
-    height: 1.5rem;
-    width: 1.5rem;
-    color: #9ca3af;
-}
-
-.end-text {
-    font-size: 0.875rem;
-    margin: 0;
-    line-height: 1.5;
-}
-
-/* Error state */
-.list-error {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    padding: 2rem;
-    background-color: #fef2f2;
-    border: 1px solid #fecaca;
-    border-radius: 0.5rem;
-    color: #991b1b;
-    font-size: 1rem;
-    min-height: 10rem;
-}
-
-.error-icon {
-    flex-shrink: 0;
-}
-
-.error-svg {
-    height: 1.25rem;
-    width: 1.25rem;
-    color: #f87171;
-}
-
-.error-text {
-    margin: 0;
-}
-
-/* Spinner animation */
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-/* Responsive */
+/* Responsive cho mobile */
 @media (max-width: 640px) {
     .post-list {
-        padding: 1rem;
-        margin: 0.5rem;
-    }
-
-    .posts-container {
-        gap: 0.75rem;
-        margin-bottom: 1rem;
-    }
-
-    .load-more-section {
-        padding-top: 0.75rem;
-        gap: 0.75rem;
+        padding: 12px;
+        max-width: 100%;
     }
 
     .load-more-button {
-        padding: 0.5rem 1rem;
-        font-size: 0.75rem;
-        min-width: 100px;
-    }
-
-    .list-loading,
-    .empty-state,
-    .list-error {
-        padding: 1.5rem 0.75rem;
-        min-height: 8rem;
-    }
-
-    .empty-svg {
-        height: 2.5rem;
-        width: 2.5rem;
-    }
-
-    .spinner-medium {
-        width: 1.5rem;
-        height: 1.5rem;
-    }
-
-    .end-state {
-        padding: 1.5rem 0.75rem;
-    }
-
-    .end-svg {
-        height: 1.25rem;
-        width: 1.25rem;
+        width: 100%;
+        padding: 12px 0;
+        font-size: 18px;
     }
 }

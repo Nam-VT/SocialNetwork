@@ -1,0 +1,42 @@
+.notification-item {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    cursor: pointer;
+    align-items: center;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+    outline: none;
+}
+
+.notification-item.unread {
+    background-color: #eaf2ff;
+    font-weight: 600;
+}
+
+.notification-item.read {
+    background-color: white;
+    font-weight: normal;
+}
+
+.notification-item:hover,
+.notification-item:focus {
+    background-color: #d0e4ff;
+}
+
+.notification-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.notification-text {
+    margin: 0 0 4px 0;
+    color: #222;
+    font-size: 15px;
+}
+
+.notification-time {
+    color: #666;
+    font-size: 12px;
+}

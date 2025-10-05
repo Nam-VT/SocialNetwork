@@ -1,220 +1,155 @@
 .profile-header {
-    background-color: white;
-    border: 1px solid #e5e7eb; /* border border-gray-200 */
-    border-radius: 0.5rem; /* rounded-lg */
-    overflow: hidden; /* Để cover bo góc */
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); /* shadow-sm */
-    margin-bottom: 1.5rem; /* mb-6 */
-    transition: box-shadow 0.2s ease;
-}
-
-.profile-header:hover {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* hover:shadow-md */
+    max-width: 700px;
+    margin: 0 auto;
+    font-family: Arial, sans-serif;
+    color: #222;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
 }
 
 .cover-section {
     position: relative;
-    height: 12rem; /* h-48 */
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Gradient fallback đẹp */
+    height: 180px;
+    background-color: #ddd;
+    overflow: hidden;
 }
 
 .cover-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: opacity 0.2s ease;
-}
-
-.cover-img:hover {
-    opacity: 0.9;
 }
 
 .cover-placeholder {
     width: 100%;
     height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-color: #6B7280;
     color: white;
-    font-size: 2rem; /* text-2xl */
-    font-weight: 700;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-}
-
-.cover-placeholder::before {
-    content: attr(--user-initial);
+    font-size: 6rem;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    /* Sử dụng biến CSS --user-initial */
+    content: var(--user-initial);
 }
 
 .profile-info {
-    position: relative;
     display: flex;
-    align-items: flex-end;
-    padding: 1rem; /* p-4 */
-    margin-top: -3rem; /* -mt-12 để avatar overlap cover */
-    gap: 1rem; /* space-x-4 */
-}
-
-.avatar-section {
-    flex-shrink: 0;
+    align-items: center;
+    padding: 16px;
+    gap: 16px;
 }
 
 .avatar-wrapper {
-    position: relative;
-    z-index: 1; /* Đẩy lên trên cover */
+    width: 128px;
+    height: 128px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #fff;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    background-color: #eee;
 }
 
 .avatar-img {
-    width: 8rem; /* w-32 */
-    height: 8rem; /* h-32 */
-    border-radius: 50%; /* rounded-full */
-    border: 4px solid white; /* border-4 border-white */
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    transition: all 0.2s ease;
-}
-
-.avatar-img:hover {
-    transform: scale(1.05); /* Hover zoom nhẹ */
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
 }
 
 .name-section {
-    flex: 1;
-    min-width: 0; /* Để text wrap nếu tên dài */
+    flex-grow: 1;
 }
 
 .profile-name {
-    font-size: 1.5rem; /* text-2xl */
-    font-weight: 700; /* font-bold */
-    color: #111827; /* text-gray-900 */
+    font-size: 1.8rem;
     margin: 0;
-    line-height: 1.25;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap; /* Không wrap tên dài */
+    color: #111;
 }
 
-/* Bio section */
 .bio-section {
-    padding: 0 1rem 1rem; /* px-4 pb-4 */
-    border-top: 1px solid #e5e7eb; /* border-t border-gray-200 */
+    padding: 0 16px 16px;
+    font-size: 1rem;
+    color: #555;
 }
 
-.profile-bio {
-    color: #4b5563; /* text-gray-600 */
-    font-size: 0.875rem; /* text-sm */
-    line-height: 1.5;
-    margin: 0;
-    max-height: 4rem; /* Giới hạn 2-3 dòng */
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 3; /* Truncate sau 3 dòng với ellipsis */
-    -webkit-box-orient: vertical;
+.follow-button-wrapper {
+    padding: 0 16px 16px;
 }
 
-/* Loading state */
-.profile-loading {
+.follow-button {
+    padding: 8px 20px;
+    font-size: 1rem;
+    border-radius: 24px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    user-select: none;
+}
+
+.follow-button.not-following {
+    background-color: #007bff;
+    color: white;
+}
+
+.follow-button.not-following:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+
+.follow-button.following {
+    background-color: #e0e0e0;
+    color: #333;
+}
+
+.follow-button.following:hover:not(:disabled) {
+    background-color: #c0c0c0;
+}
+
+.follow-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.follows-you-text {
+    padding: 0 16px 16px;
+    font-style: italic;
+    color: #666;
+    font-size: 0.9rem;
+    user-select: none;
+}
+
+.profile-loading, .profile-error {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 2rem; /* p-8 */
-    background-color: #f9fafb; /* bg-gray-50 */
-    border-radius: 0.5rem; /* rounded-lg */
-    border: 1px solid #e5e7eb; /* border border-gray-200 */
-    color: #6b7280; /* text-gray-500 */
-    font-size: 1rem; /* text-base */
-    min-height: 12rem; /* Giữ height như header */
+    padding: 40px 0;
+    color: #666;
 }
 
 .spinner-medium {
-    width: 2rem; /* w-8 */
-    height: 2rem;
-    border: 3px solid #e5e7eb; /* border border-gray-300 */
-    border-top: 3px solid #3b82f6; /* border-t-blue-500 */
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #007bff;
     border-radius: 50%;
+    width: 48px;
+    height: 48px;
     animation: spin 1s linear infinite;
-    margin-bottom: 0.5rem; /* mb-2 */
+    margin-bottom: 12px;
 }
 
-.loading-text {
-    margin: 0;
-}
-
-/* Error state */
-.profile-error {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem; /* space-x-3 */
-    padding: 2rem; /* p-8 */
-    background-color: #fef2f2; /* bg-red-50 */
-    border: 1px solid #fecaca; /* border border-red-200 */
-    border-radius: 0.5rem; /* rounded-lg */
-    color: #991b1b; /* text-red-800 */
-    font-size: 1rem; /* text-base */
-    min-height: 12rem; /* Giữ height */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 .error-icon {
-    flex-shrink: 0;
+    color: #d9534f;
+    margin-bottom: 8px;
 }
 
 .error-svg {
-    height: 1.25rem; /* h-5 */
-    width: 1.25rem;
-    color: #f87171; /* text-red-400 */
-}
-
-.error-text {
-    margin: 0;
-}
-
-/* Spinner animation (tái sử dụng) */
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-/* Responsive: Điều chỉnh trên mobile */
-@media (max-width: 640px) {
-    .cover-section {
-        height: 8rem; /* Giảm height cover trên mobile */
-    }
-
-    .profile-info {
-        margin-top: -2.5rem; /* Giảm overlap */
-        padding: 0.75rem; /* p-3 */
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        gap: 0.75rem;
-    }
-
-    .avatar-img {
-        width: 6rem; /* w-24 nhỏ hơn */
-        height: 6rem;
-    }
-
-    .profile-name {
-        font-size: 1.25rem; /* text-xl */
-    }
-
-    .bio-section {
-        padding: 0 0.75rem 0.75rem;
-    }
-
-    .profile-loading,
-    .profile-error {
-        padding: 1.5rem; /* Giảm p */
-        min-height: 8rem;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    .profile-loading .spinner-medium {
-        width: 1.5rem;
-        height: 1.5rem;
-    }
+    width: 48px;
+    height: 48px;
 }

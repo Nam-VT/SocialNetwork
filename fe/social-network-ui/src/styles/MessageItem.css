@@ -1,0 +1,144 @@
+.message-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 12px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.message-item.own {
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+}
+
+.message-item.other {
+    justify-content: flex-start;
+}
+
+/* Avatar styles */
+.message-avatar {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.avatar-img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #e5e7eb;
+}
+
+.skeleton-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #e5e7eb;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Content styles */
+.message-content {
+    max-width: 70%;
+    word-wrap: break-word;
+}
+
+.own-content {
+    background-color: #0084ff;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 18px 18px 4px 18px; /* Bubble effect cho own message */
+    margin-left: auto;
+}
+
+.other-content {
+    background-color: #f3f4f6;
+    color: #111827;
+    padding: 8px 12px;
+    border-radius: 18px 18px 18px 4px; /* Bubble effect cho other message */
+}
+
+.sender-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+    font-size: 12px;
+}
+
+.sender-name {
+    font-weight: 600;
+    color: inherit;
+}
+
+.sender-name.error {
+    color: #ef4444;
+    font-style: italic;
+}
+
+.skeleton-name {
+    width: 80px;
+    height: 12px;
+    background-color: #e5e7eb;
+    border-radius: 4px;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.message-text {
+    margin: 0 0 4px 0;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.message-time {
+    opacity: 0.7;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(10px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+@keyframes pulse {
+    0%, 100% { 
+        opacity: 1; 
+    }
+    50% { 
+        opacity: 0.5; 
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .message-item {
+        gap: 6px;
+        margin-bottom: 10px;
+    }
+    
+    .message-content {
+        max-width: 85%;
+    }
+    
+    .avatar-img {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .skeleton-avatar {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .message-text {
+        font-size: 13px;
+    }
+}

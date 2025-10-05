@@ -52,4 +52,5 @@ public class FollowController {
         FollowStatusResponse status = followService.getFollowStatus(targetUserId, authentication);
         return ResponseEntity.ok(status);
     }
+
 }

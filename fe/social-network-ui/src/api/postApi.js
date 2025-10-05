@@ -31,6 +31,11 @@ export const getPostsByUserId = (userId, page = 0, size = 10) =>
     params: { page, size },
 });
 
+export const getNewFeeds = (page = 0, size = 10) =>
+  postApiClient.get("/posts/feed", {
+    params: { page, size },
+});
+
 // UPDATE
 export const updatePost = (id, data) => postApiClient.put(`/posts/${id}`, data);
 

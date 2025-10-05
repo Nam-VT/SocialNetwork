@@ -37,8 +37,6 @@ import nvt.socialnetwork.common.dto.NotificationType;
 @RequiredArgsConstructor
 public class ChatService {
 
-    // private final ChatMessageService chatMessageService;
-    // private final ChatRoomService chatRoomService;
     private final ChatRoomRepo chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final UserClient userClient;

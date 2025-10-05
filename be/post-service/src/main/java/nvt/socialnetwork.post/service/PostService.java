@@ -1,17 +1,20 @@
 package nvt.socialnetwork.post.service;
 
 import lombok.RequiredArgsConstructor;
+import nvt.socialnetwork.post.dto.response.UserResponse;
 import nvt.socialnetwork.post.client.MediaClient;
 import nvt.socialnetwork.post.dto.request.PostRequest;
 import nvt.socialnetwork.post.dto.response.PostResponse;
 import nvt.socialnetwork.post.entity.Post;
 import nvt.socialnetwork.post.repository.PostRepo;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
+
 import nvt.socialnetwork.common.dto.NotificationEvent;
 import nvt.socialnetwork.common.dto.NotificationType;
 
@@ -22,10 +25,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+
+import nvt.socialnetwork.post.client.FollowClient;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +39,7 @@ public class PostService {
 
         private final PostRepo postRepo;
         private final MediaClient mediaClient;
-
+        private final FollowClient followClient;
         private final KafkaTemplate<String, NotificationEvent> kafkaTemplate;
 
         @Value("${app.kafka.post-topic}")
@@ -122,6 +128,25 @@ public class PostService {
         public Page<PostResponse> getAllPosts(int page, int size) {
                 Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
                 Page<Post> posts = postRepo.findByIsDeletedFalse(pageable);
+                return posts.map(this::mapPostToPostResponse);
+        }
+
+        public Page<PostResponse> getNewFeeds(Authentication authentication, int page, int size) {
+                String userId = authentication.getName();
+
+                Pageable followersPageable = PageRequest.of(page, size);
+                Page<UserResponse> followersPage = followClient.getFollowers(userId,followersPageable).getBody();
+
+                if (followersPage == null || followersPage.getContent().isEmpty()) {
+                        return Page.empty();
+                }
+                List<String> followerIds = followersPage.getContent().stream()
+                        .map(UserResponse::getId)       
+                        .collect(Collectors.toList());
+
+                Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+                Page<Post> posts = postRepo.findByUserIdIn(followerIds, pageable);
+
                 return posts.map(this::mapPostToPostResponse);
         }
 

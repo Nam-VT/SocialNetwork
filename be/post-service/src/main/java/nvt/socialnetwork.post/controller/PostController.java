@@ -70,4 +70,11 @@ public class PostController {
         String ownerId = postService.getPostOwnerId(id); 
         return ResponseEntity.ok(ownerId);
     }
+
+    @GetMapping("/feed")
+    public Page<PostResponse> getNewFeeds (Authentication authentication,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return postService.getNewFeeds(authentication, page, size);
+    }
 }
