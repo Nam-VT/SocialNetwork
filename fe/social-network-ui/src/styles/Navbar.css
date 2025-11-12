@@ -1,0 +1,177 @@
+/* src/styles/Navbar.css - Fixed Visibility (Không Bị Màu Che, Nổi Bật Trên Dark Theme) */
+
+/* Navbar Chính - Nền Đen Nổi Bật */
+.navbar {
+    background-color: #000000 !important; /* Đen thuần - Không transparent */
+    color: #FFFFFF !important; /* Text trắng rõ nét - Fix che/mờ */
+    padding: 1rem 0 !important;
+    position: sticky !important; /* Sticky top - Không chìm */
+    top: 0 !important;
+    z-index: 1000 !important; /* Cao nhất để nổi trên content (HomePage) */
+    border-bottom: 2px solid #1E40AF !important; /* Border xanh sáng - Phân cách rõ */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important; /* Shadow mạnh - "Nổi" khỏi nền đen */
+    width: 100% !important; /* Full width - Không bị che cạnh */
+}
+
+/* Container Flex - Căn Chỉnh Không Che */
+.navbar-container {
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0 1rem !important;
+    background-color: inherit !important; /* Inherit đen từ navbar */
+    min-height: 60px !important; /* Height min để không collapse */
+}
+
+/* Logo - Trắng Rõ, Không Che */
+.navbar-logo {
+    font-size: 1.5rem !important;
+    font-weight: bold !important;
+    color: #FFFFFF !important; /* Trắng - Luôn visible */
+    text-decoration: none !important;
+    transition: color 0.2s ease !important;
+    white-space: nowrap !important; /* Không wrap text */
+}
+
+.navbar-logo:hover {
+    color: #3B82F6 !important; /* Hover xanh sáng - Nổi bật */
+}
+
+/* Center (Search) - Chỉ Khi Logged In */
+.navbar-center {
+    flex: 1 !important;
+    max-width: 400px !important;
+    margin: 0 2rem !important;
+    display: flex !important;
+    justify-content: center !important;
+    opacity: 1 !important; /* Không mờ */
+}
+
+/* Nav Items - Force Visible, Không Ẩn */
+.navbar-nav {
+    display: flex !important;
+    align-items: center !important;
+    gap: 1rem !important;
+    opacity: 1 !important; /* Luôn visible */
+    visibility: visible !important;
+    min-width: auto !important; /* Không collapse */
+}
+
+/* Links Và Buttons - Contrast Cao, Không Che */
+.nav-link, .nav-button {
+    color: #FFFFFF !important; /* Trắng rõ - Fix text che nền */
+    text-decoration: none !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 0.5rem !important;
+    transition: all 0.2s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    background-color: rgba(30, 64, 175, 0.2) !important; /* Bg xanh nhạt nhẹ - Không đen che */
+    border: 1px solid #1E40AF !important; /* Border xanh - Nổi */
+    font-weight: 500 !important;
+    font-size: 0.875rem !important;
+    white-space: nowrap !important;
+}
+
+.nav-link:hover, .nav-button:hover:not(:disabled) {
+    background-color: #1E40AF !important; /* Hover xanh đậm - Nổi bật */
+    color: #FFFFFF !important;
+    transform: translateY(-1px) !important; /* Nâng nhẹ hover */
+    box-shadow: 0 2px 8px rgba(30, 64, 175, 0.3) !important;
+}
+
+/* Logout Button Specific - Đỏ Nổi Bật Để Dễ Thấy */
+.logout-button {
+    background-color: #DC3545 !important; /* Đỏ rõ - Không lẫn với đen */
+    border-color: #DC3545 !important;
+    color: #FFFFFF !important;
+    cursor: pointer !important;
+}
+
+.logout-button:hover {
+    background-color: #C82333 !important; /* Hover đỏ đậm */
+    border-color: #C82333 !important;
+}
+
+/* Profile Link - Xanh Cho Profile */
+.profile-link {
+    background-color: #1E40AF !important; /* Xanh mặc định */
+    border-color: #1E40AF !important;
+}
+
+/* Nav Text - Inherit Nhưng Force Trắng */
+.nav-text {
+    color: inherit !important; /* Trắng/đỏ từ parent */
+    font-weight: 500 !important;
+}
+
+/* Modal Buttons (Inline Style Của Bạn - Add CSS Nếu Modal Có Classes) */
+.navbar .modal button { /* Nếu Modal dùng classes navbar */
+    padding: 0.5rem 1rem !important;
+    border-radius: 0.25rem !important;
+    border: none !important;
+    cursor: pointer !important;
+    font-weight: 500 !important;
+}
+
+.navbar .modal button:first-child { /* Cancel */
+    background-color: #6C757D !important;
+    color: #FFFFFF !important;
+}
+
+.navbar .modal button:last-child { /* Logout */
+    background-color: #DC3545 !important;
+    color: #FFFFFF !important;
+}
+
+/* Responsive - Không Che Trên Mobile */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 0.75rem 0 !important;
+        border-bottom-width: 1px !important;
+    }
+
+    .navbar-container {
+        flex-direction: column !important;
+        gap: 0.75rem !important;
+        padding: 0 0.5rem !important;
+    }
+
+    .navbar-center {
+        margin: 0 !important;
+        order: 3 !important;
+        max-width: 100% !important;
+        flex: none !important;
+    }
+
+    .navbar-nav {
+        order: 2 !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        width: 100% !important; /* Full width mobile */
+    }
+
+    .nav-link, .nav-button {
+        padding: 0.5rem 0.75rem !important;
+        font-size: 0.8rem !important;
+        flex: 1 !important; /* Grow để full */
+        justify-content: center !important;
+        min-width: 100px !important;
+    }
+
+    .navbar-logo {
+        font-size: 1.25rem !important;
+        order: 1 !important;
+    }
+}
+
+/* Fallback Global - Force Toàn Bộ Navbar Không Che */
+.navbar, .navbar * {
+    color: #FFFFFF !important; /* Text trắng toàn bộ - Override conflict */
+    background-color: transparent !important; /* Không bg che, inherit từ navbar */
+    visibility: visible !important;
+    opacity: 1 !important;
+}

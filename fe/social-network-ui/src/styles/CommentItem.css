@@ -13,10 +13,7 @@
 
 .comment-content-wrapper {
     flex: 1;
-}
-
-.comment-content-box {
-    background-color: #f0f2f5;
+    background-color: var(--comment-background); /* SỬA LẠI */
     padding: 8px 12px;
     border-radius: 18px;
 }
@@ -24,23 +21,24 @@
 .comment-content-text {
     margin: 0;
     font-size: 14px;
-    color: #222;
-    white-space: pre-wrap; /* giữ xuống dòng nếu có */
+    color: var(--text-primary); /* SỬA LẠI */
+    white-space: pre-wrap;
 }
 
 .comment-actions {
     display: flex;
     gap: 12px;
     font-size: 12px;
-    color: #666;
-    padding: 4px 12px;
+    color: var(--text-secondary); /* SỬA LẠI */
+    padding: 4px 0; /* Bỏ padding ngang để căn chỉnh đẹp hơn */
+    margin-top: 4px;
     align-items: center;
 }
 
 .comment-actions button {
     background: none;
     border: none;
-    color: #3b82f6;
+    color: var(--text-link); /* SỬA LẠI */
     cursor: pointer;
     padding: 0;
     font-size: 12px;
@@ -50,7 +48,7 @@
 
 .comment-actions button:hover,
 .comment-actions button:focus {
-    color: #2563eb;
+    color: var(--text-link-hover); /* SỬA LẠI */
     outline: none;
 }
 
@@ -63,11 +61,10 @@
     margin-top: 10px;
 }
 
-/* Nút View more replies (nếu dùng) */
 .btn-view-more {
     background: transparent;
     border: none;
-    color: #3b82f6;
+    color: var(--text-link); /* SỬA LẠI */
     cursor: pointer;
     font-size: 12px;
     padding: 4px 0;
@@ -77,6 +74,59 @@
 
 .btn-view-more:hover,
 .btn-view-more:focus {
-    color: #2563eb;
+    color: var(--text-link-hover); /* SỬA LẠI */
     outline: none;
 }
+
+.owner-actions-container {
+    position: relative;
+    margin-left: auto; /* Đẩy nút "..." về phía cuối */
+}
+
+.options-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    padding: 4px;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+}
+
+.options-button:hover {
+    background-color: var(--comment-background);
+    color: var(--text-primary);
+}
+
+.options-menu {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 4px;
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    min-width: 120px;
+    display: flex;
+    flex-direction: column;
+    padding: 4px 0;
+    overflow: hidden;
+}
+
+.options-menu button {
+    text-align: left;
+    padding: 8px 12px;
+    font-size: 14px;
+    color: var(--text-primary);
+    width: 100%;
+}
+
+.options-menu button:hover {
+    background-color: var(--comment-background);
+}   

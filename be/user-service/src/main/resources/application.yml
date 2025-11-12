@@ -26,6 +26,7 @@ spring:
 app:
   kafka:
     user-topic: "user-events"
+    notification-topic: "notifications"
 
 eureka:
   client:

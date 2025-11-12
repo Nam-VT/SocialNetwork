@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useGetMessageHistoryQuery } from './chatApiSlice';
 import { chatApiSlice } from './chatApiSlice';
@@ -12,7 +12,9 @@ const MessageList = ({ chatRoomId }) => {
     const currentUser  = useSelector(selectCurrentUser );
     const messagesEndRef = useRef(null);
 
-    const { data: messageData, isLoading, isError } = useGetMessageHistoryQuery({ chatRoomId }, {
+    const [page, setPage] = useState(0);
+
+    const { data: messageData, isLoading, isError, isFetching } = useGetMessageHistoryQuery({ chatRoomId, page }, {
         skip: !chatRoomId
     });
 
@@ -39,6 +41,12 @@ const MessageList = ({ chatRoomId }) => {
         };
     }, [chatRoomId, dispatch]);
 
+    const handleLoadMore = () => {
+        if (messageData && !messageData.first && !isFetching) {
+            setPage(prev => prev + 1);
+        }
+    };
+
     if (!chatRoomId) {
         return <div className="message-list-empty">Select a conversation to start chatting.</div>;
     }
@@ -47,7 +55,7 @@ const MessageList = ({ chatRoomId }) => {
         return <div className="message-list-error">Error loading messages. Please try again.</div>;
     }
 
-    if (isLoading) {
+    if (isLoading && !messageData) {
         return (
             <div className="message-list loading">
                 <div className="messages-loading">
@@ -66,6 +74,15 @@ const MessageList = ({ chatRoomId }) => {
 
     return (
         <div className="message-list" role="log" aria-live="polite">
+            {/* Nút Load More */}
+            {messageData && !messageData.first && (
+                <div className="load-more-container">
+                    <button onClick={handleLoadMore} disabled={isFetching}>
+                        {isFetching ? 'Loading...' : 'Load older messages'}
+                    </button>
+                </div>
+            )}
+
             {messages.length === 0 ? (
                 <div className="messages-empty">No messages yet. Start the conversation!</div>
             ) : (
@@ -73,7 +90,7 @@ const MessageList = ({ chatRoomId }) => {
                     <MessageItem 
                         key={msg.id} 
                         message={msg}
-                        isOwnMessage={msg.senderId === currentUser .id}
+                        isOwnMessage={msg.senderId === currentUser.id}
                     />
                 ))
             )}

@@ -10,14 +10,21 @@ import {
 import { selectCurrentUser  } from '../auth/authSlice';
 import PostAuthorInfo from './PostAuthorInfo';
 import CommentSection from '../comment/CommentSection';
+import { formatDate } from '../../utils/formatDate';
+import { useClickOutside } from '../../hooks/useClickOutside';
 import '../../styles/PostItem.css';
 
 const PostItem = ({ post, isDetailView = false }) => {
-    const { id, content, userId, mediaUrls = [], createdAt, likeCount = 0, commentCount = 0, isPrivate = false } = post;
+    const { id, content, userId, mediaUrls = [], mediaIds = [], createdAt, likeCount = 0, commentCount = 0, isPrivate = false } = post;
     const currentUser  = useSelector(selectCurrentUser );
     const isOwner = currentUser ?.id === userId;
 
     const navigate = useNavigate();
+
+    // State cho menu options
+    const [isOptionsVisible, setIsOptionsVisible] = useState(false);
+    const optionsRef = useRef(null);
+    useClickOutside(optionsRef, () => setIsOptionsVisible(false));
 
     // --- State chỉnh sửa ---
     const [isEditing, setIsEditing] = useState(false);
@@ -28,14 +35,11 @@ const PostItem = ({ post, isDetailView = false }) => {
         setEditedContent(content);
     }, [content]);
 
-    // Hook update post
+    // Các hooks mutation
     const [updatePost, { isLoading: isUpdating }] = useUpdatePostMutation();
-
-    // Các hook khác (like, delete, etc.) giữ nguyên
-    const { data: likedData, isLoading: isLoadingLikeStatus } = useHasUserLikedPostQuery(id, { skip: !currentUser  });
-    const isLiked = likedData ?? false;
     const [deletePost, { isLoading: isDeleting }] = useDeletePostMutation();
     const [togglePostLike, { isLoading: isLiking }] = useTogglePostLikeMutation();
+    const { data: isLiked, isLoading: isLoadingLikeStatus } = useHasUserLikedPostQuery(id, { skip: !currentUser });
 
     const [isCommentSectionVisible, setIsCommentSectionVisible] = useState(false);
 
@@ -62,15 +66,7 @@ const PostItem = ({ post, isDetailView = false }) => {
         setIsCommentSectionVisible(prev => !prev);
     };
 
-    const formattedDate = (typeof formatDate === 'function' ? formatDate(createdAt) : 
-        new Date(createdAt).toLocaleString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        })
-    );
+    const formattedDate = formatDate(createdAt);
 
     const handleNavigateToDetail = () => {
         if (!isDetailView) {
@@ -88,21 +84,18 @@ const PostItem = ({ post, isDetailView = false }) => {
     };
 
     const handleUpdatePost = async () => {
-        if (editedContent.trim() === '') return; // Không cho nội dung rỗng
-
-        const updatedPostData = {
-            id,
-            content: editedContent,
-            isPrivate,
-            mediaIds: [] // Chưa xử lý media edit
-        };
-
+        if (editedContent.trim() === '') return;
         try {
-            await updatePost(updatedPostData).unwrap();
+            await updatePost({ 
+                id, 
+                content: editedContent.trim(), 
+                isPrivate, 
+                mediaIds // <-- Gửi lại mediaIds hiện có để không bị mất
+            }).unwrap();
             setIsEditing(false);
+            setIsOptionsVisible(false);
         } catch (err) {
             console.error('Failed to update post:', err);
-            // TODO: Thêm toast error nếu có
         }
     };
 
@@ -117,23 +110,24 @@ const PostItem = ({ post, isDetailView = false }) => {
                 </div>
 
                 {isOwner && (
-                    <div className="post-owner-actions">
+                    <div className="owner-actions-container" ref={optionsRef}>
                         <button 
-                            onClick={handleEditToggle} 
-                            disabled={isUpdating || isDeleting}
-                            className="action-button edit-button"
-                            aria-label={isEditing ? 'Cancel editing post' : 'Edit post'}
+                            className="options-button" 
+                            onClick={() => setIsOptionsVisible(prev => !prev)}
+                            aria-label="More options"
+                            title="More"
+                            disabled={isDeleting || isUpdating}
                         >
-                            {isEditing ? 'Cancel' : 'Edit'}
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+                                <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                            </svg>
                         </button>
-                        <button 
-                            onClick={handleDelete} 
-                            disabled={isUpdating || isDeleting}
-                            className="action-button delete-button"
-                            aria-label="Delete this post"
-                        >
-                            {isDeleting ? 'Deleting...' : 'Delete'}
-                        </button>
+                        {isOptionsVisible && (
+                            <div className="options-menu">
+                                <button onClick={() => { setIsEditing(true); setIsOptionsVisible(false); }}>Edit</button>
+                                <button onClick={handleDelete}>Delete</button>
+                            </div>
+                        )}
                     </div>
                 )}
             </header>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/be/auth-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/be/chat-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/be/comment-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/be/common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/be/discovery-server/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/be/follow-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/be/gate-way/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/be/media-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/be/notification-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/be/post-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/be/search-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/be/user-service/src/main/java" charset="UTF-8" />
+  </component>
+</project>

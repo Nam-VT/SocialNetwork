@@ -11,8 +11,11 @@ const EditProfileForm = ({ user, onClose }) => {
         displayName: '',
         bio: '',
         avatarUrl: '',
+        avatarId: '',  // <-- Thêm
         coverUrl: '',
+        coverId: ''    // <-- Thêm
     });
+
     const [errors, setErrors] = useState({}); // State cho errors
     const [updateUserProfile, { isLoading: isUpdating }] = useUpdateUserProfileMutation();
     const [uploadMedia, { isLoading: isUploading }] = useUploadMediaMutation();
@@ -25,9 +28,11 @@ const EditProfileForm = ({ user, onClose }) => {
                 displayName: user.displayName || '',
                 bio: user.bio || '',
                 avatarUrl: user.avatarUrl || '',
+                avatarId: user.avatarId || null,
                 coverUrl: user.coverUrl || '',
+                coverId: user.coverId || null,
             });
-            setErrors({}); // Clear errors khi load
+            setErrors({});
         }
     }, [user]);
 
@@ -52,36 +57,47 @@ const EditProfileForm = ({ user, onClose }) => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleFileUpload = async (e, fieldName) => {
+    const handleFileUpload = async (e, fieldPrefix) => {
         const file = e.target.files[0];
         if (!file) return;
-
-        // Reset input để chọn lại file giống
         e.target.value = '';
 
         try {
             const mediaResponse = await uploadMedia(file).unwrap();
-            setFormData(prev => ({ ...prev, [fieldName]: mediaResponse.url }));
+            setFormData(prev => ({ 
+                ...prev, 
+                [`${fieldPrefix}Url`]: mediaResponse.url,
+                [`${fieldPrefix}Id`]: mediaResponse.id
+            }));
         } catch (err) {
-            console.error(`Failed to upload ${fieldName}:`, err);
-            setErrors(prev => ({ ...prev, [fieldName]: `Failed to upload ${fieldName}.` }));
+            console.error(`Failed to upload ${fieldPrefix}:`, err);
+            setErrors(prev => ({ ...prev, general: `Failed to upload ${fieldPrefix}.` }));
         }
+    };
+
+    const handleRemoveMedia = (fieldPrefix) => {
+        setFormData(prev => ({
+            ...prev,
+            [`${fieldPrefix}Url`]: '',
+            [`${fieldPrefix}Id`]: ''
+        }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validateForm()) return;
 
-        // Chỉ gửi fields không rỗng (tối ưu API)
-        const submitData = { id: user.id };
-        if (formData.displayName.trim()) submitData.displayName = formData.displayName.trim();
-        if (formData.bio) submitData.bio = formData.bio;
-        if (formData.avatarUrl) submitData.avatarUrl = formData.avatarUrl;
-        if (formData.coverUrl) submitData.coverUrl = formData.coverUrl;
+        const submitData = { 
+            id: user.id,
+            displayName: formData.displayName.trim(),
+            bio: formData.bio,
+            avatarId: formData.avatarId,
+            coverId: formData.coverId,
+        };
 
         try {
             await updateUserProfile(submitData).unwrap();
-            onClose(); // Đóng modal sau success
+            onClose();
         } catch (err) {
             console.error('Failed to update profile:', err);
             setErrors({ general: 'Failed to update profile. Please try again.' });
@@ -155,72 +171,27 @@ const EditProfileForm = ({ user, onClose }) => {
                     )}
                 </div>
 
-                {/* Avatar */}
                 <div className="form-group">
-                    <label htmlFor="avatar" className="form-label file-label">
-                        <span className="label-icon">🖼️</span>
-                        Avatar
-                    </label>
-                    <input 
-                        type="file" 
-                        id="avatar" 
-                        accept="image/*" 
-                        onChange={(e) => handleFileUpload(e, 'avatarUrl')}
-                        className="file-input"
-                        disabled={isLoading}
-                    />
-                    <label htmlFor="avatar" className="file-upload-label" disabled={isLoading}>
-                        {isUploading ? 'Uploading...' : formData.avatarUrl ? 'Change Avatar' : 'Upload Avatar'}
-                    </label>
+                    <label htmlFor="avatar">Avatar</label>
+                    <input type="file" id="avatar" accept="image/*" onChange={(e) => handleFileUpload(e, 'avatar')} disabled={isLoading} />
                     {formData.avatarUrl && (
                         <div className="preview-container">
-                            <img src={formData.avatarUrl} alt="Avatar preview" className="preview-img avatar-preview" />
-                            <button 
-                                type="button" 
-                                onClick={() => setFormData(prev => ({ ...prev, avatarUrl: '' }))}
-                                className="remove-preview"
-                                disabled={isLoading}
-                                title="Remove avatar"
-                            >
-                                ×
-                            </button>
+                            <img src={formData.avatarUrl} alt="Avatar preview" />
+                            <button type="button" onClick={() => handleRemoveMedia('avatar')} disabled={isLoading}>×</button>
                         </div>
                     )}
-                    {errors.avatarUrl && <p className="field-error">{errors.avatarUrl}</p>}
                 </div>
 
                 {/* Cover Photo */}
                 <div className="form-group">
-                    <label htmlFor="cover" className="form-label file-label">
-                        <span className="label-icon">🖼️</span>
-                        Cover Photo
-                    </label>
-                    <input 
-                        type="file" 
-                        id="cover" 
-                        accept="image/*" 
-                        onChange={(e) => handleFileUpload(e, 'coverUrl')}
-                        className="file-input"
-                        disabled={isLoading}
-                    />
-                    <label htmlFor="cover" className="file-upload-label" disabled={isLoading}>
-                        {isUploading ? 'Uploading...' : formData.coverUrl ? 'Change Cover' : 'Upload Cover'}
-                    </label>
+                    <label htmlFor="cover">Cover Photo</label>
+                    <input type="file" id="cover" accept="image/*" onChange={(e) => handleFileUpload(e, 'cover')} disabled={isLoading} />
                     {formData.coverUrl && (
                         <div className="preview-container">
-                            <img src={formData.coverUrl} alt="Cover preview" className="preview-img cover-preview" />
-                            <button 
-                                type="button" 
-                                onClick={() => setFormData(prev => ({ ...prev, coverUrl: '' }))}
-                                className="remove-preview"
-                                disabled={isLoading}
-                                title="Remove cover"
-                            >
-                                ×
-                            </button>
+                            <img src={formData.coverUrl} alt="Cover preview" />
+                            <button type="button" onClick={() => handleRemoveMedia('cover')} disabled={isLoading}>×</button>
                         </div>
                     )}
-                    {errors.coverUrl && <p className="field-error">{errors.coverUrl}</p>}
                 </div>
 
                 {/* Buttons */}

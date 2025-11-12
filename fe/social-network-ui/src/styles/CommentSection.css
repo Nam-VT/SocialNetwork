@@ -10,7 +10,7 @@
     font-size: 1.5rem;
     font-weight: 700;
     margin-bottom: 12px;
-    color: #1e40af; /* màu xanh đậm */
+    color: var(--text-link); /* SỬA LẠI */
     user-select: none;
 }
 
@@ -22,7 +22,7 @@
 .comments-error,
 .comments-empty {
     font-style: italic;
-    color: #6b7280; /* màu xám */
+    color: var(--text-secondary); /* SỬA LẠI */
     text-align: center;
     padding: 12px 0;
 }

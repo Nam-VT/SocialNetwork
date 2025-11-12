@@ -1,39 +1,39 @@
 package nvt.socialnetwork.comment.Service;
 
-// import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import nvt.socialnetwork.comment.Entity.Comment;
-import nvt.socialnetwork.comment.Entity.CommentLike;
-import nvt.socialnetwork.comment.Repository.CommentLikeRepository;
-import nvt.socialnetwork.comment.Repository.CommentRepository;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.core.KafkaTemplate;
-import nvt.socialnetwork.common.dto.NotificationType;
-import nvt.socialnetwork.common.dto.NotificationEvent;
-
 import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
+import nvt.socialnetwork.comment.Entity.Comment;
+import nvt.socialnetwork.comment.Entity.CommentLike;
+import nvt.socialnetwork.comment.Repository.CommentLikeRepository;
+import nvt.socialnetwork.comment.Repository.CommentRepository;
+import nvt.socialnetwork.common.dto.NotificationEvent;
+import nvt.socialnetwork.common.dto.NotificationType;
+
 @Service
-// @RequiredArgsConstructor
+@RequiredArgsConstructor
 public class CommentLikeService {
 
     private final CommentRepository commentRepository;
     private final CommentLikeRepository commentLikeRepository;
     private final KafkaTemplate<String, NotificationEvent> kafkaTemplate;
 
-    @Autowired
-    public CommentLikeService(CommentRepository commentRepository,
-                              CommentLikeRepository commentLikeRepository,
-                              KafkaTemplate<String, NotificationEvent> kafkaTemplate) {
-        this.commentRepository = commentRepository;
-        this.commentLikeRepository = commentLikeRepository;
-        this.kafkaTemplate = kafkaTemplate;
-    }
+    // @Autowired
+    // public CommentLikeService(CommentRepository commentRepository,
+    //                           CommentLikeRepository commentLikeRepository,
+    //                           KafkaTemplate<String, NotificationEvent> kafkaTemplate) {
+    //     this.commentRepository = commentRepository;
+    //     this.commentLikeRepository = commentLikeRepository;
+    //     this.kafkaTemplate = kafkaTemplate;
+    // }
 
     @Value("${app.kafka.notification-topic}")
     private String notificationTopic;

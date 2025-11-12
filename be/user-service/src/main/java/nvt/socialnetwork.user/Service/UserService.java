@@ -8,18 +8,20 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import lombok.RequiredArgsConstructor;
+import nvt.socialnetwork.common.dto.NotificationEvent;
+import nvt.socialnetwork.common.dto.NotificationType;
 import nvt.socialnetwork.user.Client.MediaClient;
 import nvt.socialnetwork.user.DTO.Request.UserRequest;
 import nvt.socialnetwork.user.DTO.Response.UserResponse;
-import nvt.socialnetwork.user.Repository.UserRepo;
 import nvt.socialnetwork.user.Entity.User;
-import nvt.socialnetwork.common.dto.NotificationType;
-import nvt.socialnetwork.common.dto.NotificationEvent;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.core.KafkaTemplate;
+import nvt.socialnetwork.user.Repository.UserRepo;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +33,8 @@ public class UserService {
 
     @Value("${app.kafka.user-topic}")
     private String userTopic;
+
+    private static final String GATEWAY_URL = "http://localhost:8080";
 
     @Transactional
     public UserResponse createUserProfile(UserRequest userRequest) {
@@ -60,7 +64,8 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserResponse getUserProfileById(String userId) {
+    public UserResponse getCurrentUserProfileById(Authentication authentication) {
+        String userId = authentication.getName();
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
         return mapUserToUserResponse(user);
@@ -156,8 +161,42 @@ public class UserService {
     return userRepo.countByIdIn(userIds) == userIds.size();
     }
 
+    @Transactional
+    public UserResponse createUser(String id, String imageUrl) {
+        User newUser = new User();
+
+        newUser.setId(id);
+        newUser.setDisplayName("New User");
+        newUser.setBio("");
+        newUser.setPublicEmail("");
+        newUser.setPhoneNumber("");
+        newUser.setGender("");
+        newUser.setBirthday(null);
+        newUser.setInterests(List.of());
+        newUser.setLocation("");
+        newUser.setPrivateProfile(false);
+        newUser.setCreatedAt(LocalDate.now());
+
+        newUser.setCoverId(null);
+
+        User savedUser = userRepo.save(newUser);
+
+        return mapUserToUserResponse(savedUser);
+    }
+
+    @Transactional
+    public UserResponse getUserProfileById(String id) {
+        User user = userRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+        return mapUserToUserResponse(user);
+    }
+
     private void sendUserEvent(User user, NotificationType type) {
-        String avatarUrl = (user.getAvatarId() != null) ? "/media/" + user.getAvatarId().toString() : null;
+        String avatarUrl = (user.getAvatarId() != null) ? GATEWAY_URL + "/media/" + user.getAvatarId().toString() : null;
+
+        String publicEmail = user.getPublicEmail() != null ? user.getPublicEmail() : "";
+        String displayName = user.getDisplayName() != null ? user.getDisplayName() : "";
+
         NotificationEvent event = NotificationEvent.builder()
                 .eventId(UUID.randomUUID().toString())
                 .eventTimestamp(Instant.now())
@@ -173,19 +212,19 @@ public class UserService {
     }
 
     // Phương thức private để tái sử dụng, giúp code sạch sẽ và nhất quán
-    private UserResponse mapUserToUserResponse(User user) {
+    public UserResponse mapUserToUserResponse(User user) {
         if (user == null) {
             return null;
         }
 
-        String finalAvatarUrl = "/path/to/default/avatar.png"; // Ảnh mặc định
+        String finalAvatarUrl = null;
         if (user.getAvatarId() != null) {
-            finalAvatarUrl = "/media/" + user.getAvatarId().toString(); // URL tương đối
+            finalAvatarUrl = GATEWAY_URL + "/media/" + user.getAvatarId().toString();
         }
 
-        String finalCoverUrl = "/path/to/default/cover.png"; // Ảnh mặc định
+        String finalCoverUrl = null;
         if (user.getCoverId() != null) {
-            finalCoverUrl = "/media/" + user.getCoverId().toString(); // URL tương đối
+            finalCoverUrl = GATEWAY_URL + "/media/" + user.getCoverId().toString();
         }
 
         return UserResponse.builder()

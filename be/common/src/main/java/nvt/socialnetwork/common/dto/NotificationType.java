@@ -22,6 +22,8 @@ public enum NotificationType {
     USER_DELETED,
     POST_CREATED,
     POST_UPDATED,
-    POST_DELETED
+    POST_DELETED,
     // You can add other notification types here
+    FRIEND_REQUEST_RECEIVED,
+    FRIEND_REQUEST_ACCEPTED
 }

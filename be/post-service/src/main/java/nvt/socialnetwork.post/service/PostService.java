@@ -1,23 +1,5 @@
 package nvt.socialnetwork.post.service;
 
-import lombok.RequiredArgsConstructor;
-import nvt.socialnetwork.post.dto.response.UserResponse;
-import nvt.socialnetwork.post.client.MediaClient;
-import nvt.socialnetwork.post.dto.request.PostRequest;
-import nvt.socialnetwork.post.dto.response.PostResponse;
-import nvt.socialnetwork.post.entity.Post;
-import nvt.socialnetwork.post.repository.PostRepo;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.core.KafkaTemplate;
-
-import nvt.socialnetwork.common.dto.NotificationEvent;
-import nvt.socialnetwork.common.dto.NotificationType;
-
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -26,12 +8,28 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import lombok.RequiredArgsConstructor;
+import nvt.socialnetwork.common.dto.NotificationEvent;
+import nvt.socialnetwork.common.dto.NotificationType;
 import nvt.socialnetwork.post.client.FollowClient;
+import nvt.socialnetwork.post.client.MediaClient;
+import nvt.socialnetwork.post.dto.request.PostRequest;
+import nvt.socialnetwork.post.dto.response.PostResponse;
+import nvt.socialnetwork.post.dto.response.UserResponse;
+import nvt.socialnetwork.post.entity.Post;
+import nvt.socialnetwork.post.repository.PostRepo;
 
 @Service
 @RequiredArgsConstructor
@@ -44,6 +42,27 @@ public class PostService {
 
         @Value("${app.kafka.post-topic}")
         private String postTopic;
+
+        @KafkaListener(topics = "${app.kafka.comment-topic}", groupId = "post-group")
+        @Transactional
+        public void handleCommentEvent(Map<String, Object> payload) {
+                try {
+                UUID postId = UUID.fromString((String) payload.get("postId"));
+                String action = (String) payload.get("action");
+
+                Post post = postRepo.findById(postId).orElse(null);
+                if (post == null) return;
+
+                if ("CREATED".equals(action)) {
+                        post.setCommentCount(post.getCommentCount() + 1);
+                } else if ("DELETED".equals(action)) {
+                        post.setCommentCount(Math.max(0, post.getCommentCount() - 1));
+                }
+                postRepo.save(post);
+                } catch (Exception e) {
+                        System.err.println("Failed to handle comment event: " + e.getMessage());
+                }
+        }
 
         @Transactional
         public PostResponse createPost(PostRequest request, Authentication authentication) {
@@ -134,18 +153,19 @@ public class PostService {
         public Page<PostResponse> getNewFeeds(Authentication authentication, int page, int size) {
                 String userId = authentication.getName();
 
-                Pageable followersPageable = PageRequest.of(page, size);
-                Page<UserResponse> followersPage = followClient.getFollowers(userId,followersPageable).getBody();
+                Pageable followingPageable = PageRequest.of(page, size);
+                // Sửa lại để gọi đúng client method lấy danh sách người MÌNH THEO DÕI
+                Page<UserResponse> followingPage = followClient.getFollowing(userId, followingPageable).getBody();
 
-                if (followersPage == null || followersPage.getContent().isEmpty()) {
+                if (followingPage == null || followingPage.getContent().isEmpty()) {
                         return Page.empty();
                 }
-                List<String> followerIds = followersPage.getContent().stream()
-                        .map(UserResponse::getId)       
+                List<String> followingIds = followingPage.getContent().stream() // Đây là followingIds
+                        .map(UserResponse::getId)
                         .collect(Collectors.toList());
 
                 Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-                Page<Post> posts = postRepo.findByUserIdIn(followerIds, pageable);
+                Page<Post> posts = postRepo.findByUserIdIn(followingIds, pageable); // -> Tìm bài viết của người mình theo dõi
 
                 return posts.map(this::mapPostToPostResponse);
         }
@@ -184,7 +204,7 @@ public class PostService {
                 List<String> mediaUrls = Collections.emptyList();
                 if (post.getMediaIds() != null && !post.getMediaIds().isEmpty()) {
                         mediaUrls = post.getMediaIds().stream()
-                                        .map(mediaId -> "/media/" + mediaId.toString())
+                                        .map(mediaId -> "http://localhost:8080/media/" + mediaId.toString())
                                         .collect(Collectors.toList());
                 }
 

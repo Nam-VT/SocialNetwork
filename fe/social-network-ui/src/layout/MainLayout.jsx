@@ -1,11 +1,16 @@
+// src/components/MainLayout.jsx
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectCurrentUser , logOut } from '../features/auth/authSlice';
+
+// Import các component con
 import NotificationsDropdown from '../features/notification/NotificationsDropdown';
-import SearchInput from '../features/search/SearchInput';
-import Modal from '../components/ui/Modal';
-import '../styles/MainLayout.css';
+import SearchInput from '../features/search/SearchInput'; // <-- KIỂM TRA LẠI ĐƯỜNG DẪN NÀY
+import Modal from '../components/ui/Modal'; 
+
+// Thêm import CSS cho navbar (tạo file nếu chưa)
+import '../styles/Navbar.css';
 
 const Navbar = () => {
     const dispatch = useDispatch();
@@ -13,58 +18,40 @@ const Navbar = () => {
     const currentUser  = useSelector(selectCurrentUser );
 
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-    const [isLoggingOut, setIsLoggingOut] = useState(false);
-
-    const handleLogoutClick = () => {
-        setShowLogoutConfirm(true);
-    };
 
     const handleConfirmLogout = () => {
-        setIsLoggingOut(true);
         dispatch(logOut());
         setShowLogoutConfirm(false);
-        navigate('/login');
-        setIsLoggingOut(false);
-    };
-
-    const handleCancelLogout = () => {
-        setShowLogoutConfirm(false);
+        navigate('/login', { replace: true });
     };
 
     return (
         <>
-            <nav className="navbar" role="navigation" aria-label="Main navigation">
+            <nav className="navbar" role="navigation">
                 <div className="navbar-container">
-                    <Link to="/" className="navbar-logo" aria-label="Go to homepage">
+                    <Link to="/" className="navbar-logo">
                         Social Network
                     </Link>
+
+                    {/* Chỉ hiển thị các thành phần cần đăng nhập */}
+                    {currentUser  && (
+                        <div className="navbar-center">
+                            <SearchInput />
+                        </div>
+                    )}
+                    
                     <div className="navbar-nav">
                         {currentUser  && (
                             <>  
-                                <SearchInput />
                                 <NotificationsDropdown />
-                                <Link
-                                    to={`/profile/${currentUser .id}`}
-                                    className="nav-link profile-link"
-                                    title="My Profile"
-                                    aria-label="My Profile"
-                                >
-                                    <span className="nav-icon">
-                                        {/* SVG icon */}
-                                    </span>
+                                <Link to={`/profile/${currentUser .id}`} className="nav-link profile-link">
                                     <span className="nav-text">My Profile</span>
                                 </Link>
                                 <button
                                     type="button"
-                                    onClick={handleLogoutClick}
+                                    onClick={() => setShowLogoutConfirm(true)}
                                     className="nav-button logout-button"
-                                    title="Log out"
-                                    aria-label="Log out"
-                                    disabled={isLoggingOut}
                                 >
-                                    <span className="nav-icon">
-                                        {/* SVG icon */}
-                                    </span>
                                     <span className="nav-text">Logout</span>
                                 </button>
                             </>
@@ -73,23 +60,36 @@ const Navbar = () => {
                 </div>
             </nav>
 
-            <Modal
-                isOpen={showLogoutConfirm}
-                onClose={handleCancelLogout}
-                title="Confirm Logout"
-            >
-                <p>Are you sure you want to log out?</p>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '20px' }}>
-                    <button onClick={handleCancelLogout} type="button">
-                        Cancel
-                    </button>
-                    <button onClick={handleConfirmLogout} type="button" disabled={isLoggingOut}>
-                        {isLoggingOut ? 'Logging out...' : 'Logout'}
-                    </button>
-                </div>
-            </Modal>
+            {/* Modal xác nhận đăng xuất */}
+            {showLogoutConfirm && (
+                 <Modal title="Confirm Logout" onClose={() => setShowLogoutConfirm(false)}>
+                    <p>Are you sure you want to log out?</p>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '20px' }}>
+                        <button onClick={() => setShowLogoutConfirm(false)} type="button">
+                            Cancel
+                        </button>
+                        <button onClick={handleConfirmLogout} type="button">
+                            Logout
+                        </button>
+                    </div>
+                </Modal>
+            )}
         </>
     );
 };
 
-export default Navbar;
+// --- Component MainLayout ---
+const MainLayout = () => {
+    return (
+        <div className="app-layout">
+            <header>
+                <Navbar />
+            </header>
+            <main className="main-content">
+                <Outlet />
+            </main>
+        </div>
+    );
+};
+
+export default MainLayout;

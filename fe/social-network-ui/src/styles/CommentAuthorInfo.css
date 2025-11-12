@@ -13,7 +13,7 @@
 
 .comment-author-link {
     font-weight: 600;
-    color: #1e40af; /* màu xanh đậm */
+    color: var(--text-link); /* SỬA LẠI */
     text-decoration: none;
     user-select: none;
 }
@@ -22,10 +22,11 @@
 .comment-author-link:focus {
     text-decoration: underline;
     outline: none;
+    color: var(--text-link-hover); /* THÊM */
 }
 
 .comment-author-loading,
 .comment-author-unknown {
     font-style: italic;
-    color: #6b7280; /* màu xám */
+    color: var(--text-secondary); /* SỬA LẠI */
 }

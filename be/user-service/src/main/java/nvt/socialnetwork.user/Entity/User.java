@@ -1,10 +1,18 @@
 package nvt.socialnetwork.user.Entity;
 
-import jakarta.persistence.*;
-import lombok.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "users")
@@ -20,8 +28,6 @@ public class User {
 
     private String displayName; // Tên hiển thị (nickname)
     private String bio; // Giới thiệu bản thân
-    // private String avatarUrl; // Link ảnh đại diện
-    // private String coverUrl; // Ảnh bìa (nếu có)
     private UUID avatarId;
     private UUID coverId;
     private String publicEmail; // Email hiển thị (khác với đăng nhập)
@@ -32,7 +38,7 @@ public class User {
     @ElementCollection
     private List<String> interests; // Danh sách sở thích
 
-    private String location; // Nơi ở / quê quán
+    private String location;
     private LocalDate createdAt;
     private boolean privateProfile;
 }

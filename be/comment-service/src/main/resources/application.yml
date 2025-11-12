@@ -35,3 +35,4 @@ eureka:
 app:
   kafka:
     notification-topic: "notifications"
+    comment-topic: "comments"

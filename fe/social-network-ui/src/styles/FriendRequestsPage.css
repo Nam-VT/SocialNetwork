@@ -1,0 +1,93 @@
+.friend-requests-page {
+    max-width: 600px;
+    margin: 24px auto;
+    padding: 24px;
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.page-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--text-primary);
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 16px;
+}
+
+.page-status {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 32px;
+    font-style: italic;
+}
+.page-status.error {
+    color: #ef4444;
+}
+
+.requests-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.request-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background-color: var(--comment-background);
+    border-radius: 6px;
+}
+
+.requester-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+}
+
+.requester-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.requester-name {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.request-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.request-actions button {
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-accept {
+    background-color: var(--text-link);
+    color: white;
+}
+.btn-accept:hover:not(:disabled) {
+    background-color: var(--text-link-hover);
+}
+
+.btn-decline {
+    background-color: var(--comment-background);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+.btn-decline:hover:not(:disabled) {
+    background-color: var(--border-color);
+}

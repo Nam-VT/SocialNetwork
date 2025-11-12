@@ -14,17 +14,23 @@ const NotificationsDropdown = () => {
         error, // Thêm để xử lý lỗi
     } = useGetNotificationsQuery({ page: 0, size: 7 }); // Lấy 7 thông báo gần nhất
 
-    // Đóng dropdown khi click ra ngoài (optimize với useCallback)
     useEffect(() => {
-        const handleClickOutside = useCallback((event) => {
+        // 1. Định nghĩa hàm `handleClickOutside` ở đây
+        const handleClickOutside = (event) => {
+
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
                 setIsOpen(false);
             }
-        }, []);
+        };
 
+        // 2. Thêm event listener
         document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, [handleClickOutside]); // Thêm dependency đúng
+        
+        // 3. Dọn dẹp event listener khi component bị unmount
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [dropdownRef]); // Thêm dependency đúng
 
     const hasUnread = notificationsData?.content?.some(n => !n.isRead) ?? false;
     const unreadCount = notificationsData?.content?.filter(n => !n.isRead).length ?? 0; // Optional: đếm số unread

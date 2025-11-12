@@ -30,9 +30,7 @@ public class FileStorageService {
     private String uploadDir;
 
     private Path rootLocation;
-
-    // Phương thức này sẽ được gọi ngay sau khi service được tạo
-    // Dùng để tạo thư mục upload nếu nó chưa tồn tại
+    
     @PostConstruct
     public void init() {
         this.rootLocation = Paths.get(uploadDir);

@@ -17,7 +17,7 @@ const ConversationListItem = ({ room }) => {
 
     const displayName = type === 'GROUP' ? name : (otherUser?.displayName || '...');
     const avatarUrl = type === 'GROUP' 
-        ? 'https://via.placeholder.com/48/8B5CF6/FFFFFF?text=G' // Avatar nhóm mặc định
+        ? 'https://ui-avatars.com/api/?name=U&size=48&background=6B7280&color=fff' // Avatar nhóm mặc định
         : (otherUser?.avatarUrl || 'https://via.placeholder.com/48');
 
     return (

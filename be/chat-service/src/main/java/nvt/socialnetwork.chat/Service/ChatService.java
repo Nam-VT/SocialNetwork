@@ -46,6 +46,8 @@ public class ChatService {
     @Value("${app.kafka.notification-topic}")
     private String notificationTopic;
 
+    private static final String GATEWAY_URL = "http://localhost:8080";
+
     @Transactional
     public ChatRoomResponse findOrCreatePrivateRoom(String user1Id, String user2Id) {
         if (user1Id.equals(user2Id)) {
@@ -150,7 +152,7 @@ public class ChatService {
     private ChatMessageResponse mapChatMessageToResponse(ChatMessage message) {
         String mediaUrl = null;
         if (message.getMediaId() != null) {
-            mediaUrl = "/media/" + message.getMediaId();
+            mediaUrl = GATEWAY_URL + "/media/" + message.getMediaId();
         }
 
         return ChatMessageResponse.builder()

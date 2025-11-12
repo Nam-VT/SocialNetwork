@@ -17,9 +17,21 @@ export const chatApiSlice = apiSlice.injectEndpoints({
         getMessageHistory: builder.query({
             query: ({ chatRoomId, page = 0, size = 20 }) => 
                 `${VITE_CHAT_SERVICE_URL}/chats/${chatRoomId}/messages?page=${page}&size=${size}`,
+            
+            serializeQueryArgs: ({ queryArgs }) => `history-${queryArgs.chatRoomId}`,
+            merge: (currentCache, newItems) => {
+                if (currentCache.content && newItems.content) {
+                    currentCache.content.unshift(...newItems.content);
+                }
+
+                currentCache.first = newItems.first;
+            },
+            forceRefetch({ currentArg, previousArg }) {
+                return currentArg?.page !== previousArg?.page;
+            },
             providesTags: (result, error, { chatRoomId }) => [{ type: 'Message', id: chatRoomId }],
         }),
-        
+
         // GET: Tìm các nhóm chat chung với người dùng khác
         findCommonGroupRooms: builder.query({
             query: (otherUserId) => `${VITE_CHAT_SERVICE_URL}/chats/common-groups/${otherUserId}`,

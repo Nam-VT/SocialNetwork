@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.Map;
@@ -19,14 +19,10 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/media")
+@RequiredArgsConstructor
 public class MediaController {
 
-    @Autowired
     private final MediaService mediaService;
-
-    public MediaController(MediaService mediaService) {
-        this.mediaService = mediaService;
-    }
 
     @PostMapping
     public ResponseEntity<MediaResponse> uploadFile(@RequestParam("file") MultipartFile file,

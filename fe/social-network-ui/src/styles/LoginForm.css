@@ -1,267 +1,289 @@
-/* src/styles/LoginForm.css */
+/* src/styles/LoginForm.css - Dark Theme Fixed (Toàn Màu Đen) */
 
-/* Container chính */
+/* Container chính - Nền Đen Toàn Màn */
 .login-container {
-    min-height: 100vh;
+    min-height: 100vh; 
     display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #f9fafb; /* bg-gray-50 */
-    padding: 3rem 1rem; /* py-12 px-4 */
+    align-items: center; 
+    justify-content: center; 
+    background-color: #000000 !important; /* Đen thuần thay bg-gray-50 */
+    padding: 3rem 1rem !important; /* py-12 px-4 */
+    color: #FFFFFF !important; /* Text trắng mặc định - Fix chữ trắng mất màu */
 }
 
 @media (min-width: 640px) {
     .login-container {
-        padding-left: 1.5rem;
-        padding-right: 1.5rem; /* sm:px-6 */
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important; /* sm:px-6 */
     }
 }
 
 @media (min-width: 1024px) {
     .login-container {
-        padding-left: 2rem;
-        padding-right: 2rem; /* lg:px-8 */
+        padding-left: 2rem !important;
+        padding-right: 2rem !important; /* lg:px-8 */
     }
 }
 
 /* Inner wrapper */
 .login-inner {
-    max-width: 28rem; /* max-w-md */
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 2rem; /* space-y-8 */
+    max-width: 28rem !important; /* max-w-md */
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2rem !important; /* space-y-8 */
 }
 
-/* Header */
+/* Header - Text Trắng */
 .login-header {
-    text-align: center;
+    text-align: center !important;
 }
 
 .login-title {
-    margin-top: 1.5rem; /* mt-6 */
-    font-size: 1.875rem; /* text-3xl */
-    font-weight: 800; /* font-extrabold */
-    color: #111827; /* text-gray-900 */
-    line-height: 2.25rem;
+    margin-top: 1.5rem !important; /* mt-6 */
+    font-size: 1.875rem !important; /* text-3xl */
+    font-weight: 800 !important; /* font-extrabold */
+    color: #FFFFFF !important; /* Trắng thay text-gray-900 - Rõ nét */
+    line-height: 2.25rem !important;
 }
 
 .login-subtitle {
-    margin-top: 0.5rem; /* mt-2 */
-    font-size: 0.875rem; /* text-sm */
-    color: #4b5563; /* text-gray-600 */
+    margin-top: 0.5rem !important; /* mt-2 */
+    font-size: 0.875rem !important; /* text-sm */
+    color: #A0A0A0 !important; /* Xám nhạt thay text-gray-600 - Dễ đọc trên đen */
 }
 
-/* Card form */
+/* Card form - Nền Xám Đen */
 .login-card {
-    margin-top: 2rem; /* mt-8 */
-    background-color: white;
-    padding: 2rem 1.5rem; /* py-8 px-6 */
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
-    border-radius: 0.5rem; /* rounded-lg */
-    border: 1px solid #e5e7eb; /* border border-gray-200 */
+    margin-top: 2rem !important; /* mt-8 */
+    background-color: #121212 !important; /* Xám đen thay white */
+    padding: 2rem 1.5rem !important; /* py-8 px-6 */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important; /* Shadow đen đậm thay shadow-lg */
+    border-radius: 0.5rem !important; /* rounded-lg */
+    border: 1px solid #333333 !important; /* Border xám tối thay border-gray-200 */
 }
 
 /* Form */
 .login-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem; /* space-y-6 */
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1.5rem !important; /* space-y-6 */
 }
 
-/* Error alert */
+/* Error alert - Đỏ Trên Nền Đen */
 .error-alert {
-    background-color: #fef2f2; /* bg-red-50 */
-    border: 1px solid #fecaca; /* border border-red-200 */
-    border-radius: 0.375rem; /* rounded-md */
-    padding: 1rem; /* p-4 */
-    display: flex;
-    align-items: flex-start;
-    gap: 0.75rem;
+    background-color: #1A1A1A !important; /* Đen nhạt thay bg-red-50 */
+    border: 1px solid #FF6B6B !important; /* Border đỏ thay border-red-200 */
+    border-radius: 0.375rem !important; /* rounded-md */
+    padding: 1rem !important; /* p-4 */
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+    color: #FF6B6B !important; /* Text đỏ rõ */
 }
 
 .error-icon {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
 }
 
 .error-svg {
-    height: 1.25rem; /* h-5 */
-    width: 1.25rem; /* w-5 */
-    color: #f87171; /* text-red-400 */
+    height: 1.25rem !important; /* h-5 */
+    width: 1.25rem !important; /* w-5 */
+    color: #FF6B6B !important; /* Đỏ thay text-red-400 */
 }
 
 .error-message {
-    margin-left: 0.75rem; /* ml-3 */
+    margin-left: 0.75rem !important; /* ml-3 */
 }
 
 .error-message p {
-    font-size: 0.875rem; /* text-sm */
-    color: #991b1b; /* text-red-800 */
-    margin: 0;
+    font-size: 0.875rem !important; /* text-sm */
+    color: #FF6B6B !important; /* Đỏ thay text-red-800 */
+    margin: 0 !important;
 }
 
 /* Form group */
 .form-group {
-    display: flex;
-    flex-direction: column;
+    display: flex !important;
+    flex-direction: column !important;
 }
 
 .form-label {
-    display: block;
-    font-size: 0.875rem; /* text-sm */
-    font-weight: 500; /* font-medium */
-    color: #374151; /* text-gray-700 */
-    margin-bottom: 0.5rem; /* mb-2 */
+    display: block !important;
+    font-size: 0.875rem !important; /* text-sm */
+    font-weight: 500 !important; /* font-medium */
+    color: #A0A0A0 !important; /* Xám nhạt thay text-gray-700 - Rõ trên đen */
+    margin-bottom: 0.5rem !important; /* mb-2 */
 }
 
+/* Form Input - Fix Chữ Trắng Khi Điền */
 .form-input {
-    width: 100%;
-    padding: 0.75rem 1rem; /* px-4 py-3 */
-    border: 1px solid #d1d5db; /* border border-gray-300 */
-    border-radius: 0.5rem; /* rounded-lg */
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
-    outline: none;
-    transition: all 0.2s ease; /* transition duration-200 */
+    width: 100% !important;
+    padding: 0.75rem 1rem !important; /* px-4 py-3 */
+    border: 1px solid #333333 !important; /* Border xám tối thay border-gray-300 */
+    border-radius: 0.5rem !important; /* rounded-lg */
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important; /* Shadow tối thay shadow-sm */
+    outline: none !important;
+    background-color: #1A1A1A !important; /* Nền đen nhạt - Không trắng */
+    color: #FFFFFF !important; /* Text trắng rõ nét khi điền - Fix "chữ trắng mất màu" */
+    transition: all 0.2s ease !important; /* transition duration-200 */
+    font-size: 1rem !important; /* Default font cho input */
 }
 
 .form-input:focus {
-    ring: 2px; /* focus:ring-2 */
-    ring-color: #3b82f6; /* focus:ring-blue-500 */
-    border-color: #3b82f6; /* focus:border-blue-500 */
+    border-color: #1E40AF !important; /* Focus border xanh tối thay blue-500 */
+    box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.2) !important; /* Glow xanh - ring */
+}
+
+.form-input::placeholder {
+    color: #6B7280 !important; /* Placeholder xám - Dễ thấy khi chưa điền, "nhìn đi" */
+}
+
+.form-input:disabled {
+    opacity: 0.5 !important;
+    background-color: #000000 !important;
+    cursor: not-allowed !important;
 }
 
 /* Form options */
 .form-options {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
 }
 
 .remember-me {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
 }
 
 .checkbox {
-    height: 1rem; /* h-4 */
-    width: 1rem; /* w-4 */
-    color: #2563eb; /* text-blue-600 */
-    border: 1px solid #d1d5db; /* border-gray-300 */
-    border-radius: 0.25rem; /* rounded */
-    accent-color: #2563eb; /* focus:ring-blue-500 */
+    height: 1rem !important; /* h-4 */
+    width: 1rem !important; /* w-4 */
+    color: #1E40AF !important; /* Xanh tối thay text-blue-600 */
+    border: 1px solid #333333 !important; /* Border xám tối thay border-gray-300 */
+    border-radius: 0.25rem !important; /* rounded */
+    accent-color: #1E40AF !important; /* Focus xanh tối */
+    background-color: #1A1A1A !important; /* Nền checkbox đen nhạt */
 }
 
 .checkbox-label {
-    margin-left: 0.5rem; /* ml-2 */
-    display: block;
-    font-size: 0.875rem; /* text-sm */
-    color: #111827; /* text-gray-900 */
+    margin-left: 0.5rem !important; /* ml-2 */
+    display: block !important;
+    font-size: 0.875rem !important; /* text-sm */
+    color: #FFFFFF !important; /* Trắng thay text-gray-900 */
 }
 
 .forgot-password {
-    font-size: 0.875rem; /* text-sm */
+    font-size: 0.875rem !important; /* text-sm */
 }
 
 .link {
-    font-weight: 500; /* font-medium */
-    color: #2563eb; /* text-blue-600 */
-    text-decoration: none;
-    transition: color 0.2s ease;
+    font-weight: 500 !important; /* font-medium */
+    color: #1E40AF !important; /* Xanh tối thay text-blue-600 */
+    text-decoration: none !important;
+    transition: color 0.2s ease !important;
 }
 
 .link:hover {
-    color: #1d4ed8; /* hover:text-blue-500 */
+    color: #3B82F6 !important; /* Hover sáng hơn thay hover:text-blue-500 */
 }
 
-/* Submit button */
+/* Submit button - Xanh Tối */
 .submit-button {
-    position: relative; /* group relative */
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 0.75rem 1rem; /* py-3 px-4 */
-    border: 1px solid transparent; /* border border-transparent */
-    font-size: 0.875rem; /* text-sm */
-    font-weight: 500; /* font-medium */
-    border-radius: 0.5rem; /* rounded-lg */
-    color: white;
-    background-color: #2563eb; /* bg-blue-600 */
-    cursor: pointer;
-    outline: none;
-    transition: all 0.2s ease; /* transition duration-200 */
+    position: relative !important; /* group relative */
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 0.75rem 1rem !important; /* py-3 px-4 */
+    border: 1px solid transparent !important; /* border border-transparent */
+    font-size: 0.875rem !important; /* text-sm */
+    font-weight: 500 !important; /* font-medium */
+    border-radius: 0.5rem !important; /* rounded-lg */
+    color: #FFFFFF !important; /* Text trắng */
+    background-color: #1E40AF !important; /* Xanh tối thay bg-blue-600 */
+    cursor: pointer !important;
+    outline: none !important;
+    transition: all 0.2s ease !important; /* transition duration-200 */
 }
 
 .submit-button:hover:not(:disabled) {
-    background-color: #1d4ed8; /* hover:bg-blue-700 */
+    background-color: #1E3A8A !important; /* Hover tối hơn thay hover:bg-blue-700 */
 }
 
 .submit-button:focus {
-    ring: 2px; /* focus:ring-2 */
-    ring-offset: 2px; /* focus:ring-offset-2 */
-    ring-color: #3b82f6; /* focus:ring-blue-500 */
+    box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.5) !important; /* Focus glow xanh */
 }
 
 .submit-button:disabled {
-    opacity: 0.5; /* disabled:opacity-50 */
-    cursor: not-allowed; /* disabled:cursor-not-allowed */
+    opacity: 0.5 !important; /* disabled:opacity-50 */
+    cursor: not-allowed !important; /* disabled:cursor-not-allowed */
+    background-color: #333333 !important; /* Disabled xám tối */
 }
 
 .button-icon {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    display: flex;
-    align-items: center;
-    padding-left: 0.75rem; /* pl-3 */
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    padding-left: 0.75rem !important; /* pl-3 */
 }
 
 .spinner {
-    animation: spin 1s linear infinite; /* animate-spin */
-    margin-left: -0.25rem; /* -ml-1 */
-    margin-right: 0.75rem; /* mr-3 */
-    height: 1.25rem; /* h-5 */
-    width: 1.25rem; /* w-5 */
-    color: white;
+    animation: spin 1s linear infinite !important; /* animate-spin */
+    margin-left: -0.25rem !important; /* -ml-1 */
+    margin-right: 0.75rem !important; /* mr-3 */
+    height: 1.25rem !important; /* h-5 */
+    width: 1.25rem !important; /* w-5 */
+    color: #FFFFFF !important; /* Spinner trắng */
 }
 
 .spinner-circle {
-    opacity: 0.25;
+    opacity: 0.25 !important;
 }
 
 .spinner-path {
-    opacity: 0.75;
+    opacity: 0.75 !important;
 }
 
 @keyframes spin {
     from {
-        transform: rotate(0deg);
+        transform: rotate(0deg) !important;
     }
     to {
-        transform: rotate(360deg);
+        transform: rotate(360deg) !important;
     }
 }
 
-/* Footer */
+/* Footer - Text Xám Nhạt */
 .form-footer {
-    margin-top: 1.5rem; /* mt-6 */
-    text-align: center;
+    margin-top: 1.5rem !important; /* mt-6 */
+    text-align: center !important;
 }
 
 .footer-text {
-    font-size: 0.875rem; /* text-sm */
-    color: #4b5563; /* text-gray-600 */
-    margin: 0;
+    font-size: 0.875rem !important; /* text-sm */
+    color: #A0A0A0 !important; /* Xám nhạt thay text-gray-600 */
+    margin: 0 !important;
 }
 
 .signup-link {
-    color: #2563eb; /* text-blue-600 */
+    color: #1E40AF !important; /* Xanh tối thay text-blue-600 */
 }
 
 .signup-link:hover {
-    color: #1d4ed8; /* hover:text-blue-500 */
+    color: #3B82F6 !important; /* Hover sáng hơn thay hover:text-blue-500 */
+}
+
+/* Fallback Global Cho Input Text (Đảm Bảo Không Mất Màu) */
+.login-container input,
+.login-container *::placeholder {
+    color: #FFFFFF !important; /* Force text trắng khi điền */
+    background-color: #1A1A1A !important; /* Force bg đen nhạt */
 }

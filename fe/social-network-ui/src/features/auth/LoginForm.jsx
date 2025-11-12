@@ -3,39 +3,42 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLoginMutation } from './authApiSlice';
-import '../../styles/LoginForm.css'; // Import từ folder styles tập trung (điều chỉnh path nếu cần)
+import { useDispatch } from 'react-redux';
+import { setCredentials } from './authSlice';
+import '../../styles/LoginForm.css';
 
 const LoginForm = () => {
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
 
+    const dispatch = useDispatch();
     const navigate = useNavigate();
-
-    // Sử dụng hook đã tạo ở bước 3
-    // `login` là một hàm để trigger mutation
-    // `isLoading` là một boolean cho biết trạng thái loading (RTK Query tự quản lý)
-    const [login, { isLoading }] = useLoginMutation();
+    const [login, { isLoading }] = useLoginMutation(); 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setErrorMsg(''); // Xóa lỗi cũ
+        setErrorMsg('');
 
         try {
-            // Gọi hàm login với credentials
-            // .unwrap() sẽ trả về một Promise, resolve với data hoặc reject với error
             const userData = await login({ email, password }).unwrap();
-            console.log('Login successful:', userData);
-            
-            // Dọn dẹp form và chuyển hướng về trang chủ
+            const token = userData.token;
+            const user = {
+                id: userData.userId,
+                email: userData.email,
+                role: userData.role
+            };
+            if (!token || !user.id) {
+                throw new Error('Invalid response from server');
+            }
+            dispatch(setCredentials({ user, token }));
             setEmail('');
             setPassword('');
-            navigate('/');
-
+            navigate('/', { replace: true });
         } catch (err) {
             console.error('Failed to login:', err);
-            // Hiển thị lỗi cho người dùng
-            setErrorMsg(err.data?.message || 'Login Failed');
+            setErrorMsg(err.data?.message || err.message || 'Login Failed');
         }
     };
 

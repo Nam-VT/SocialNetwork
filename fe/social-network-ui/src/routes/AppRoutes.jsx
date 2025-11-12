@@ -34,6 +34,7 @@ const AppRoutes = () => {
                         {/* Trang khi chọn một cuộc trò chuyện cụ thể */}
                         <Route path=":chatRoomId" element={<ChatWindow />} />
                     </Route>
+                    <Route path="/friend-requests" element={<PrivateRoute><FriendRequestsPage /></PrivateRoute>} />
                 </Route>
 
                 {/* Not Found Route */}

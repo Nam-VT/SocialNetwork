@@ -34,8 +34,25 @@ export const postApiSlice = apiSlice.injectEndpoints({
         }),
         
         getPostsByUserId: builder.query({
-            query: ({ userId, page = 0, size = 10 }) => `${VITE_POST_SERVICE_URL}/posts/user/${userId}?page=${page}&size=${size}`,
-            providesTags: (result, error, arg) => [{ type: 'Post', id: 'LIST' }],
+            // Thay đổi: Nhận cả userId và page/size
+            query: ({ userId, page = 0, size = 10 }) => 
+                `${VITE_POST_SERVICE_URL}/posts/user/${userId}?page=${page}&size=${size}`,
+            // Thêm logic merge để hỗ trợ infinite scroll
+            serializeQueryArgs: ({ queryArgs }) => {
+                // Gộp cache theo userId
+                return `posts-user-${queryArgs.userId}`;
+            },
+            merge: (currentCache, newItems) => {
+                if (currentCache.content && newItems.content) {
+                    const uniqueNewPosts = newItems.content.filter(
+                        newItem => !currentCache.content.some(currentItem => currentItem.id === newItem.id)
+                    );
+                    currentCache.content.push(...uniqueNewPosts);
+                }
+                currentCache.last = newItems.last;
+                currentCache.number = newItems.number;
+            },
+            providesTags: (result, error, { userId }) => [{ type: 'Post', id: `LIST_USER_${userId}` }],
         }),
 
         createPost: builder.mutation({
@@ -53,7 +70,12 @@ export const postApiSlice = apiSlice.injectEndpoints({
                 method: 'PUT',
                 body: data,
             }),
-            invalidatesTags: (result, error, arg) => [{ type: 'Post', id: arg.id }],
+            invalidatesTags: (result, error, arg) => [
+                { type: 'Post', id: arg.id },
+                { type: 'Post', id: 'LIST' },
+                { type: 'Post', id: 'FEED' },
+                { type: 'Post', id: `LIST_USER_${result?.userId}` }
+            ],
         }),
 
         deletePost: builder.mutation({
@@ -61,9 +83,11 @@ export const postApiSlice = apiSlice.injectEndpoints({
                 url: `${VITE_POST_SERVICE_URL}/posts/${id}`,
                 method: 'DELETE',
             }),
+            // SỬA LẠI: Thêm tag 'FEED'
             invalidatesTags: (result, error, id) => [
                 { type: 'Post', id },
                 { type: 'Post', id: 'LIST' },
+                { type: 'Post', id: 'FEED' } 
             ],
         }),
 
@@ -77,15 +101,55 @@ export const postApiSlice = apiSlice.injectEndpoints({
                 url: `${VITE_POST_SERVICE_URL}/api/posts/${postId}/likes`,
                 method: 'POST',
             }),
-            invalidatesTags: (result, error, postId) => [
-                { type: 'PostLikeStatus', id: postId },
-                { type: 'Post', id: postId },
-            ],
+            async onQueryStarted(postId, { dispatch, queryFulfilled }) {
+                // Cập nhật tất cả các list có chứa bài viết này
+                const listPatchResults = ['getFeedPosts', 'getPostsByUserId'].map(endpointName =>
+                    dispatch(
+                        apiSlice.util.updateQueryData(endpointName, undefined, (draft) => {
+                            const post = draft.content?.find(p => p.id === postId);
+                            if (post) {
+                                post.isLiked = !post.isLiked;
+                                post.likeCount += post.isLiked ? 1 : -1;
+                            }
+                        })
+                    )
+                );
+                
+                try {
+                    await queryFulfilled;
+                } catch {
+                    listPatchResults.forEach(patch => patch.undo()); // Hoàn tác nếu có lỗi
+                }
+            },
         }),
 
         getFeedPosts: builder.query({
-            // Chỉ cần định nghĩa query và providesTags
-            query: ({ page = 0, size = 10 }) => `${VITE_POST_SERVICE_URL}/feed?page=${page}&size=${size}`,
+            query: ({ page = 0, size = 10 }) => `${VITE_POST_SERVICE_URL}/posts/feed?page=${page}&size=${size}`,
+            
+            // 1. Gộp tất cả các request vào một cache duy nhất
+            serializeQueryArgs: ({ endpointName }) => {
+                return endpointName;
+            },
+
+            // 2. Tự động nối dữ liệu mới vào cache hiện tại
+            merge: (currentCache, newItems) => {
+                if (currentCache.content && newItems.content) {
+                    // Lọc ra các bài viết mới thực sự để tránh trùng lặp
+                    const uniqueNewPosts = newItems.content.filter(
+                        newItem => !currentCache.content.some(currentItem => currentItem.id === newItem.id)
+                    );
+                    currentCache.content.push(...uniqueNewPosts);
+                }
+                // Cập nhật thông tin phân trang
+                currentCache.last = newItems.last;
+                currentCache.number = newItems.number;
+            },
+
+            // 3. Đảm bảo fetch lại khi 'page' thay đổi
+            forceRefetch({ currentArg, previousArg }) {
+                return currentArg?.page !== previousArg?.page;
+            },
+
             providesTags: (result) =>
                 result && result.content
                     ? [

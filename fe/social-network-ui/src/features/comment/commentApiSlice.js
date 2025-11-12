@@ -1,4 +1,3 @@
-
 import { apiSlice } from "../../api/apiSlice";
 
 const VITE_COMMENT_SERVICE_URL = import.meta.env.VITE_COMMENT_SERVICE_URL;
@@ -8,6 +7,18 @@ export const commentApiSlice = apiSlice.injectEndpoints({
         getCommentsByPost: builder.query({
             query: ({ postId, page = 0, size = 10 }) => 
                 `${VITE_COMMENT_SERVICE_URL}/comments/post/${postId}?page=${page}&size=${size}`,
+            serializeQueryArgs: ({ queryArgs }) => `comments-post-${queryArgs.postId}`,
+            merge: (currentCache, newItems) => {
+                if (currentCache.content && newItems.content) {
+                    const uniqueNewItems = newItems.content.filter(
+                        newItem => !currentCache.content.some(currentItem => currentItem.id === newItem.id)
+                    );
+                    currentCache.content.push(...uniqueNewItems);
+                }
+            },
+            forceRefetch({ currentArg, previousArg }) {
+                return currentArg?.page !== previousArg?.page;
+            },
             providesTags: (result, error, { postId }) => [{ type: 'Comment', id: `LIST-${postId}` }],
         }),
 
@@ -30,46 +41,41 @@ export const commentApiSlice = apiSlice.injectEndpoints({
                     : [{ type: 'Comment', id: `LIST-${postId}` }],
         }),
 
-        // UPDATE: Cập nhật một bình luận
         updateComment: builder.mutation({
-            query: ({ id, ...data }) => ({
+            query: ({ id, content }) => ({
                 url: `${VITE_COMMENT_SERVICE_URL}/comments/${id}`,
                 method: 'PUT',
-                body: data,
+                body: { content },
             }),
-            // Sau khi cập nhật, cần làm mới cả danh sách gốc và các danh sách con có thể chứa nó
-            invalidatesTags: (result, error, arg) => [
-                { type: 'Comment', id: `LIST-${arg.postId}` },
-                arg.parentCommentId ? { type: 'Comment', id: `REPLIES-${arg.parentCommentId}` } : '',
+            invalidatesTags: (result, error, { postId, parentCommentId }) => [
+                { type: 'Comment', id: `LIST-${postId}` },
+                parentCommentId ? { type: 'Comment', id: `REPLIES-${parentCommentId}` } : null,
             ].filter(Boolean),
         }),
 
-        // DELETE: Xóa một bình luận
         deleteComment: builder.mutation({
-            query: (id) => ({
+            query: ({ id }) => ({ // SỬA LẠI: Lấy 'id' từ object
                 url: `${VITE_COMMENT_SERVICE_URL}/comments/${id}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: (result, error, arg) => [
-                { type: 'Comment', id: `LIST-${arg.postId}` },
-                arg.parentCommentId ? { type: 'Comment', id: `REPLIES-${arg.parentCommentId}` } : '',
+            invalidatesTags: (result, error, { postId, parentCommentId }) => [
+                { type: 'Comment', id: `LIST-${postId}` },
+                parentCommentId ? { type: 'Comment', id: `REPLIES-${parentCommentId}` } : null,
             ].filter(Boolean),
         }),
 
         toggleCommentLike: builder.mutation({
-            query: (commentId) => ({
-                url: `${VITE_COMMENT_SERVICE_URL}/comment-likes`,
+            query: ({ commentId }) => ({ // SỬA LẠI: Lấy 'commentId' từ object
+                url: `${VITE_COMMENT_SERVICE_URL}/comment-likes/${commentId}`,
                 method: 'POST',
-                body: { commentId } // Giả định body cần { commentId }
             }),
-            invalidatesTags: (result, error, arg) => [
-                { type: 'Comment', id: `LIST-${arg.postId}` },
-                arg.parentCommentId ? { type: 'Comment', id: `REPLIES-${arg.parentCommentId}` } : '',
+            invalidatesTags: (result, error, { postId, parentCommentId }) => [
+                { type: 'Comment', id: `LIST-${postId}` },
+                parentCommentId ? { type: 'Comment', id: `REPLIES-${parentCommentId}` } : null,
             ].filter(Boolean),
         }),
     }),
 });
-
 
 export const {
     useGetCommentsByPostQuery,

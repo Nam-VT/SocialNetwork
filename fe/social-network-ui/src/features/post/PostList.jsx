@@ -5,7 +5,6 @@ import '../../styles/PostList.css';
 
 const PostList = () => {
     const [page, setPage] = useState(0);
-    const [allPosts, setAllPosts] = useState([]);
 
     const {
         data: postsData,
@@ -15,19 +14,6 @@ const PostList = () => {
         isError,
     } = useGetFeedPostsQuery({ page, size: 10 });
 
-    // Khi có dữ liệu mới, append vào allPosts
-    useEffect(() => {
-        if (isSuccess && postsData?.content) {
-            setAllPosts(prevPosts => {
-                // Tránh trùng lặp bài viết (theo id)
-                const newPosts = postsData.content.filter(
-                    p => !prevPosts.some(prev => prev.id === p.id)
-                );
-                return [...prevPosts, ...newPosts];
-            });
-        }
-    }, [postsData, isSuccess]);
-
     const handleLoadMore = () => {
         if (postsData && !postsData.last && !isFetching) {
             setPage(prevPage => prevPage + 1);
@@ -36,16 +22,18 @@ const PostList = () => {
 
     let content;
 
-    if (isLoading && page === 0) {
+    if (isLoading && !postsData) {
         content = <p className="loading-text">Loading your feed...</p>;
     } else if (isError) {
         content = <p className="error-text">Could not load your feed.</p>;
-    } else {
+    } else if (isSuccess && postsData?.content) {
+        // Trực tiếp sử dụng postsData.content để render
+        const allPostsFromCache = postsData.content;
         content = (
             <>
-                {allPosts.length > 0 ? (
+                {allPostsFromCache.length > 0 ? (
                     <div className="posts-container">
-                        {allPosts.map(post => (
+                        {allPostsFromCache.map(post => (
                             <PostItem key={post.id} post={post} />
                         ))}
                     </div>
@@ -56,18 +44,17 @@ const PostList = () => {
                 )}
 
                 <div className="load-more-section">
-                    {!postsData?.last && allPosts.length > 0 && (
+                    {/* isFetching cho biết có request đang chạy dưới nền (kể cả khi load more) */}
+                    {!postsData?.last && allPostsFromCache.length > 0 && (
                         <button
                             onClick={handleLoadMore}
                             disabled={isFetching}
-                            aria-busy={isFetching}
-                            aria-disabled={isFetching}
                             className="load-more-button"
                         >
                             {isFetching ? 'Loading more...' : 'Load More'}
                         </button>
                     )}
-                    {postsData?.last && allPosts.length > 0 && (
+                    {postsData?.last && allPostsFromCache.length > 0 && (
                         <p className="end-text">You have reached the end of your feed.</p>
                     )}
                 </div>

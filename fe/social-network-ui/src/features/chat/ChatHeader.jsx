@@ -53,8 +53,8 @@ const ChatHeader = ({ chatRoomId }) => {
     // Logic hiển thị name/subtitle/avatar
     const displayName = room.type === 'GROUP' ? room.name : (otherUser ?.displayName || 'Unknown User');
     const avatarUrl = room.type === 'GROUP' 
-        ? 'https://via.placeholder.com/40/8B5CF6/FFFFFF?text=G'
-        : (otherUser ?.avatarUrl || 'https://via.placeholder.com/40/6b7280/ffffff?text=U');
+        ? 'https://ui-avatars.com/api/?name=U&size=48&background=6B7280&color=fff'
+        : (otherUser ?.avatarUrl || 'https://ui-avatars.com/api/?name=U&size=48&background=6B7280&color=fff');
     
     const subtitle = room.type === 'GROUP' 
         ? `${room.participantIds?.length || 0} members` 

@@ -39,7 +39,7 @@ public class CommentService {
     private final CommentLikeRepository commentLikeRepository;
     private final PostClient postClient;
     private final KafkaTemplate<String, Object> kafkaTemplate;
-
+    
     // @Autowired
     // public CommentService(CommentRepository commentRepository,
     //                       CommentLikeRepository commentLikeRepository,
@@ -53,6 +53,9 @@ public class CommentService {
 
     @Value("${app.kafka.notification-topic}")
     private String notificationTopic;
+
+    @Value("${app.kafka.comment-topic}")
+    private String commentTopic;
 
     @Transactional
     public CommentResponse createComment(CommentRequest request, Authentication authentication) {
@@ -79,6 +82,8 @@ public class CommentService {
                 .build();
     
         Comment savedComment = commentRepository.save(comment);
+
+        sendCommentEvent(savedComment, "CREATED");
 
         if(comment.getParentCommentId() != null){
             Optional<Comment> parentComment = commentRepository.findById(comment.getParentCommentId());
@@ -112,7 +117,7 @@ public class CommentService {
                 kafkaTemplate.send(notificationTopic, notificationEvent);
             }
         }
-        return mapCommentToResponse(savedComment, Collections.emptySet());
+        return mapCommentToResponse(savedComment, Collections.emptySet(), 0);
     }
 
     @Transactional
@@ -136,7 +141,7 @@ public class CommentService {
         // Kiểm tra lại trạng thái like của user hiện tại cho comment này
         boolean isLiked = commentLikeRepository.existsByCommentIdAndUserId(commentId, userId);
         
-        return mapCommentToResponse(updatedComment, isLiked ? Collections.singleton(commentId) : Collections.emptySet());
+        return mapCommentToResponse(updatedComment, isLiked ? Collections.singleton(commentId) : Collections.emptySet(), 0);
     }
 
     @Transactional
@@ -152,6 +157,8 @@ public class CommentService {
         comment.setDeleted(true);
         comment.setContent("This comment has been deleted.");
         commentRepository.save(comment);
+
+        sendCommentEvent(comment, "DELETED");
     }
 
     @Transactional(readOnly = true)
@@ -176,23 +183,28 @@ public class CommentService {
         return mapCommentPageToResponsePage(replyPage, userId);
     }
     
-    // Phương thức helper để chuyển đổi Page<Comment> sang Page<CommentResponse>
     private Page<CommentResponse> mapCommentPageToResponsePage(Page<Comment> commentPage, String userId) {
+        // ... logic tối ưu N+1 query giữ nguyên, đã rất tốt ...
         List<UUID> commentIds = commentPage.getContent().stream().map(Comment::getId).collect(Collectors.toList());
         
-        Set<UUID> likedCommentIds = Collections.emptySet();
-        if (userId != null && !commentIds.isEmpty()) {
-            likedCommentIds = commentLikeRepository.findLikedCommentIdsByUserId(userId, commentIds).stream().collect(Collectors.toSet());
-        }
+        Set<UUID> likedCommentIds = (userId != null && !commentIds.isEmpty())
+            ? commentLikeRepository.findLikedCommentIdsByUserId(userId, commentIds).stream().collect(Collectors.toSet())
+            : Collections.emptySet();
 
-        final Set<UUID> finalLikedCommentIds = likedCommentIds;
-        return commentPage.map(comment -> mapCommentToResponse(comment, finalLikedCommentIds));
-    }
+        Map<UUID, Integer> replyCounts = (commentIds.isEmpty())
+            ? Collections.emptyMap()
+            : commentRepository.countRepliesByParentIds(commentIds).stream()
+                .collect(Collectors.toMap(
+                    map -> (UUID) map.get("parentId"),
+                    map -> ((Long) map.get("replyCount")).intValue()
+                ));
     
-    // Phương thức helper để chuyển đổi một Comment sang CommentResponse
-    private CommentResponse mapCommentToResponse(Comment comment, Set<UUID> likedCommentIds) {
-        long replyCount = commentRepository.countByParentCommentIdAndIsDeletedFalse(comment.getId());
-        
+        final Map<UUID, Integer> finalReplyCounts = replyCounts;
+        return commentPage.map(comment -> mapCommentToResponse(comment, likedCommentIds, finalReplyCounts.getOrDefault(comment.getId(), 0)));
+    }
+
+    private CommentResponse mapCommentToResponse(Comment comment, Set<UUID> likedCommentIds, int replyCount) {
+        // ... logic map giữ nguyên, đã tốt ...
         return CommentResponse.builder()
                 .id(comment.getId())
                 .postId(comment.getPostId())
@@ -201,8 +213,46 @@ public class CommentService {
                 .createdAt(comment.getCreatedAt())
                 .likeCount(comment.getLikeCount())
                 .parentCommentId(comment.getParentCommentId())
-                .replyCount((int) replyCount)
+                .replyCount(replyCount)
                 .isLiked(likedCommentIds.contains(comment.getId()))
                 .build();
+    }
+
+    private void sendCommentEvent(Comment comment, String action) {
+        if (comment.getParentCommentId() == null) {
+            Map<String, Object> payload = Map.of("postId", comment.getPostId().toString(), "action", action);
+            kafkaTemplate.send(commentTopic, payload);
+        }
+    }
+
+    private void sendCreationNotification(Comment comment, String senderId) {
+        if (comment.getParentCommentId() != null) { // Là một reply
+            Optional<Comment> parentCommentOpt = commentRepository.findById(comment.getParentCommentId());
+            if (parentCommentOpt.isPresent()) {
+                Comment parentComment = parentCommentOpt.get();
+                // SỬA LẠI: Điều kiện kiểm tra phải là với chủ của comment gốc, không phải chủ bài viết
+                if (!senderId.equals(parentComment.getUserId())) {
+                    NotificationEvent event = createNotificationEvent(senderId, parentComment.getUserId(), NotificationType.REPLY_TO_COMMENT, comment);
+                    kafkaTemplate.send(notificationTopic, event);
+                }
+            }
+        } else { // Là một comment gốc
+            String postOwnerId = postClient.getPostOwnerId(comment.getPostId()).getBody();
+            if (postOwnerId != null && !senderId.equals(postOwnerId)) {
+                NotificationEvent event = createNotificationEvent(senderId, postOwnerId, NotificationType.COMMENT_ON_POST, comment);
+                kafkaTemplate.send(notificationTopic, event);
+            }
+        }
+    }
+    
+    private NotificationEvent createNotificationEvent(String senderId, String receiverId, NotificationType type, Comment comment) {
+        return NotificationEvent.builder()
+            .eventId(UUID.randomUUID().toString())
+            .eventTimestamp(Instant.now())
+            .senderId(senderId)
+            .receiverId(receiverId)
+            .type(type)
+            .payload(Map.of("postId", comment.getPostId(), "commentId", comment.getId()))
+            .build();
     }
 }

@@ -1,43 +1,64 @@
+import { useState } from 'react';
 import { useGetCommentsByPostQuery } from './commentApiSlice';
 import CommentItem from './CommentItem';
-import CommentForm from './CommentForm'; // Giả sử có component này
+import CommentForm from './CommentForm';
 import '../../styles/CommentSection.css';
 
 const CommentSection = ({ postId }) => {
+    const [page, setPage] = useState(0);
+
     const {
         data: commentsData,
         isLoading,
+        isFetching,
         isSuccess,
         isError,
-    } = useGetCommentsByPostQuery({ postId });
+    } = useGetCommentsByPostQuery({ postId, page });
 
-    let content;
+    const handleLoadMore = () => {
+        if (commentsData && !commentsData.last && !isFetching) {
+            setPage(prevPage => prevPage + 1);
+        }
+    };
 
-    if (isLoading) {
-        content = <div className="comments-loading">Loading comments...</div>;
-    } else if (isSuccess) {
-        const comments = commentsData?.content || [];
-        content = (
-            <div className="comments-list">
-                {comments.length > 0 
-                    ? comments.map((comment) => (
-                        <CommentItem key={comment.id} comment={comment} />
-                      ))
-                    : <p className="comments-empty">No comments yet.</p>
-                }
-            </div>
+    let listContent;
+
+    if (isLoading && !commentsData) {
+        listContent = <div className="comments-loading">Loading comments...</div>;
+    } else if (isSuccess && commentsData?.content) {
+        const comments = commentsData.content;
+        listContent = (
+            <>
+                <div className="comments-list">
+                    {comments.length > 0 
+                        ? comments.map((comment) => (
+                            <CommentItem key={comment.id} comment={comment} />
+                          ))
+                        : <p className="comments-empty">Be the first to comment.</p>
+                    }
+                </div>
+                {commentsData && !commentsData.last && comments.length > 0 && (
+                    <button onClick={handleLoadMore} disabled={isFetching} className="load-more-btn">
+                        {isFetching ? 'Loading...' : 'Load More Comments'}
+                    </button>
+                )}
+            </>
         );
     } else if (isError) {
-        content = <div className="comments-error">Error loading comments.</div>;
+        listContent = <div className="comments-error">Error loading comments.</div>;
     }
 
     return (
         <section className="comment-section">
             <h3 className="comment-section-title">Comments</h3>
-            <CommentForm postId={postId} />
+            
+            {/* SỬA LẠI BỐ CỤC: Hiển thị danh sách comment TRƯỚC */}
             <div className="comment-section-content">
-                {content}
+                {listContent}
             </div>
+
+            {/* SỬA LẠI BỐ CỤC: Form nhập comment nằm ở DƯỚI CÙNG */}
+            <CommentForm postId={postId} />
         </section>
     );
 };

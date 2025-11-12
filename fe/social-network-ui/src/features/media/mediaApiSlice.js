@@ -14,7 +14,7 @@ export const mediaApiSlice = apiSlice.injectEndpoints({
                 
                 // Sử dụng baseQuery của RTK Query nhưng tùy chỉnh header
                 const response = await baseQuery({
-                    url: `${VITE_MEDIA_SERVICE_URL}/upload`,
+                    url: `${VITE_MEDIA_SERVICE_URL}/media`,
                     method: 'POST',
                     body: formData,
                     // Không cần set 'Content-Type', trình duyệt sẽ tự làm khi có FormData

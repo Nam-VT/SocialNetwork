@@ -43,11 +43,11 @@ const PostAuthorInfo = ({ userId }) => {
         <div className="author-info">
             <div className="author-avatar">
                 <img 
-                    src={avatarUrl || 'https://via.placeholder.com/48x48/6B7280/FFFFFF?text=U'} 
+                    src={avatarUrl || `https://ui-avatars.com/api/?name=${displayName?.charAt(0) || 'U'}&size=48&background=6B7280&color=fff`} 
                     alt={displayName || 'User '}
                     className="avatar-img"
                     onError={(e) => { 
-                        e.target.src = 'https://via.placeholder.com/48x48/6B7280/FFFFFF?text=U'; // Fallback nếu load lỗi
+                        e.target.src = `https://ui-avatars.com/api/?name=${displayName?.charAt(0) || 'U'}&size=48&background=6B7280&color=fff`;
                     }}
                 />
             </div>

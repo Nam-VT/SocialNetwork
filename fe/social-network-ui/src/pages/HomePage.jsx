@@ -1,31 +1,17 @@
-import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { selectCurrentUser, logOut } from '../features/auth/authSlice';
+// src/pages/HomePage.jsx
+
+import CreatePostForm from '../features/post/CreatePostForm';
+import PostList from '../features/post/PostList';
 
 const HomePage = () => {
-    const user = useSelector(selectCurrentUser);
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-
-    const handleLogout = () => {
-        dispatch(logOut());
-        navigate('/login');
-    };
-
     return (
-        <div>
-            <h1>Home Page</h1>
-            {user ? (
-                <div>
-                    <p>Welcome, {user.email}!</p>
-                    <p>User ID: {user.id}</p>
-                    <p>Role: {user.role}</p>
-                    <button onClick={handleLogout}>Logout</button>
-                </div>
-            ) : (
-                <p>You are not logged in. <a href="/login">Login here</a>.</p>
-            )}
+        // Sử dụng một layout container để căn giữa nội dung (tùy chọn)
+        <div style={{ maxWidth: '700px', margin: '0 auto' }}>
+            {/* Component để người dùng tạo bài viết mới */}
+            <CreatePostForm />
+
+            {/* Component hiển thị danh sách bài viết từ những người đã follow */}
+            <PostList />
         </div>
     );
 };
