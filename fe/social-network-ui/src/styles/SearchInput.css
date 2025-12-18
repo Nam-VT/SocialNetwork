@@ -1,89 +1,110 @@
+/* src/styles/SearchInput.css */
+
 .search-form {
-    max-width: 400px;
+    position: relative;
     width: 100%;
+    max-width: 400px; /* Giới hạn chiều rộng tối đa */
 }
 
 .search-input-group {
+    position: relative;
     display: flex;
     align-items: center;
-    gap: 8px;
-    position: relative;
-    background-color: white;
-    border-radius: 24px;
-    padding: 4px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.2s ease;
+    background-color: var(--comment-background); /* Nền input (theo theme) */
+    border: 1px solid var(--border-color);
+    border-radius: 24px; /* Bo tròn mạnh */
+    padding: 4px 12px;
+    transition: all 0.2s ease;
 }
 
+/* Hiệu ứng khi focus vào group (giả lập border của input) */
 .search-input-group:focus-within {
-    box-shadow: 0 0 0 3px rgba(0, 132, 255, 0.1);
+    border-color: var(--text-link);
+    background-color: var(--background-color); /* Nền sáng hơn khi focus */
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2); /* Highlight xanh nhạt */
 }
 
 .search-input {
     flex: 1;
-    padding: 10px 12px;
     border: none;
-    outline: none;
-    font-size: 14px;
     background: transparent;
-    border-radius: 20px;
-    transition: background-color 0.2s ease;
+    padding: 8px 4px;
+    font-size: 14px;
+    color: var(--text-primary);
+    outline: none; /* Tắt outline mặc định vì đã style group */
+    width: 100%;
 }
 
+/* Placeholder color */
 .search-input::placeholder {
-    color: #9ca3af;
+    color: var(--text-secondary);
+    opacity: 0.8;
 }
 
-.search-input.has-content {
-    background-color: #f9fafb;
-}
-
-.search-input:focus {
-    outline: none;
-}
-
-.clear-button,
-.search-button {
+/* Nút Clear (dấu X) */
+.clear-button {
     background: none;
     border: none;
-    font-size: 16px;
-    color: #6b7280;
+    color: var(--text-secondary);
     cursor: pointer;
-    padding: 8px;
+    font-size: 18px;
+    line-height: 1;
+    padding: 4px 8px;
     border-radius: 50%;
-    transition: color 0.2s ease, background-color 0.2s ease;
-    width: 32px;
-    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
+    transition: background 0.2s;
 }
 
-.clear-button:hover:not(:disabled),
-.clear-button:focus:not(:disabled),
-.search-button:hover:not(:disabled),
-.search-button:focus:not(:disabled) {
-    color: #0084ff;
-    background-color: #f3f4f6;
-    outline: none;
+.clear-button:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: var(--text-primary);
 }
 
-.clear-button:disabled,
+/* Nút Submit (Kính lúp) */
+.search-button {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: color 0.2s;
+}
+
+.search-button:hover:not(:disabled) {
+    color: var(--text-link);
+}
+
 .search-button:disabled {
-    color: #d1d5db;
-    cursor: not-allowed;
+    opacity: 0.5;
+    cursor: default;
 }
 
+/* Gợi ý phím tắt (nhỏ bên dưới) */
 .search-hint {
-    display: block;
-    font-size: 11px;
-    color: #6b7280;
-    text-align: center;
+    position: absolute;
+    top: 100%;
+    left: 12px;
     margin-top: 4px;
-    font-style: italic;
+    font-size: 11px;
+    color: var(--text-secondary);
+    opacity: 0; /* Mặc định ẩn */
+    transition: opacity 0.2s;
+    white-space: nowrap;
+    pointer-events: none;
 }
 
+/* Hiện gợi ý khi focus */
+.search-input-group:focus-within + .search-hint {
+    opacity: 1;
+}
+
+/* Utility class cho Screen Readers */
 .sr-only {
     position: absolute;
     width: 1px;
@@ -93,50 +114,16 @@
     overflow: hidden;
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
-    border: 0;
+    border-width: 0;
 }
 
-/* Animations */
-@keyframes slideIn {
-    from { 
-        opacity: 0; 
-        transform: translateY(-10px); 
-    }
-    to { 
-        opacity: 1; 
-        transform: translateY(0); 
-    }
-}
-
-.search-form {
-    animation: slideIn 0.3s ease-out;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .search-form {
-        max-width: none;
+/* Responsive: Ẩn hint trên mobile để đỡ rối */
+@media (max-width: 640px) {
+    .search-hint {
+        display: none;
     }
     
     .search-input-group {
-        gap: 4px;
-        padding: 2px;
-    }
-    
-    .search-input {
-        padding: 12px 14px;
-        font-size: 16px; /* Tăng font cho mobile keyboard */
-    }
-    
-    .clear-button,
-    .search-button {
-        font-size: 18px;
-        width: 36px;
-        height: 36px;
-        padding: 10px;
-    }
-    
-    .search-hint {
-        font-size: 12px;
+        max-width: 100%;
     }
 }

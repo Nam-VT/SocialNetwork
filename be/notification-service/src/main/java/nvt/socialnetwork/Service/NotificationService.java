@@ -1,6 +1,8 @@
 package nvt.socialnetwork.Service;
 
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -46,5 +48,15 @@ public class NotificationService {
                 .isRead(notification.isRead())
                 .createdAt(notification.getCreatedAt())
                 .build();
+    }
+
+    public Map<String, Long> getUnreadCount(String userId) {
+        // Truyền userId (ID của người dùng hiện tại) vào làm receiverId
+        long count = notificationRepository.countUnreadNotifications(userId); 
+        return Collections.singletonMap("count", count);
+    }
+
+    public void markAllAsRead(String userId) {
+        notificationRepository.markAllAsRead(userId);
     }
 }

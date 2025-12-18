@@ -1,18 +1,29 @@
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useLazySearchUsersQuery, useLazySearchPostsQuery } from '../features/search/searchApiSlice';
 import UserSearchResultItem from '../features/user/UserSearchResultItem';
 import PostItem from '../features/post/PostItem';
 import '../styles/SearchPage.css';
 
 const SearchPage = () => {
-    const [activeTab, setActiveTab] = useState('users');
-    const location = useLocation();
-    const query = new URLSearchParams(location.search).get('q');
+    const [searchParams] = useSearchParams();
+    const query = searchParams.get('q'); // Lấy từ khóa từ URL
+    const [activeTab, setActiveTab] = useState('users'); // 'users' | 'posts'
 
-    const [triggerSearchUsers, { data: usersData, isLoading: isLoadingUsers, isError: isErrorUsers }] = useLazySearchUsersQuery();
-    const [triggerSearchPosts, { data: postsData, isLoading: isLoadingPosts, isError: isErrorPosts }] = useLazySearchPostsQuery();
+    // Dùng Lazy Query để gọi API khi query thay đổi
+    const [triggerSearchUsers, { 
+        data: usersData, 
+        isLoading: isLoadingUsers, 
+        isError: isErrorUsers 
+    }] = useLazySearchUsersQuery();
 
+    const [triggerSearchPosts, { 
+        data: postsData, 
+        isLoading: isLoadingPosts, 
+        isError: isErrorPosts 
+    }] = useLazySearchPostsQuery();
+
+    // Gọi API mỗi khi query thay đổi
     useEffect(() => {
         if (query) {
             triggerSearchUsers({ query });
@@ -21,51 +32,33 @@ const SearchPage = () => {
     }, [query, triggerSearchUsers, triggerSearchPosts]);
 
     if (!query) {
-        return (
-            <div className="search-page-empty">
-                <h1>Search Results</h1>
-                <p>Please enter a search term in the navigation bar to begin.</p>
-            </div>
-        );
+        return <div className="search-page-empty">Please enter a keyword to search.</div>;
     }
 
-    const isLoading = activeTab === 'users' ? isLoadingUsers : isLoadingPosts;
+    // Xác định data hiển thị dựa trên tab đang chọn
+    const isLoading = activeTab === 'users' ? (isLoadingUsers || isFetchingUsers) : (isLoadingPosts || isFetchingPosts);
     const isError = activeTab === 'users' ? isErrorUsers : isErrorPosts;
-    const resultsData = activeTab === 'users' ? usersData : postsData;
-    const totalCount = resultsData?.totalElements ?? 0;
-    const resultsContent = resultsData?.content ?? [];
+    const results = activeTab === 'users' ? (usersData?.content || []) : (postsData?.content || []);
+    const totalCount = activeTab === 'users' ? (usersData?.totalElements || 0) : (postsData?.totalElements || 0);
 
     const renderSkeleton = () => (
         <div className="results-skeleton">
-            {[...Array(5)].map((_, index) => (
-                <div key={index} className="skeleton-item">
+            {[1, 2, 3].map((n) => (
+                <div key={n} className="skeleton-item">
                     <div className="skeleton-avatar"></div>
-                    <div className="skeleton-content"></div>
+                    <div className="skeleton-text">
+                        <div className="skeleton-line"></div>
+                        <div className="skeleton-line short"></div>
+                    </div>
                 </div>
             ))}
-        </div>
-    );
-
-    const renderEmpty = () => (
-        <div className="results-empty">
-            <span className="empty-icon">🔍</span>
-            <h3>No {activeTab} found</h3>
-            <p>No {activeTab} matching "{query}" were found. Try a different search term.</p>
-        </div>
-    );
-
-    const renderError = () => (
-        <div className="results-error">
-            <p>Error loading {activeTab}. Please try again.</p>
-            <button onClick={() => window.location.reload()}>Retry</button>
         </div>
     );
 
     return (
         <div className="search-page" role="main">
             <div className="search-header">
-                <h1 className="search-title">Search Results for "{query}"</h1>
-                <p className="search-subtitle">{totalCount} result{totalCount !== 1 ? 's' : ''} found</p>
+                <h1 className="search-title">Results for "{query}"</h1>
             </div>
 
             <nav className="search-tabs" role="tablist" aria-label="Search results tabs">
@@ -74,37 +67,41 @@ const SearchPage = () => {
                     onClick={() => setActiveTab('users')}
                     role="tab"
                     aria-selected={activeTab === 'users'}
-                    aria-controls="users-panel"
-                    tabIndex={activeTab === 'users' ? 0 : -1}
                 >
-                    Users
-                    <span className="tab-count">{usersData?.totalElements ?? 0}</span>
+                    Users 
+                    <span className="tab-count">{usersData?.totalElements || 0}</span>
                 </button>
                 <button 
                     className={`tab-button ${activeTab === 'posts' ? 'active' : ''}`}
                     onClick={() => setActiveTab('posts')}
                     role="tab"
                     aria-selected={activeTab === 'posts'}
-                    aria-controls="posts-panel"
-                    tabIndex={activeTab === 'posts' ? 0 : -1}
                 >
-                    Posts
-                    <span className="tab-count">{postsData?.totalElements ?? 0}</span>
+                    Posts 
+                    <span className="tab-count">{postsData?.totalElements || 0}</span>
                 </button>
             </nav>
 
-            <div className="search-results" id={activeTab === 'users' ? 'users-panel' : 'posts-panel'}>
-                {isError ? renderError() : 
-                 isLoading ? renderSkeleton() : 
-                 resultsContent.length === 0 ? renderEmpty() :
-                 (
-                    <div className="results-list">
+            <div className="search-results-container">
+                {isLoading ? (
+                    renderSkeleton()
+                ) : isError ? (
+                    <div className="results-error">
+                        <p>Something went wrong while searching.</p>
+                        <button onClick={() => window.location.reload()} className="retry-button">Retry</button>
+                    </div>
+                ) : results.length === 0 ? (
+                    <div className="results-empty">
+                        <p>No {activeTab} found matching "{query}".</p>
+                    </div>
+                ) : (
+                    <div className={activeTab === 'users' ? "user-results-grid" : "post-results-list"}>
                         {activeTab === 'users' ? (
-                            resultsContent.map(user => (
+                            results.map(user => (
                                 <UserSearchResultItem key={user.id} user={user} />
                             ))
                         ) : (
-                            resultsContent.map(post => (
+                            results.map(post => (
                                 <PostItem key={post.id} post={post} />
                             ))
                         )}

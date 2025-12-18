@@ -1,241 +1,202 @@
+/* src/styles/SearchPage.css */
+
 .search-page {
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
-    background-color: #f9fafb;
     min-height: 100vh;
+    /* Nền của trang con, không cần set background-color nếu body đã set */
 }
 
+/* Header */
 .search-header {
-    text-align: center;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
 }
 
 .search-title {
-    margin: 0 0 8px 0;
     font-size: 24px;
-    font-weight: 600;
-    color: #111827;
-}
-
-.search-subtitle {
+    font-weight: 700;
+    color: var(--text-primary);
     margin: 0;
-    font-size: 14px;
-    color: #6b7280;
 }
 
-/* Empty state khi không có query */
+/* Empty State (No query) */
 .search-page-empty {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 400px;
+    height: 60vh;
     text-align: center;
-    color: #6b7280;
+    color: var(--text-secondary);
 }
 
-.search-page-empty h1 {
-    font-size: 28px;
+.empty-icon-large {
+    font-size: 64px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.search-page-empty h2 {
+    font-size: 20px;
     margin-bottom: 8px;
-    color: #374151;
+    color: var(--text-primary);
 }
 
-.search-page-empty p {
-    font-size: 16px;
-    margin: 0;
-}
-
-/* Tabs */
+/* Tabs Navigation */
 .search-tabs {
     display: flex;
-    border-bottom: 2px solid #e5e7eb;
+    border-bottom: 1px solid var(--border-color);
     margin-bottom: 24px;
-    background-color: white;
-    border-radius: 8px 8px 0 0;
-    overflow: hidden;
+    background-color: var(--background-color); /* Đảm bảo nền khớp theme */
 }
 
 .tab-button {
+    flex: 1;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
-    padding: 12px 20px;
+    padding: 14px 16px;
     border: none;
     background: none;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 500;
-    color: #6b7280;
+    color: var(--text-secondary);
     cursor: pointer;
-    transition: color 0.2s ease, background-color 0.2s ease;
     border-bottom: 2px solid transparent;
-    flex: 1;
+    transition: all 0.2s ease;
 }
 
-.tab-button:hover,
-.tab-button:focus {
-    color: #0084ff;
-    outline: none;
-    background-color: #f3f4f6;
+.tab-button:hover {
+    color: var(--text-primary);
+    background-color: var(--comment-background);
 }
 
 .tab-button.active {
-    color: #0084ff;
+    color: var(--text-link);
+    border-bottom-color: var(--text-link);
     font-weight: 600;
-    border-bottom-color: #0084ff;
-    background-color: #f9fafb;
 }
 
 .tab-count {
-    background-color: #0084ff;
-    color: white;
-    font-size: 12px;
+    background-color: var(--comment-background);
+    color: var(--text-primary);
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 12px;
     font-weight: 600;
-    padding: 2px 6px;
-    border-radius: 10px;
-    min-width: 20px;
+}
+
+.tab-button.active .tab-count {
+    background-color: var(--text-link);
+    color: white;
+}
+
+/* Results Container */
+.search-results-container {
+    min-height: 200px;
+}
+
+/* Layout Grid cho User */
+.user-results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+}
+
+/* Layout List cho Post */
+.post-results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Empty & Error States in Results */
+.results-empty, .results-error {
     text-align: center;
+    padding: 40px 0;
+    color: var(--text-secondary);
+    font-style: italic;
 }
 
-/* Results container */
-.search-results {
-    background-color: white;
-    border-radius: 0 0 8px 8px;
-    padding: 20px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    min-height: 300px;
+.results-error {
+    color: #ef4444;
 }
 
-/* Loading skeleton */
+.retry-button {
+    margin-top: 12px;
+    padding: 8px 16px;
+    background-color: var(--text-link);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+/* Skeleton Loading Animation */
 .results-skeleton {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
 }
 
 .skeleton-item {
     display: flex;
     align-items: center;
-    gap: 15px;
-    padding: 12px;
-    background-color: #f9fafb;
+    gap: 16px;
+    padding: 16px;
+    background-color: var(--background-color); /* Hoặc var(--comment-background) */
+    border: 1px solid var(--border-color);
     border-radius: 8px;
-    animation: pulse 1.5s ease-in-out infinite;
 }
 
 .skeleton-avatar {
-    width: 64px;
-    height: 64px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
-    background-color: #e5e7eb;
+    background-color: var(--border-color); /* Màu xám nhạt */
+    animation: pulse 1.5s infinite ease-in-out;
 }
 
-.skeleton-content {
+.skeleton-text {
     flex: 1;
-    height: 20px;
-    background-color: #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.skeleton-line {
+    height: 16px;
+    background-color: var(--border-color);
     border-radius: 4px;
-    width: 200px;
+    width: 60%;
+    animation: pulse 1.5s infinite ease-in-out;
 }
 
-/* Empty state */
-.results-empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 40px 20px;
-    color: #6b7280;
-    min-height: 200px;
+.skeleton-line.short {
+    width: 40%;
 }
 
-.empty-icon {
-    font-size: 48px;
-    margin-bottom: 16px;
-}
-
-.results-empty h3 {
-    margin: 0 0 8px 0;
-    font-size: 20px;
-    color: #374151;
-}
-
-.results-empty p {
-    margin: 0;
-    font-size: 14px;
-}
-
-/* Error state */
-.results-error {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 40px 20px;
-    color: #ef4444;
-    min-height: 200px;
-}
-
-.results-error button {
-    margin-top: 12px;
-    padding: 8px 16px;
-    background-color: #0084ff;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-.results-error button:hover {
-    background-color: #0066cc;
-}
-
-/* Results list */
-.results-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0; /* Để UserSearchResultItem/PostItem tự handle gap */
-}
-
-/* Animations */
 @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+    0% { opacity: 0.6; }
+    50% { opacity: 0.3; }
+    100% { opacity: 0.6; }
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 640px) {
     .search-page {
         padding: 16px;
     }
     
-    .search-title {
-        font-size: 20px;
-    }
-    
-    .search-tabs {
-        flex-direction: column;
-    }
-    
     .tab-button {
-        justify-content: space-between;
-        border-bottom: none;
-        border-right: 2px solid transparent;
+        font-size: 14px;
+        padding: 12px;
     }
     
-    .tab-button.active {
-        border-right-color: #0084ff;
-    }
-    
-    .search-results {
-        padding: 16px;
-    }
-    
-    .results-empty,
-    .results-error {
-        padding: 30px 16px;
+    .user-results-grid {
+        grid-template-columns: 1fr; /* Chuyển về 1 cột trên mobile */
     }
 }

@@ -4,10 +4,10 @@ const VITE_USER_SERVICE_URL = import.meta.env.VITE_USER_SERVICE_URL;
 
 export const userApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
-
+        // --- CÁC ENDPOINT THUỘC USER-CONTROLLER (/users) ---
         getCurrentUserProfile: builder.query({
             query: () => `${VITE_USER_SERVICE_URL}/users/profile`,
-            providesTags: (result) => [{ type: 'User', id: 'CURRENT_USER' }, { type: 'User', id: result?.id }],
+            providesTags: [{ type: 'User', id: 'CURRENT_USER' }],
         }),
 
         getUserById: builder.query({
@@ -15,68 +15,21 @@ export const userApiSlice = apiSlice.injectEndpoints({
             providesTags: (result, error, id) => [{ type: 'User', id }],
         }),
 
-        // READ: getUserProfileByDisplayName
-        getUserByDisplayName: builder.query({
-            query: (displayName) => `${VITE_USER_SERVICE_URL}/users/by-display-name/${displayName}`,
-            // Cung cấp tag dựa trên displayName
-            providesTags: (result, error, displayName) => [{ type: 'User', id: result?.id || displayName }],
-        }),
-        
-        // READ: getUsersByIds (dùng cho internal)
-        getUsersByIds: builder.query({
-            query: (ids) => ({
-                url: `${VITE_USER_SERVICE_URL}/users/internal/users-by-ids`,
-                method: 'POST',
-                body: { ids }, // Giả định body cần một object chứa mảng ids
-            }),
-        }),
-
-        // CREATE: createUserProfile
-        createUserProfile: builder.mutation({
-            query: (profileData) => ({
-                url: `${VITE_USER_SERVICE_URL}/users`,
-                method: 'POST',
-                body: profileData,
-            }),
-        }),
-
-        // UPDATE: updateUserProfile
         updateUserProfile: builder.mutation({
             query: ({ id, ...data }) => ({
-                url: `${VITE_USER_SERVICE_URL}/users/${id}`,
+                url: `${VITE_USER_SERVICE_URL}/users/${id}`, // id lấy từ object truyền vào
                 method: 'PUT',
-                body: data,
+                body: data, // bio, displayName, avatarId, coverId nằm ở đây
             }),
-            // SỬA LẠI: Thêm invalidatesTags cho CURRENT_USER
             invalidatesTags: (result, error, arg) => [
                 { type: 'User', id: arg.id },
                 { type: 'User', id: 'CURRENT_USER' }
             ],
         }),
 
-        // DELETE: deleteUserProfile
-        deleteUserProfile: builder.mutation({
-            query: (id) => ({
-                url: `${VITE_USER_SERVICE_URL}/users/${id}`,
-                method: 'DELETE',
-            }),
-            invalidatesTags: (result, error, id) => [{ type: 'User', id }],
-        }),
-
-        getFriends: builder.query({
-            query: ({ userId, page = 0, size = 15 }) => 
-                `${VITE_USER_SERVICE_URL}/api/friendships/friends/${userId}?page=${page}&size=${size}`,
-            providesTags: (result, error, { userId }) => [{ type: 'Friend', id: `LIST-${userId}` }],
-        }),
-        
-        getPendingRequests: builder.query({
-            query: ({ page = 0, size = 15 }) => 
-                `${VITE_USER_SERVICE_URL}/api/friendships/requests/pending?page=${page}&size=${size}`,
-            providesTags: ['PendingRequest'],
-        }),
-        
         getFriendshipStatus: builder.query({
             query: (otherUserId) => `${VITE_USER_SERVICE_URL}/api/friendships/status/${otherUserId}`,
+            // Chuẩn hóa tag để mutation có thể invalidate đúng
             providesTags: (result, error, otherUserId) => [{ type: 'FriendStatus', id: otherUserId }],
         }),
         
@@ -85,6 +38,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
                 url: `${VITE_USER_SERVICE_URL}/api/friendships/requests/${addresseeId}`,
                 method: 'POST',
             }),
+            // Khi gửi yêu cầu, phải invalidate chính ID của addresseeId đó
             invalidatesTags: (result, error, addresseeId) => [{ type: 'FriendStatus', id: addresseeId }],
         }),
 
@@ -93,10 +47,8 @@ export const userApiSlice = apiSlice.injectEndpoints({
                 url: `${VITE_USER_SERVICE_URL}/api/friendships/requests/${requestId}/accept`,
                 method: 'POST',
             }),
-            invalidatesTags: (result, error, requestId) => [
-                'PendingRequest',
-                { type: 'Friend', id: 'LIST' }, // Làm mới danh sách bạn bè
-            ],
+            // Invalidate toàn bộ các tag liên quan để UI cập nhật lại trạng thái "Friends"
+            invalidatesTags: ['PendingRequest', 'FriendStatus', { type: 'Friend', id: 'LIST' }],
         }),
 
         declineOrCancelRequest: builder.mutation({
@@ -104,7 +56,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
                 url: `${VITE_USER_SERVICE_URL}/api/friendships/requests/${requestId}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: ['PendingRequest'],
+            invalidatesTags: ['PendingRequest', 'FriendStatus'],
         }),
 
         unfriend: builder.mutation({
@@ -112,22 +64,30 @@ export const userApiSlice = apiSlice.injectEndpoints({
                 url: `${VITE_USER_SERVICE_URL}/api/friendships/friends/${friendId}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: (result, error, friendId) => [
-                { type: 'Friend', id: 'LIST' },
-                { type: 'FriendStatus', id: friendId }
-            ],
+            invalidatesTags: (result, error, id) => [{ type: 'Friendship', id }],
+        }),
+
+        getFriendsByUserId: builder.query({
+            query: ({ userId, page = 0, size = 10 }) => 
+                `${VITE_USER_SERVICE_URL}/api/friendships/friends/${userId}?page=${page}&size=${size}`,
+            providesTags: ['Friendship'],
+        }),
+
+        getPendingRequests: builder.query({
+            query: () => `${VITE_USER_SERVICE_URL}/api/friendships/requests/pending`,
+            providesTags: ['PendingRequest'],
         }),
     }),
 });
 
 export const {
-    useGetCurrentUserProfileQuery, // <-- Thêm
+    useGetCurrentUserProfileQuery,
     useGetUserByIdQuery,
     useGetUserByDisplayNameQuery,
     useLazyGetUserByDisplayNameQuery,
     useGetUsersByIdsQuery,
     useCreateUserProfileMutation,
-    useUpdateUserProfileMutation,
+    useUpdateUserProfileMutation, // <-- KIỂM TRA DÒNG NÀY PHẢI CÓ Ở ĐÂY
     useDeleteUserProfileMutation,
     useGetFriendsQuery,
     useGetPendingRequestsQuery,

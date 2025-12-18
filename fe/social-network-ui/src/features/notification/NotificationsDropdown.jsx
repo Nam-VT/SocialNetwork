@@ -5,7 +5,7 @@ import {
     useMarkAllNotificationsAsReadMutation 
 } from './notificationApiSlice';
 import NotificationItem from './NotificationItem';
-import { useClickOutside } from '../../hooks/useClickOutside'; // Đảm bảo import đúng đường dẫn hook này
+import { useClickOutside } from '../../hooks/useClickOutside'; 
 import '../../styles/NotificationsDropdown.css';
 
 const NotificationsDropdown = () => {

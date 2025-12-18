@@ -11,7 +11,7 @@ spring:
   
   # Cấu hình Kafka Consumer
   kafka:
-    bootstrap-servers: localhost:9202
+    bootstrap-servers: localhost:9092
     consumer:
       group-id: search-group
       auto-offset-reset: earliest

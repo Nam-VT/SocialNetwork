@@ -32,11 +32,12 @@ public class SearchService {
     }
 
     public Page<UserDocument> searchUsers(String query, Pageable pageable) {
-        return userSearchRepository.findByDisplayNameContainingOrEmailContaining(query, query, pageable);
+        // Sử dụng phương thức tối ưu Multi-match + Fuzzy
+        return userSearchRepository.searchUsers(query, pageable);
     }
 
     public Page<PostDocument> searchPosts(String query, Pageable pageable) {
-        // Gọi đến phương thức repository đã được cập nhật
-        return postSearchRepository.findByContentContaining(query, pageable);
+        // Sử dụng phương thức tối ưu Fuzzy search
+        return postSearchRepository.searchByContent(query, pageable);
     }
 }

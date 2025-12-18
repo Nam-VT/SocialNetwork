@@ -3,41 +3,22 @@
   <component name="CompilerConfiguration">
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
-      <profile name="Annotation profile for common" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.34/lombok-1.18.34.jar" />
-        </processorPath>
-        <module name="common" />
-      </profile>
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="socialweb" />
-        <module name="socialnetwork.api_gateway" />
-      </profile>
-      <profile name="Annotation profile for socialnetwork (2)" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.5.5.Final/mapstruct-processor-1.5.5.Final.jar" />
-        </processorPath>
         <module name="socialnetwork (2)" />
-      </profile>
-      <profile name="Annotation profile for socialnetwork (1)" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.5.5.Final/mapstruct-processor-1.5.5.Final.jar" />
-        </processorPath>
         <module name="socialnetwork (1)" />
+        <module name="common" />
+        <module name="search-service" />
+        <module name="socialweb" />
+        <module name="socialnetwork (8)" />
+        <module name="socialnetwork (7)" />
+        <module name="socialnetwork.api_gateway" />
+        <module name="socialnetwork (4)" />
+        <module name="socialnetwork (3)" />
+        <module name="socialnetwork (6)" />
+        <module name="socialnetwork (5)" />
       </profile>
       <profile name="Annotation profile for socialnetwork" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -47,29 +28,23 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
         </processorPath>
         <module name="socialnetwork" />
-        <module name="search-service" />
-        <module name="socialnetwork (7)" />
-        <module name="socialnetwork (4)" />
-        <module name="socialnetwork (3)" />
-        <module name="socialnetwork (6)" />
-        <module name="socialnetwork (5)" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="common" options="-parameters" />
-      <module name="search-service" options="-parameters" />
+      <module name="common" options="" />
+      <module name="search-service" options="" />
       <module name="socialnetwork" options="-parameters" />
-      <module name="socialnetwork (1)" options="-parameters" />
-      <module name="socialnetwork (2)" options="-parameters" />
-      <module name="socialnetwork (3)" options="-parameters" />
-      <module name="socialnetwork (4)" options="-parameters" />
-      <module name="socialnetwork (5)" options="-parameters" />
-      <module name="socialnetwork (6)" options="-parameters" />
-      <module name="socialnetwork (7)" options="-parameters" />
-      <module name="socialnetwork.api_gateway" options="-parameters" />
-      <module name="socialweb" options="-parameters" />
+      <module name="socialnetwork (1)" options="" />
+      <module name="socialnetwork (2)" options="" />
+      <module name="socialnetwork (3)" options="" />
+      <module name="socialnetwork (4)" options="" />
+      <module name="socialnetwork (5)" options="" />
+      <module name="socialnetwork (6)" options="" />
+      <module name="socialnetwork (7)" options="" />
+      <module name="socialnetwork.api_gateway" options="" />
+      <module name="socialweb" options="" />
     </option>
   </component>
 </project>

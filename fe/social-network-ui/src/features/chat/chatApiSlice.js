@@ -63,5 +63,5 @@ export const {
     useGetMessageHistoryQuery,
     useFindCommonGroupRoomsQuery, // <-- Hook mới
     useFindOrCreatePrivateRoomMutation,
-    useCreateGroupChatRoomMutation, // <-- Hook mới
+    useCreateGroupChatRoomMutation,
 } = chatApiSlice;

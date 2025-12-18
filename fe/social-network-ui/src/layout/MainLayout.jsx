@@ -15,7 +15,7 @@ import '../styles/Navbar.css';
 const Navbar = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const currentUser  = useSelector(selectCurrentUser );
+    const currentUser = useSelector(selectCurrentUser);
 
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
@@ -34,7 +34,7 @@ const Navbar = () => {
                     </Link>
 
                     {/* Chỉ hiển thị các thành phần cần đăng nhập */}
-                    {currentUser  && (
+                    {currentUser && (
                         <div className="navbar-center">
                             <SearchInput />
                         </div>
@@ -44,7 +44,7 @@ const Navbar = () => {
                         {currentUser  && (
                             <>  
                                 <NotificationsDropdown />
-                                <Link to={`/profile/${currentUser .id}`} className="nav-link profile-link">
+                                <Link to={`/profile/${currentUser.idgit}`} className="nav-link profile-link">
                                     <span className="nav-text">My Profile</span>
                                 </Link>
                                 <button

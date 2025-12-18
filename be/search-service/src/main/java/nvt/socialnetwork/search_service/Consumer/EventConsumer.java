@@ -61,34 +61,39 @@ public class EventConsumer {
     // Lắng nghe các sự kiện liên quan đến Post
     @KafkaListener(topics = "${app.kafka.post-topic}", groupId = "search-group-post")
     public void consumePostEvents(@Payload NotificationEvent event) {
-        log.info("Received post event: type={}, eventId={}", event.getEventId(), event.getType());
+        try {
+            log.info("Received post event: type={}, eventId={}", event.getType(), event.getEventId()); // Sửa event.getType() thành event.getEventId() cho đúng log
+            Map<String, Object> payload = event.getPayload();
+            
+            // SỬA LỖI: Parse String sang UUID an toàn
+            String postIdStr = (String) payload.get("postId");
+            if (postIdStr == null) return;
+            UUID postId = UUID.fromString(postIdStr);
 
-        Map<String, Object> payload = event.getPayload();
-        UUID postId = (UUID) payload.get("postId");
-
-        if (postId == null) {
-            log.warn("Post event received with no postId. Skipping.");
-            return;
-        }
-
-        switch (event.getType()) {
-            case POST_CREATED, POST_UPDATED:
-                PostDocument post = new PostDocument();
-                post.setId(postId);
-                post.setContent((String) payload.get("content"));
-                post.setUserId((String) payload.get("userId"));
-                post.setCreatedAt((LocalDateTime) payload.get("createdAt"));
-                postSearchRepository.save(post);
-                log.info("Indexed post document for postId: {}", postId);
-                break;
-
-            case POST_DELETED:
-                postSearchRepository.deleteById(postId);
-                log.info("Deleted post document for postId: {}", postId);
-                break;
-
-            default:
-                log.warn("Unhandled post event type: {}", event.getType());
+            switch (event.getType()) {
+                case POST_CREATED, POST_UPDATED -> {
+                    PostDocument post = new PostDocument();
+                    post.setId(postId);
+                    post.setContent((String) payload.get("content"));
+                    post.setUserId((String) payload.get("userId"));
+                    
+                    // SỬA LỖI: Parse String sang LocalDateTime an toàn
+                    Object createdAtObj = payload.get("createdAt");
+                    if (createdAtObj != null) {
+                        // Xử lý trường hợp JSON gửi dạng String ISO-8601
+                        post.setCreatedAt(LocalDateTime.parse(createdAtObj.toString())); 
+                    }
+                    
+                    postSearchRepository.save(post);
+                    log.info("Indexed post document for postId: {}", postId);
+                }
+                case POST_DELETED -> {
+                    postSearchRepository.deleteById(postId);
+                    log.info("Deleted post document for postId: {}", postId);
+                }
+            }
+        } catch (Exception e) {
+            log.error("Error processing post event: {}", e.getMessage(), e);
         }
     }
 }
