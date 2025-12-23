@@ -1,14 +1,24 @@
 import { useState } from 'react';
-import { useGetFriendsByUserIdQuery } from '../user/userApiSlice';
-import UserSearchResultItem from '../user/UserSearchResultItem'; // Tái sử dụng component hiển thị user
+// Sửa 1: Import đúng tên hook từ userApiSlice
+import { useGetFriendsQuery } from '../user/userApiSlice'; 
+import UserSearchResultItem from '../user/UserSearchResultItem'; 
 import '../../styles/FriendList.css'; 
 
 const FriendList = ({ userId }) => {
     const [page, setPage] = useState(0);
+    const pageSize = 12;
     
-    // Lưu ý: Logic merge cho infinite scroll cần được thêm vào getFriendsByUserId trong slice nếu muốn tải vô hạn
-    // Hiện tại, mỗi lần "Load More", nó sẽ fetch và hiển thị trang mới.
-    const { data: friendsData, isLoading, isFetching, isError } = useGetFriendsByUserIdQuery({ userId, page, size: 12 });
+    // Sửa 2: Sử dụng useGetFriendsQuery khớp với tên hàm trong userApiSlice.js
+    const { 
+        data: friendsData, 
+        isLoading, 
+        isFetching, 
+        isError 
+    } = useGetFriendsQuery({ 
+        userId, 
+        page, 
+        size: pageSize 
+    });
 
     if (isLoading && page === 0) {
         return <p className="friend-list-status">Loading friends...</p>;
@@ -18,6 +28,7 @@ const FriendList = ({ userId }) => {
         return <p className="friend-list-status error">Could not load friends.</p>;
     }
 
+    // Lấy mảng content từ Page object trả về từ Spring Boot
     const friends = friendsData?.content || [];
 
     return (
@@ -32,9 +43,14 @@ const FriendList = ({ userId }) => {
                 <p className="friend-list-status">This user has no friends to display.</p>
             )}
 
+            {/* Logic hiển thị nút Load More dựa trên trường 'last' của Spring Boot Page */}
             {friendsData && !friendsData.last && (
                 <div className="load-more-container">
-                    <button onClick={() => setPage(p => p + 1)} disabled={isFetching} className="load-more-button">
+                    <button 
+                        onClick={() => setPage(p => p + 1)} 
+                        disabled={isFetching} 
+                        className="load-more-button"
+                    >
                         {isFetching ? 'Loading...' : 'Load More'}
                     </button>
                 </div>

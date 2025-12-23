@@ -58,4 +58,14 @@ public class FriendshipController {
     public ResponseEntity<FriendshipStatusResponse> getFriendshipStatus(@PathVariable String otherUserId, Authentication authentication) {
         return ResponseEntity.ok(friendshipService.getFriendshipStatus(otherUserId, authentication));
     }
+
+    // Bổ sung vào FriendshipController.java
+    @GetMapping("/requests/pending")
+    public ResponseEntity<Page<UserResponse>> getPendingRequests(
+            Authentication authentication, 
+            Pageable pageable) {
+        Page<UserResponse> pendingRequests = friendshipService.getPendingRequests(authentication, pageable);
+    
+        return ResponseEntity.ok(pendingRequests);
+    }
 }

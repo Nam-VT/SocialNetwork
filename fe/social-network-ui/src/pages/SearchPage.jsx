@@ -7,23 +7,24 @@ import '../styles/SearchPage.css';
 
 const SearchPage = () => {
     const [searchParams] = useSearchParams();
-    const query = searchParams.get('q'); // Lấy từ khóa từ URL
-    const [activeTab, setActiveTab] = useState('users'); // 'users' | 'posts'
+    const query = searchParams.get('q');
+    const [activeTab, setActiveTab] = useState('users');
 
-    // Dùng Lazy Query để gọi API khi query thay đổi
+    // Bóc tách thêm isFetching để UI mượt mà khi chuyển trang hoặc search lại
     const [triggerSearchUsers, { 
         data: usersData, 
         isLoading: isLoadingUsers, 
+        isFetching: isFetchingUsers,
         isError: isErrorUsers 
     }] = useLazySearchUsersQuery();
 
     const [triggerSearchPosts, { 
         data: postsData, 
         isLoading: isLoadingPosts, 
+        isFetching: isFetchingPosts,
         isError: isErrorPosts 
     }] = useLazySearchPostsQuery();
 
-    // Gọi API mỗi khi query thay đổi
     useEffect(() => {
         if (query) {
             triggerSearchUsers({ query });
@@ -32,18 +33,22 @@ const SearchPage = () => {
     }, [query, triggerSearchUsers, triggerSearchPosts]);
 
     if (!query) {
-        return <div className="search-page-empty">Please enter a keyword to search.</div>;
+        return (
+            <div className="search-page-empty">
+                <div className="empty-icon">🔍</div>
+                <p>Please enter a keyword to search for users or posts.</p>
+            </div>
+        );
     }
 
-    // Xác định data hiển thị dựa trên tab đang chọn
+    // Logic xác định trạng thái hiển thị
     const isLoading = activeTab === 'users' ? (isLoadingUsers || isFetchingUsers) : (isLoadingPosts || isFetchingPosts);
     const isError = activeTab === 'users' ? isErrorUsers : isErrorPosts;
     const results = activeTab === 'users' ? (usersData?.content || []) : (postsData?.content || []);
-    const totalCount = activeTab === 'users' ? (usersData?.totalElements || 0) : (postsData?.totalElements || 0);
 
     const renderSkeleton = () => (
         <div className="results-skeleton">
-            {[1, 2, 3].map((n) => (
+            {[1, 2, 3, 4].map((n) => (
                 <div key={n} className="skeleton-item">
                     <div className="skeleton-avatar"></div>
                     <div className="skeleton-text">
@@ -58,15 +63,14 @@ const SearchPage = () => {
     return (
         <div className="search-page" role="main">
             <div className="search-header">
-                <h1 className="search-title">Results for "{query}"</h1>
+                <h1 className="search-title">Results for "<span>{query}</span>"</h1>
             </div>
 
-            <nav className="search-tabs" role="tablist" aria-label="Search results tabs">
+            <nav className="search-tabs" role="tablist">
                 <button 
                     className={`tab-button ${activeTab === 'users' ? 'active' : ''}`}
                     onClick={() => setActiveTab('users')}
                     role="tab"
-                    aria-selected={activeTab === 'users'}
                 >
                     Users 
                     <span className="tab-count">{usersData?.totalElements || 0}</span>
@@ -75,7 +79,6 @@ const SearchPage = () => {
                     className={`tab-button ${activeTab === 'posts' ? 'active' : ''}`}
                     onClick={() => setActiveTab('posts')}
                     role="tab"
-                    aria-selected={activeTab === 'posts'}
                 >
                     Posts 
                     <span className="tab-count">{postsData?.totalElements || 0}</span>
@@ -92,6 +95,7 @@ const SearchPage = () => {
                     </div>
                 ) : results.length === 0 ? (
                     <div className="results-empty">
+                        <div className="empty-img">🌵</div>
                         <p>No {activeTab} found matching "{query}".</p>
                     </div>
                 ) : (

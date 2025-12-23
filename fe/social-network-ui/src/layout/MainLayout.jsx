@@ -6,10 +6,9 @@ import { selectCurrentUser , logOut } from '../features/auth/authSlice';
 
 // Import các component con
 import NotificationsDropdown from '../features/notification/NotificationsDropdown';
-import SearchInput from '../features/search/SearchInput'; // <-- KIỂM TRA LẠI ĐƯỜNG DẪN NÀY
+import SearchInput from '../features/search/SearchInput';
 import Modal from '../components/ui/Modal'; 
 
-// Thêm import CSS cho navbar (tạo file nếu chưa)
 import '../styles/Navbar.css';
 
 const Navbar = () => {

@@ -3,15 +3,28 @@ import { useMarkAsReadMutation } from './notificationApiSlice';
 import NotificationSenderInfo from './NotificationSenderInfo';
 import '../../styles/NotificationItem.css';
 
-const NotificationItem = ({ notification }) => {
+const NotificationItem = ({ notification, onCloseDropdown }) => {
     const navigate = useNavigate();
     const [markAsRead] = useMarkAsReadMutation();
 
-    const handleClick = () => {
+    const handleClick = async () => {
+        // 1. Đánh dấu đã đọc nếu chưa đọc
         if (!notification.isRead) {
-            markAsRead(notification.id);
+            try {
+                // Đảm bảo truyền notification.id (Backend nhận UUID)
+                await markAsRead(notification.id).unwrap();
+            } catch (err) {
+                console.error("Failed to mark as read:", err);
+            }
         }
-        navigate(notification.redirectUrl);
+        
+        // 2. Đóng dropdown trước khi chuyển trang (nếu có prop này từ component cha)
+        if (onCloseDropdown) onCloseDropdown();
+
+        // 3. Chuyển hướng theo URL trả về từ Backend
+        if (notification.redirectUrl) {
+            navigate(notification.redirectUrl);
+        }
     };
 
     return (
@@ -22,18 +35,27 @@ const NotificationItem = ({ notification }) => {
             tabIndex={0}
             onKeyDown={e => {
                 if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
                     handleClick();
                 }
             }}
-            aria-pressed={notification.isRead}
+            aria-label={`Notification: ${notification.content}`}
         >
-            <NotificationSenderInfo userId={notification.senderId} />
-            <div className="notification-content">
+            {/* Component lấy info người gửi từ user-service */}
+            <div className="sender-avatar-container">
+                <NotificationSenderInfo userId={notification.senderId} />
+            </div>
+
+            <div className="notification-body">
                 <p className="notification-text">{notification.content}</p>
                 <small className="notification-time">
-                    {new Date(notification.createdAt).toLocaleString()}
+                    {new Date(notification.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    {" · "}
+                    {new Date(notification.createdAt).toLocaleDateString()}
                 </small>
             </div>
+            
+            {!notification.isRead && <div className="unread-indicator" />}
         </div>
     );
 };

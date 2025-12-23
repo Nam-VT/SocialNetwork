@@ -24,4 +24,8 @@ public interface FriendshipRepository extends JpaRepository<Friendship, UUID> {
     // Tìm tất cả bạn bè của một user
     @Query("SELECT f FROM Friendship f WHERE (f.requesterId = :userId OR f.addresseeId = :userId) AND f.status = 'ACCEPTED'")
     Page<Friendship> findFriendsByUserId(@Param("userId") String userId, Pageable pageable);
+
+    // Tìm tất cả các quan hệ bạn bè đã chấp nhận của một người
+    @Query("SELECT f FROM Friendship f WHERE (f.requesterId = :userId OR f.addresseeId = :userId) AND f.status = 'ACCEPTED'")
+    Page<Friendship> findAllAcceptedFriends(String userId, Pageable pageable);
 }

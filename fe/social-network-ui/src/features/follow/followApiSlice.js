@@ -2,44 +2,48 @@ import { apiSlice } from "../../api/apiSlice";
 
 const VITE_FOLLOW_SERVICE_URL = import.meta.env.VITE_FOLLOW_SERVICE_URL;
 
-export const relationshipApiSlice = apiSlice.injectEndpoints({
+export const followApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
-        // GET: Lấy trạng thái follow với một user khác
+        // Kiểm tra trạng thái follow
         getFollowStatus: builder.query({
-            query: (targetUserId) => `${VITE_FOLLOW_SERVICE_URL}/follows/status/${targetUserId}`,
-            // Response là: { isFollowing: boolean, isFollowedBy: boolean }
-            providesTags: (result, error, targetUserId) => [{ type: 'FollowStatus', id: targetUserId }],
+            query: (targetId) => `${VITE_FOLLOW_SERVICE_URL}/follows/status/${targetId}`,
+            providesTags: (result, error, targetId) => [{ type: 'Follow', id: targetId }],
         }),
 
-        // POST: Follow một user
+        // Thực hiện Follow
         followUser: builder.mutation({
-            query: (followingId) => ({
-                url: `${VITE_FOLLOW_SERVICE_URL}/follows/${followingId}`,
+            query: (targetId) => ({
+                url: `${VITE_FOLLOW_SERVICE_URL}/follows/${targetId}`,
                 method: 'POST',
             }),
-            // Sau khi follow thành công, làm mới trạng thái follow với user đó
-            invalidatesTags: (result, error, followingId) => [{ type: 'FollowStatus', id: followingId }],
+            invalidatesTags: (result, error, targetId) => [
+                { type: 'Follow', id: targetId },
+                { type: 'Follow', id: 'LIST' }
+            ],
         }),
 
-        // DELETE: Unfollow một user
+        // Hủy Follow
         unfollowUser: builder.mutation({
-            query: (followingId) => ({
-                url: `${VITE_FOLLOW_SERVICE_URL}/follows/${followingId}`,
+            query: (targetId) => ({
+                url: `${VITE_FOLLOW_SERVICE_URL}/follows/${targetId}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: (result, error, followingId) => [{ type: 'FollowStatus', id: followingId }],
+            invalidatesTags: (result, error, targetId) => [
+                { type: 'Follow', id: targetId },
+                { type: 'Follow', id: 'LIST' }
+            ],
         }),
 
-        // GET: Lấy danh sách người đang theo dõi (Following)
-        getFollowing: builder.query({
-            query: ({ userId, page = 0, size = 10 }) => 
-                `${VITE_FOLLOW_SERVICE_URL}/follows/${userId}/following?page=${page}&size=${size}`,
-        }),
-        
-        // GET: Lấy danh sách người được theo dõi (Followers)
+        // Lấy danh sách Followers (người theo dõi mình)
         getFollowers: builder.query({
-            query: ({ userId, page = 0, size = 10 }) => 
-                `${VITE_FOLLOW_SERVICE_URL}/follows/${userId}/followers?page=${page}&size=${size}`,
+            query: (userId) => `${VITE_FOLLOW_SERVICE_URL}/follows/${userId}/followers`,
+            providesTags: [{ type: 'Follow', id: 'LIST' }],
+        }),
+
+        // Lấy danh sách Following (người mình đang theo dõi)
+        getFollowing: builder.query({
+            query: (userId) => `${VITE_FOLLOW_SERVICE_URL}/follows/${userId}/following`,
+            providesTags: [{ type: 'Follow', id: 'LIST' }],
         }),
     }),
 });
@@ -48,6 +52,6 @@ export const {
     useGetFollowStatusQuery,
     useFollowUserMutation,
     useUnfollowUserMutation,
-    useGetFollowingQuery,
     useGetFollowersQuery,
-} = relationshipApiSlice;
+    useGetFollowingQuery,
+} = followApiSlice;

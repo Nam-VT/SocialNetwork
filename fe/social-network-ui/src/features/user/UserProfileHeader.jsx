@@ -1,6 +1,5 @@
 import { useState, useRef, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
 import { selectCurrentUser } from '../auth/authSlice';
 import { 
     useGetUserByIdQuery,
@@ -8,7 +7,7 @@ import {
     useSendFriendRequestMutation,
     useUnfriendMutation,
     useDeclineOrCancelRequestMutation,
-    useAcceptFriendRequestMutation // Thêm vào để đồng bộ
+    useAcceptFriendRequestMutation
 } from './userApiSlice'; 
 
 import { 
@@ -59,7 +58,7 @@ const UserProfileHeader = ({ userId }) => {
                 await followUser(userId).unwrap();
             }
         } catch (err) {
-            console.error('Follow error:', err);
+            console.error('Lỗi khi thực hiện follow/unfollow:', err);
         }
     };
 
@@ -132,7 +131,7 @@ const UserProfileHeader = ({ userId }) => {
                                     
                                     {isFriendMenuVisible && friendshipStatus?.isFriends && (
                                         <div className="options-menu-profile">
-                                            <button onClick={() => { unfriend(userId); setIsFriendMenuVisible(false); }}>Unfriend</button>
+                                            <button onClick={() => unfriend(userId)}>Unfriend</button>
                                         </div>
                                     )}
                                 </div>

@@ -1,141 +1,101 @@
-/* src/styles/SearchPage.css */
-
 .search-page {
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
     min-height: 100vh;
-    /* Nền của trang con, không cần set background-color nếu body đã set */
 }
 
-/* Header */
 .search-header {
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
 .search-title {
-    font-size: 24px;
+    font-size: 1.5rem;
+    color: var(--text-primary);
+}
+
+.search-title span {
+    color: var(--text-link);
     font-weight: 700;
-    color: var(--text-primary);
-    margin: 0;
 }
 
-/* Empty State (No query) */
-.search-page-empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 60vh;
-    text-align: center;
-    color: var(--text-secondary);
-}
-
-.empty-icon-large {
-    font-size: 64px;
-    margin-bottom: 16px;
-    opacity: 0.5;
-}
-
-.search-page-empty h2 {
-    font-size: 20px;
-    margin-bottom: 8px;
-    color: var(--text-primary);
-}
-
-/* Tabs Navigation */
+/* Tabs */
 .search-tabs {
     display: flex;
     border-bottom: 1px solid var(--border-color);
-    margin-bottom: 24px;
-    background-color: var(--background-color); /* Đảm bảo nền khớp theme */
+    margin-bottom: 20px;
+    gap: 10px;
 }
 
 .tab-button {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 14px 16px;
-    border: none;
     background: none;
-    font-size: 15px;
-    font-weight: 500;
+    border: none;
+    padding: 12px 20px;
+    font-size: 1rem;
+    font-weight: 600;
     color: var(--text-secondary);
     cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s ease;
+    position: relative;
+    transition: all 0.2s;
 }
 
 .tab-button:hover {
     color: var(--text-primary);
-    background-color: var(--comment-background);
 }
 
 .tab-button.active {
     color: var(--text-link);
-    border-bottom-color: var(--text-link);
-    font-weight: 600;
+}
+
+.tab-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background-color: var(--text-link);
+    border-radius: 3px 3px 0 0;
 }
 
 .tab-count {
-    background-color: var(--comment-background);
-    color: var(--text-primary);
-    font-size: 11px;
+    font-size: 0.8rem;
+    background: var(--comment-background);
     padding: 2px 8px;
     border-radius: 12px;
-    font-weight: 600;
+    margin-left: 8px;
 }
 
-.tab-button.active .tab-count {
-    background-color: var(--text-link);
-    color: white;
-}
-
-/* Results Container */
-.search-results-container {
-    min-height: 200px;
-}
-
-/* Layout Grid cho User */
+/* Results Layouts */
 .user-results-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 16px;
 }
 
-/* Layout List cho Post */
 .post-results-list {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 20px;
 }
 
-/* Empty & Error States in Results */
-.results-empty, .results-error {
-    text-align: center;
-    padding: 40px 0;
+/* States: Empty, Error */
+.search-page-empty, .results-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 100px 0;
     color: var(--text-secondary);
-    font-style: italic;
+    text-align: center;
 }
 
-.results-error {
-    color: #ef4444;
+.empty-icon, .empty-img {
+    font-size: 4rem;
+    margin-bottom: 16px;
 }
 
-.retry-button {
-    margin-top: 12px;
-    padding: 8px 16px;
-    background-color: var(--text-link);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 500;
-}
-
-/* Skeleton Loading Animation */
+/* Skeleton Animation */
 .results-skeleton {
     display: flex;
     flex-direction: column;
@@ -145,58 +105,56 @@
 .skeleton-item {
     display: flex;
     align-items: center;
-    gap: 16px;
     padding: 16px;
-    background-color: var(--background-color); /* Hoặc var(--comment-background) */
+    background: var(--background-color);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 12px;
 }
 
 .skeleton-avatar {
-    width: 48px;
-    height: 48px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
-    background-color: var(--border-color); /* Màu xám nhạt */
-    animation: pulse 1.5s infinite ease-in-out;
+    background: var(--border-color);
+    margin-right: 16px;
 }
 
 .skeleton-text {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
 }
 
 .skeleton-line {
-    height: 16px;
-    background-color: var(--border-color);
+    height: 12px;
+    background: var(--border-color);
+    margin-bottom: 8px;
     border-radius: 4px;
-    width: 60%;
-    animation: pulse 1.5s infinite ease-in-out;
+    width: 80%;
 }
 
 .skeleton-line.short {
     width: 40%;
 }
 
-@keyframes pulse {
-    0% { opacity: 0.6; }
-    50% { opacity: 0.3; }
-    100% { opacity: 0.6; }
+.skeleton-avatar, .skeleton-line {
+    animation: shimmer 1.5s infinite linear;
+    background: linear-gradient(90deg, var(--border-color) 25%, var(--comment-background) 50%, var(--border-color) 75%);
+    background-size: 200% 100%;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
 }
 
 /* Responsive */
-@media (max-width: 640px) {
-    .search-page {
-        padding: 16px;
+@media (max-width: 600px) {
+    .user-results-grid {
+        grid-template-columns: 1fr;
     }
     
     .tab-button {
-        font-size: 14px;
-        padding: 12px;
-    }
-    
-    .user-results-grid {
-        grid-template-columns: 1fr; /* Chuyển về 1 cột trên mobile */
+        flex: 1;
+        padding: 12px 5px;
+        font-size: 0.9rem;
     }
 }
