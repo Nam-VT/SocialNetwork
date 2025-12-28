@@ -203,6 +203,14 @@ public class FriendshipService {
         });
     }
 
+    public Page<UserResponse> getSuggestions(String currentUserId, Pageable pageable) {
+        // 1. Lấy danh sách gợi ý từ Repo
+        Page<User> suggestions = friendshipRepository.findFriendSuggestions(currentUserId, pageable);
+
+        // 2. Map sang UserResponse (Dùng hàm mapUserToUserResponse có sẵn trong UserService)
+        return suggestions.map(userService::mapUserToUserResponse);
+    }
+
     private void sendNotificationEvent(String senderId, String receiverId, NotificationType type, Map<String, Object> payload) {
         NotificationEvent event = NotificationEvent.builder()
                 .eventId(UUID.randomUUID().toString())

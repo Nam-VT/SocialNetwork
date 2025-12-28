@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 import nvt.socialnetwork.user.Entity.Enum.FriendshipStatus;
 import nvt.socialnetwork.user.Entity.Friendship;
+import nvt.socialnetwork.user.Entity.User;
 
 public interface FriendshipRepository extends JpaRepository<Friendship, UUID> {
 
@@ -28,4 +29,9 @@ public interface FriendshipRepository extends JpaRepository<Friendship, UUID> {
     // Tìm tất cả các quan hệ bạn bè đã chấp nhận của một người
     @Query("SELECT f FROM Friendship f WHERE (f.requesterId = :userId OR f.addresseeId = :userId) AND f.status = 'ACCEPTED'")
     Page<Friendship> findAllAcceptedFriends(String userId, Pageable pageable);
+
+    @Query("SELECT u FROM User u WHERE u.id != :currentUserId " +
+        "AND u.id NOT IN (SELECT f.addresseeId FROM Friendship f WHERE f.requesterId = :currentUserId) " +
+        "AND u.id NOT IN (SELECT f.requesterId FROM Friendship f WHERE f.addresseeId = :currentUserId)")
+    Page<User> findFriendSuggestions(@Param("currentUserId") String currentUserId, Pageable pageable);
 }

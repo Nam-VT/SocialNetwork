@@ -67,10 +67,31 @@ const sendMessage = (chatRoomId, messageRequest) => {
     }
 };
 
+const subscribeToNotifications = (userId, onNotificationReceived) => {
+    const topic = `/user/${userId}/queue/notifications`;
+    if (stompClient && stompClient.connected && !subscriptions.has(topic)) {
+        const subscription = stompClient.subscribe(topic, (message) => {
+            onNotificationReceived(JSON.parse(message.body));
+        });
+        subscriptions.set(topic, subscription);
+        return subscription;
+    }
+};
+
+const unsubscribeFromNotifications = (userId) => {
+    const topic = `/user/${userId}/queue/notifications`;
+    if (subscriptions.has(topic)) {
+        subscriptions.get(topic).unsubscribe();
+        subscriptions.delete(topic);
+    }
+};
+
 export const websocketService = {
     connect,
     disconnect,
     subscribeToChatRoom,
     unsubscribeFromChatRoom,
     sendMessage,
+    subscribeToNotifications,
+    unsubscribeFromNotifications,
 };

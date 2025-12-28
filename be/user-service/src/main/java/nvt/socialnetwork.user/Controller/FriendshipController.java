@@ -68,4 +68,12 @@ public class FriendshipController {
     
         return ResponseEntity.ok(pendingRequests);
     }
+
+    @GetMapping("/suggestions")
+    public ResponseEntity<Page<UserResponse>> getSuggestions(
+            Authentication authentication, 
+            Pageable pageable) {
+        String currentUserId = authentication.getName();
+        return ResponseEntity.ok(friendshipService.getSuggestions(currentUserId, pageable));
+    }
 }

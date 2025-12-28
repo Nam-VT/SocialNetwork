@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectCurrentUser , logOut } from '../features/auth/authSlice';
+import { selectCurrentUser, logOut } from '../features/auth/authSlice';
 
 // Import các component con
 import NotificationsDropdown from '../features/notification/NotificationsDropdown';
@@ -32,7 +32,7 @@ const Navbar = () => {
                         Social Network
                     </Link>
 
-                    {/* Chỉ hiển thị các thành phần cần đăng nhập */}
+                    {/* Hiển thị SearchInput nếu đã đăng nhập */}
                     {currentUser && (
                         <div className="navbar-center">
                             <SearchInput />
@@ -40,10 +40,11 @@ const Navbar = () => {
                     )}
                     
                     <div className="navbar-nav">
-                        {currentUser  && (
+                        {currentUser && (
                             <>  
                                 <NotificationsDropdown />
-                                <Link to={`/profile/${currentUser.idgit}`} className="nav-link profile-link">
+                                {/* Sửa lỗi idgit thành id */}
+                                <Link to={`/profile/${currentUser.id}`} className="nav-link profile-link">
                                     <span className="nav-text">My Profile</span>
                                 </Link>
                                 <button
@@ -63,11 +64,11 @@ const Navbar = () => {
             {showLogoutConfirm && (
                  <Modal title="Confirm Logout" onClose={() => setShowLogoutConfirm(false)}>
                     <p>Are you sure you want to log out?</p>
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '20px' }}>
-                        <button onClick={() => setShowLogoutConfirm(false)} type="button">
+                    <div className="modal-actions">
+                        <button onClick={() => setShowLogoutConfirm(false)} type="button" className="btn-cancel">
                             Cancel
                         </button>
-                        <button onClick={handleConfirmLogout} type="button">
+                        <button onClick={handleConfirmLogout} type="button" className="btn-logout">
                             Logout
                         </button>
                     </div>
@@ -77,15 +78,17 @@ const Navbar = () => {
     );
 };
 
-// --- Component MainLayout ---
 const MainLayout = () => {
     return (
         <div className="app-layout">
-            <header>
+            <header className="app-header">
                 <Navbar />
             </header>
             <main className="main-content">
-                <Outlet />
+                {/* Vùng chứa nội dung chính sẽ giãn rộng và căn giữa tại đây */}
+                <div className="content-container">
+                    <Outlet />
+                </div>
             </main>
         </div>
     );

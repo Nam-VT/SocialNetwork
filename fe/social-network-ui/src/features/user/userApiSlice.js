@@ -92,7 +92,15 @@ export const userApiSlice = apiSlice.injectEndpoints({
                 `${VITE_USER_SERVICE_URL}/api/friendships/requests/pending?page=${page}&size=${size}`,
             providesTags: ['PendingRequest'],
         }),
+        getFriendSuggestions: builder.query({
+        query: (params) => ({
+            url: `${VITE_USER_SERVICE_URL}/api/friendships/suggestions`,
+            params: { page: params?.page || 0, size: params?.size || 5 }
+        }),
+        providesTags: ['Friend'],
     }),
+    }),
+    
 });
 
 export const {
@@ -108,4 +116,5 @@ export const {
     useUnfriendMutation,
     useGetFriendsQuery,
     useGetPendingRequestsQuery,
+    useGetFriendSuggestionsQuery,
 } = userApiSlice;
