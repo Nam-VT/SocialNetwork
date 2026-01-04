@@ -95,7 +95,10 @@
     /* Cấu trúc: [Trái 280px] - [Giữa tự giãn] - [Phải 320px] */
     grid-template-columns: 280px minmax(500px, 1fr) 320px;
     gap: 32px;
-    max-width: 1440px; /* Giới hạn độ rộng nội dung */
+
+    max-width: 1920px; /* Hoặc để 100% nếu muốn tràn viền hoàn toàn */
+    width: 100%;
+
     margin: 0 auto;    /* Căn giữa màn hình */
     padding: 0 20px;
 }
@@ -152,9 +155,7 @@
     margin-bottom: 40px;
 }
 
-/* --- 6. Responsive (Ẩn cột khi màn hình nhỏ) --- */
-/* Laptop nhỏ: Ẩn cột phải */
-@media (max-width: 1100px) {
+@media (max-width: 1200px) {
     .layout-grid {
         grid-template-columns: 280px 1fr;
     }
@@ -163,16 +164,11 @@
     }
 }
 
-/* Tablet/Mobile: Ẩn cả 2 cột, chỉ hiện Feed */
 @media (max-width: 900px) {
     .layout-grid {
         grid-template-columns: 1fr;
-        padding: 0 10px;
     }
-    .sidebar-left, .sidebar-right {
+    .sidebar-left {
         display: none;
-    }
-    .navbar-center {
-        display: none; /* Ẩn ô tìm kiếm trên mobile cho gọn */
     }
 }

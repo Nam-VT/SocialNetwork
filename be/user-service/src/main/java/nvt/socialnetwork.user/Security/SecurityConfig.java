@@ -29,6 +29,10 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll() 
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         .requestMatchers("/users/internal/**").permitAll()
+                        .requestMatchers("/users/profile").authenticated() // Lấy thông tin bản thân
+                        .requestMatchers(HttpMethod.GET, "/users/**").permitAll() // Cho phép xem profile người khác (Public)
+                        .requestMatchers(HttpMethod.PUT, "/users/**").authenticated() // Update phải đăng nhập
+                        .requestMatchers("/api/friendships/**").authenticated()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
