@@ -54,18 +54,19 @@ export const commentApiSlice = apiSlice.injectEndpoints({
         }),
 
         deleteComment: builder.mutation({
-            query: ({ id }) => ({ // SỬA LẠI: Lấy 'id' từ object
+            query: ({ id }) => ({
                 url: `${VITE_COMMENT_SERVICE_URL}/comments/${id}`,
                 method: 'DELETE',
             }),
             invalidatesTags: (result, error, { postId, parentCommentId }) => [
                 { type: 'Comment', id: `LIST-${postId}` },
+                { type: 'Post', id: postId }, // Để cập nhật commentCount
                 parentCommentId ? { type: 'Comment', id: `REPLIES-${parentCommentId}` } : null,
             ].filter(Boolean),
         }),
 
         toggleCommentLike: builder.mutation({
-            query: ({ commentId }) => ({ // SỬA LẠI: Lấy 'commentId' từ object
+            query: ({ commentId }) => ({
                 url: `${VITE_COMMENT_SERVICE_URL}/comment-likes/${commentId}`,
                 method: 'POST',
             }),

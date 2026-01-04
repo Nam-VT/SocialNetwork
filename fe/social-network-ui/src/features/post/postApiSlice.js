@@ -91,36 +91,20 @@ export const postApiSlice = apiSlice.injectEndpoints({
             ],
         }),
 
+        togglePostLike: builder.mutation({
+            query: (postId) => ({
+                url: `${VITE_POST_SERVICE_URL}/api/posts/${postId}/likes`, 
+                method: 'POST',
+            }),
+            invalidatesTags: (result, error, postId) => [
+                { type: 'Post', id: postId },
+                { type: 'PostLikeStatus', id: postId }
+            ],
+        }),
+
         hasUserLikedPost: builder.query({
             query: (postId) => `${VITE_POST_SERVICE_URL}/api/posts/${postId}/likes`,
             providesTags: (result, error, postId) => [{ type: 'PostLikeStatus', id: postId }],
-        }),
-
-        togglePostLike: builder.mutation({
-            query: (postId) => ({
-                url: `${VITE_POST_SERVICE_URL}/api/posts/${postId}/likes`,
-                method: 'POST',
-            }),
-            async onQueryStarted(postId, { dispatch, queryFulfilled }) {
-                // Cập nhật tất cả các list có chứa bài viết này
-                const listPatchResults = ['getFeedPosts', 'getPostsByUserId'].map(endpointName =>
-                    dispatch(
-                        apiSlice.util.updateQueryData(endpointName, undefined, (draft) => {
-                            const post = draft.content?.find(p => p.id === postId);
-                            if (post) {
-                                post.isLiked = !post.isLiked;
-                                post.likeCount += post.isLiked ? 1 : -1;
-                            }
-                        })
-                    )
-                );
-                
-                try {
-                    await queryFulfilled;
-                } catch {
-                    listPatchResults.forEach(patch => patch.undo()); // Hoàn tác nếu có lỗi
-                }
-            },
         }),
 
         getFeedPosts: builder.query({
@@ -170,5 +154,5 @@ export const {
     useUpdatePostMutation,
     useDeletePostMutation,
     useHasUserLikedPostQuery,
-    useTogglePostLikeMutation, 
+    useTogglePostLikeMutation
 } = postApiSlice;

@@ -1,11 +1,10 @@
 .profile-page {
-    max-width: 48rem;
+    max-width: 1000px;
     margin: 0 auto;
     padding: 1rem;
     background-color: #f9fafb;
     min-height: 100vh;
 }
-
 /* Edit section */
 .edit-section {
     display: flex;

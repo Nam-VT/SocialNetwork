@@ -1,21 +1,22 @@
-// src/components/MainLayout.jsx
+// src/layout/MainLayout.jsx
 import { useState } from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectCurrentUser, logOut } from '../features/auth/authSlice';
 
-// Import các component con
+// Import Components
 import NotificationsDropdown from '../features/notification/NotificationsDropdown';
 import SearchInput from '../features/search/SearchInput';
 import Modal from '../components/ui/Modal'; 
+import RightSidebar from '../features/friend/RightSidebar';
 
-import '../styles/Navbar.css';
+// CHỈ IMPORT FILE CSS NÀY (Đã chứa toàn bộ style layout)
+import '../styles/Navbar.css'; 
 
 const Navbar = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const currentUser = useSelector(selectCurrentUser);
-
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
     const handleConfirmLogout = () => {
@@ -26,13 +27,10 @@ const Navbar = () => {
 
     return (
         <>
-            <nav className="navbar" role="navigation">
+            <nav className="navbar">
                 <div className="navbar-container">
-                    <Link to="/" className="navbar-logo">
-                        Social Network
-                    </Link>
+                    <Link to="/" className="navbar-logo">Social Network</Link>
 
-                    {/* Hiển thị SearchInput nếu đã đăng nhập */}
                     {currentUser && (
                         <div className="navbar-center">
                             <SearchInput />
@@ -43,16 +41,11 @@ const Navbar = () => {
                         {currentUser && (
                             <>  
                                 <NotificationsDropdown />
-                                {/* Sửa lỗi idgit thành id */}
                                 <Link to={`/profile/${currentUser.id}`} className="nav-link profile-link">
-                                    <span className="nav-text">My Profile</span>
+                                    <span>My Profile</span>
                                 </Link>
-                                <button
-                                    type="button"
-                                    onClick={() => setShowLogoutConfirm(true)}
-                                    className="nav-button logout-button"
-                                >
-                                    <span className="nav-text">Logout</span>
+                                <button type="button" onClick={() => setShowLogoutConfirm(true)} className="nav-button logout-button">
+                                    <span>Logout</span>
                                 </button>
                             </>
                         )}
@@ -60,17 +53,12 @@ const Navbar = () => {
                 </div>
             </nav>
 
-            {/* Modal xác nhận đăng xuất */}
             {showLogoutConfirm && (
                  <Modal title="Confirm Logout" onClose={() => setShowLogoutConfirm(false)}>
-                    <p>Are you sure you want to log out?</p>
+                    <p style={{color: '#333'}}>Are you sure you want to log out?</p>
                     <div className="modal-actions">
-                        <button onClick={() => setShowLogoutConfirm(false)} type="button" className="btn-cancel">
-                            Cancel
-                        </button>
-                        <button onClick={handleConfirmLogout} type="button" className="btn-logout">
-                            Logout
-                        </button>
+                        <button onClick={() => setShowLogoutConfirm(false)} className="btn-cancel">Cancel</button>
+                        <button onClick={handleConfirmLogout} className="btn-logout">Logout</button>
                     </div>
                 </Modal>
             )}
@@ -81,13 +69,43 @@ const Navbar = () => {
 const MainLayout = () => {
     return (
         <div className="app-layout">
+            {/* Header nằm trên cùng */}
             <header className="app-header">
                 <Navbar />
             </header>
+            
+            {/* Nội dung chính chia 3 cột */}
             <main className="main-content">
-                {/* Vùng chứa nội dung chính sẽ giãn rộng và căn giữa tại đây */}
-                <div className="content-container">
-                    <Outlet />
+                <div className="layout-grid">
+                    
+                    {/* Cột 1: Sidebar Trái */}
+                    <aside className="sidebar-left">
+                        <nav className="side-menu">
+                            <Link to="/" className="menu-item">
+                                <span className="icon">🏠</span> 
+                                <span className="text">Bảng tin</span>
+                            </Link>
+                            <Link to="/friend-requests" className="menu-item">
+                                <span className="icon">👥</span> 
+                                <span className="text">Lời mời kết bạn</span>
+                            </Link>
+                            <Link to="/chat" className="menu-item">
+                                <span className="icon">💬</span> 
+                                <span className="text">Tin nhắn</span>
+                            </Link>
+                        </nav>
+                    </aside>
+
+                    {/* Cột 2: Feed Chính */}
+                    <section className="feed-column">
+                        <Outlet />
+                    </section>
+
+                    {/* Cột 3: Sidebar Phải */}
+                    <aside className="sidebar-right">
+                        <RightSidebar />
+                    </aside>
+                    
                 </div>
             </main>
         </div>

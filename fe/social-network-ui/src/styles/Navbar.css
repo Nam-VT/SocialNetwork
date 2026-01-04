@@ -1,133 +1,178 @@
-/* --- Cấu trúc Layout Tổng thể (Sửa lỗi bị 1 nửa màn hình) --- */
+/* src/styles/Navbar.css */
+
+/* --- 1. Cấu trúc nền tảng (Reset & Base) --- */
 .app-layout {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
     width: 100%;
-    background-color: #121212; /* Nền tối cho toàn trang */
+    background-color: #18191a; /* Màu nền Facebook Dark Mode */
+    color: #e4e6eb;
 }
 
 .main-content {
     flex: 1;
     width: 100%;
-    padding: 20px 0;
+    padding-top: 20px;
 }
 
-/* Container cho nội dung bài viết, căn giữa và giãn rộng tối đa 1200px */
-.content-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
-    box-sizing: border-box;
-}
-
-/* --- Navbar Styling --- */
+/* --- 2. Navbar Styling (Cố định ở trên cùng) --- */
 .navbar {
-    background-color: #000000;
-    color: #FFFFFF;
-    padding: 0.75rem 0;
+    background-color: #242526;
+    border-bottom: 1px solid #393a3b;
     position: sticky;
     top: 0;
     z-index: 1000;
-    border-bottom: 2px solid #1E40AF;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     width: 100%;
+    height: 60px; /* Chiều cao cố định để tính toán sticky bên dưới */
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .navbar-container {
-    max-width: 1200px; /* Khớp với content-container bên dưới */
+    width: 100%;
+    max-width: 1920px; /* Full màn hình nhưng có giới hạn */
+    padding: 0 16px;
     margin: 0 auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 1rem;
-    min-height: 60px;
 }
 
 .navbar-logo {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #FFFFFF;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #2E89FF; /* Màu xanh thương hiệu */
     text-decoration: none;
-    transition: color 0.2s ease;
-    white-space: nowrap;
-}
-
-.navbar-logo:hover {
-    color: #3B82F6;
+    letter-spacing: -0.5px;
 }
 
 .navbar-center {
     flex: 1;
-    max-width: 500px; /* Tăng độ rộng ô search một chút */
-    margin: 0 2rem;
+    max-width: 600px;
+    margin: 0 20px;
 }
 
 .navbar-nav {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 12px;
 }
 
-/* Buttons & Links */
+/* Link & Button trên Navbar */
 .nav-link, .nav-button {
-    color: #FFFFFF;
-    text-decoration: none;
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    transition: all 0.2s ease;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    background-color: rgba(30, 64, 175, 0.2);
-    border: 1px solid #1E40AF;
-    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 20px; /* Bo tròn kiểu chip */
+    background-color: #3a3b3c;
+    color: #e4e6eb;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: none;
     cursor: pointer;
+    transition: background 0.2s;
 }
 
 .nav-link:hover, .nav-button:hover {
-    background-color: #1E40AF;
-    transform: translateY(-1px);
+    background-color: #4e4f50;
 }
 
 .logout-button {
-    background-color: #DC3545;
-    border-color: #DC3545;
+    background-color: rgba(220, 53, 69, 0.2);
+    color: #ff4d4d;
 }
 
 .logout-button:hover {
-    background-color: #C82333;
-    border-color: #C82333;
+    background-color: rgba(220, 53, 69, 0.3);
 }
 
-/* Modal Actions */
-.modal-actions {
+/* --- 3. GRID SYSTEM 3 CỘT (QUAN TRỌNG NHẤT) --- */
+.layout-grid {
+    display: grid;
+    /* Cấu trúc: [Trái 280px] - [Giữa tự giãn] - [Phải 320px] */
+    grid-template-columns: 280px minmax(500px, 1fr) 320px;
+    gap: 32px;
+    max-width: 1440px; /* Giới hạn độ rộng nội dung */
+    margin: 0 auto;    /* Căn giữa màn hình */
+    padding: 0 20px;
+}
+
+/* --- 4. Thiết lập Sidebar (Sticky - Dính khi cuộn) --- */
+.sidebar-left, .sidebar-right {
+    position: sticky;
+    /* Top = Chiều cao Navbar (60px) + Padding (20px) */
+    top: 80px; 
+    height: fit-content;
+    /* Max height để sidebar có thể scroll độc lập nếu quá dài */
+    max-height: calc(100vh - 100px); 
+    overflow-y: auto;
+    
+    /* Ẩn thanh cuộn cho đẹp */
+    scrollbar-width: none; 
+}
+
+.sidebar-left::-webkit-scrollbar, 
+.sidebar-right::-webkit-scrollbar {
+    display: none;
+}
+
+/* Menu bên trái */
+.side-menu {
     display: flex;
-    justify-content: flex-end;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
     gap: 12px;
-    margin-top: 20px;
-}
-
-.modal-actions button {
-    padding: 8px 16px;
-    border-radius: 4px;
-    border: none;
-    cursor: pointer;
+    padding: 12px;
+    border-radius: 8px;
+    color: #e4e6eb;
+    text-decoration: none;
     font-weight: 500;
+    transition: background 0.2s;
 }
 
-.btn-cancel { background-color: #6C757D; color: white; }
-.btn-logout { background-color: #DC3545; color: white; }
+.menu-item:hover {
+    background-color: #3a3b3c;
+}
 
-/* Responsive */
-@media (max-width: 768px) {
-    .navbar-container {
-        flex-direction: column;
-        gap: 1rem;
+.menu-item .icon {
+    font-size: 1.5rem;
+}
+
+/* --- 5. Cột giữa (Feed) --- */
+.feed-column {
+    min-width: 0; /* Ngăn vỡ layout flex/grid con */
+    margin-bottom: 40px;
+}
+
+/* --- 6. Responsive (Ẩn cột khi màn hình nhỏ) --- */
+/* Laptop nhỏ: Ẩn cột phải */
+@media (max-width: 1100px) {
+    .layout-grid {
+        grid-template-columns: 280px 1fr;
+    }
+    .sidebar-right {
+        display: none;
+    }
+}
+
+/* Tablet/Mobile: Ẩn cả 2 cột, chỉ hiện Feed */
+@media (max-width: 900px) {
+    .layout-grid {
+        grid-template-columns: 1fr;
+        padding: 0 10px;
+    }
+    .sidebar-left, .sidebar-right {
+        display: none;
     }
     .navbar-center {
-        margin: 0;
-        width: 100%;
-        max-width: 100%;
+        display: none; /* Ẩn ô tìm kiếm trên mobile cho gọn */
     }
 }

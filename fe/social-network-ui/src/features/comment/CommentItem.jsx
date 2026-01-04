@@ -39,13 +39,23 @@ const CommentItem = ({ comment }) => {
         setEditedContent(content);
     }, [content]);
 
-    const handleLike = () => {
-        toggleCommentLike({ commentId: id, postId, parentCommentId });
+    const handleDelete = async () => {
+        if (window.confirm('Bạn có chắc muốn xóa bình luận này?')) {
+            try {
+        
+                await deleteComment({ id, postId, parentCommentId }).unwrap();
+            } catch (err) {
+                console.error('Failed to delete comment:', err);
+            }
+        }
     };
 
-    const handleDelete = async () => {
-        if (window.confirm('Are you sure you want to delete this comment?')) {
-            await deleteComment({ id, postId, parentCommentId });
+    const handleLike = async () => {
+        try {
+            // Truyền thêm dữ liệu ngữ cảnh
+            await toggleCommentLike({ commentId: id, postId, parentCommentId }).unwrap();
+        } catch (err) {
+            console.error('Failed to toggle comment like:', err);
         }
     };
 

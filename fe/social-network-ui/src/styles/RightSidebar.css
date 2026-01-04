@@ -1,0 +1,118 @@
+/* src/styles/RightSidebar.css */
+
+.right-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.sidebar-section {
+    background-color: #1a1a1a;
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid #333;
+}
+
+.section-title {
+    color: #b0b3b8;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.item-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Suggestion Card */
+.suggestion-card {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.avatar-sm {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #444;
+}
+
+.info .name {
+    display: block;
+    color: #e4e6eb;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-decoration: none;
+    margin-bottom: 4px;
+}
+
+.info .name:hover {
+    text-decoration: underline;
+}
+
+.btn-add {
+    background-color: #2341d2;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-add:hover {
+    background-color: #1e36af;
+}
+
+/* Friend Mini Item */
+.friend-mini-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.friend-mini-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.friend-name {
+    color: #e4e6eb;
+    font-size: 0.9rem;
+}
+
+.avatar-wrapper {
+    position: relative;
+}
+
+.status-dot {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid #1a1a1a;
+}
+
+.status-dot.online {
+    background-color: #31a24c;
+}
+
+.empty-text {
+    color: #888;
+    font-size: 0.85rem;
+    font-style: italic;
+    text-align: center;
+}

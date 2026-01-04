@@ -19,23 +19,23 @@ const ProfilePage = () => {
     // So sánh trực tiếp String với String, giờ đã chính xác
     const isOwner = currentUser?.id === userId;
 
-    // useEffect để xử lý phím Escape và cuộn trang khi modal mở
-    useEffect(() => {
-        const handleEscapeKey = (event) => {
-            if (event.key === 'Escape') {
-                setIsEditModalOpen(false);
-            }
-        };
+    // // useEffect để xử lý phím Escape và cuộn trang khi modal mở
+    // useEffect(() => {
+    //     const handleEscapeKey = (event) => {
+    //         if (event.key === 'Escape') {
+    //             setIsEditModalOpen(false);
+    //         }
+    //     };
 
-        if (isEditModalOpen) {
-            document.addEventListener('keydown', handleEscapeKey);
-            document.body.style.overflow = 'hidden';
-            return () => {
-                document.removeEventListener('keydown', handleEscapeKey);
-                document.body.style.overflow = 'unset';
-            };
-        }
-    }, [isEditModalOpen]);
+    //     if (isEditModalOpen) {
+    //         document.addEventListener('keydown', handleEscapeKey);
+    //         document.body.style.overflow = 'hidden';
+    //         return () => {
+    //             document.removeEventListener('keydown', handleEscapeKey);
+    //             document.body.style.overflow = 'unset';
+    //         };
+    //     }
+    // }, [isEditModalOpen]);
 
     // Xử lý trường hợp không có userId trong URL
     if (!userId) {
@@ -82,16 +82,11 @@ const ProfilePage = () => {
                 </div>
             </div>
 
-            {/* Modal Edit Profile (Giữ nguyên) */}
             {isEditModalOpen && (
-                <div className="modal-overlay" onClick={() => setIsEditModalOpen(false)}>
-                    <div className="modal-content" onClick={e => e.stopPropagation()}>
-                        <EditProfileForm
-                            user={currentUser}
-                            onClose={() => setIsEditModalOpen(false)}
-                        />
-                    </div>
-                </div>
+                <EditProfileForm
+                    user={currentUser}
+                    onClose={() => setIsEditModalOpen(false)}
+                />
             )}
         </>
     );

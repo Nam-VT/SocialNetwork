@@ -18,7 +18,7 @@ import {
 import { useClickOutside } from '../../hooks/useClickOutside';
 import '../../styles/UserProfileHeader.css';
 
-const UserProfileHeader = ({ userId }) => {
+const UserProfileHeader = ({ userId, onEditClick }) => {
     // 1. Fetch dữ liệu User
     const { data: user, isLoading: isLoadingUser, isError } = useGetUserByIdQuery(userId, { skip: !userId });
 
@@ -91,7 +91,12 @@ const UserProfileHeader = ({ userId }) => {
 
                     <div className="profile-actions">
                         {isOwnProfile ? (
-                            <button className="btn-profile edit-profile">Edit Profile</button>
+                            <button 
+                                className="btn-profile edit-profile" 
+                                onClick={onEditClick} // Thêm dòng này
+                            >
+                                Edit Profile
+                            </button>
                         ) : (
                             <>
                                 <div className="friendship-button-container" ref={friendMenuRef}>
