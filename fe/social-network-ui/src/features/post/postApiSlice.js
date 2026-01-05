@@ -70,11 +70,9 @@ export const postApiSlice = apiSlice.injectEndpoints({
                 method: 'PUT',
                 body: data,
             }),
-            invalidatesTags: (result, error, arg) => [
-                { type: 'Post', id: arg.id },
-                { type: 'Post', id: 'LIST' },
-                { type: 'Post', id: 'FEED' },
-                { type: 'Post', id: `LIST_USER_${result?.userId}` }
+            // Khi update xong, chỉ reload đúng bài post đó (không reload cả list)
+            invalidatesTags: (result, error, { id }) => [
+                { type: 'Post', id: id } 
             ],
         }),
 
@@ -92,14 +90,50 @@ export const postApiSlice = apiSlice.injectEndpoints({
         }),
 
         togglePostLike: builder.mutation({
-            query: (postId) => ({
-                url: `${VITE_POST_SERVICE_URL}/api/posts/${postId}/likes`, 
-                method: 'POST',
-            }),
-            invalidatesTags: (result, error, postId) => [
-                { type: 'Post', id: postId },
-                { type: 'PostLikeStatus', id: postId }
-            ],
+        query: (postId) => ({
+            url: `${VITE_POST_SERVICE_URL}/posts/${postId}/likes`,
+            method: 'POST',
+        }),
+        
+        async onQueryStarted(postId, { dispatch, queryFulfilled }) {
+            
+            const patchResult = dispatch(
+                postApiSlice.util.updateQueryData('getPosts', { page: 0, size: 10 }, (draft) => {
+                    
+                    const post = draft?.content?.find((p) => p.id === postId);
+                    if (post) {
+                        if (post.isLiked) {
+                            post.likeCount--;
+                            post.isLiked = false;
+                        } else {
+                            post.likeCount++;
+                            post.isLiked = true;
+                        }
+                    }
+                })
+            );
+                const patchResultDetail = dispatch(
+                    postApiSlice.util.updateQueryData('getPostById', postId, (draft) => {
+                        if (draft) {
+                            if (draft.isLiked) {
+                                draft.likeCount--;
+                                draft.isLiked = false;
+                            } else {
+                                draft.likeCount++;
+                                draft.isLiked = true;
+                            }
+                        }
+                    })
+                );
+
+                try {
+                    await queryFulfilled; // Chờ Server xác nhận
+                } catch {
+                    // Nếu Server lỗi, hoàn tác lại giao diện cũ
+                    patchResult.undo();
+                    patchResultDetail.undo();
+                }
+            },
         }),
 
         hasUserLikedPost: builder.query({

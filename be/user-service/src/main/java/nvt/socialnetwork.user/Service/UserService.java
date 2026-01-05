@@ -2,6 +2,7 @@ package nvt.socialnetwork.user.Service;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +23,7 @@ import nvt.socialnetwork.user.DTO.Request.UserRequest;
 import nvt.socialnetwork.user.DTO.Response.UserResponse;
 import nvt.socialnetwork.user.Entity.User;
 import nvt.socialnetwork.user.Repository.UserRepo;
+
 
 @Service
 @RequiredArgsConstructor
@@ -192,22 +194,29 @@ public class UserService {
     }
 
     private void sendUserEvent(User user, NotificationType type) {
-        String avatarUrl = (user.getAvatarId() != null) ? GATEWAY_URL + "/media/" + user.getAvatarId().toString() : null;
+        // 1. Xử lý logic lấy Avatar URL
+        String avatarUrl = (user.getAvatarId() != null) 
+                ? GATEWAY_URL + "/media/" + user.getAvatarId().toString() 
+                : null;
 
-        String publicEmail = user.getPublicEmail() != null ? user.getPublicEmail() : "";
-        String displayName = user.getDisplayName() != null ? user.getDisplayName() : "";
+        // 2. Sử dụng HashMap thay cho Map.of để cho phép giá trị null
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("userId", user.getId());
+        
+        // HashMap chấp nhận null, nên không lo bị crash
+        payload.put("displayName", user.getDisplayName()); 
+        payload.put("email", user.getPublicEmail() != null ? user.getPublicEmail() : user.getPublicEmail());
+        payload.put("avatarUrl", avatarUrl);
 
+        // 3. Tạo Event
         NotificationEvent event = NotificationEvent.builder()
                 .eventId(UUID.randomUUID().toString())
                 .eventTimestamp(Instant.now())
                 .type(type)
-                .payload(Map.of(
-                    "userId", user.getId(),
-                    "displayName", user.getDisplayName(),
-                    "email", user.getPublicEmail(), // Hoặc email chính nếu có
-                    "avatarUrl", avatarUrl
-                ))
+                .payload(payload)
                 .build();
+
+        // 4. Gửi Kafka
         kafkaTemplate.send(userTopic, event);
     }
 
