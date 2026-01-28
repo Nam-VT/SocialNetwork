@@ -11,8 +11,9 @@ import java.util.Date;
 
 @Component
 public class JwtUtil {
-    private final String SECRET_KEY = "b3f8d9a7e5c2b1a0f4e7d8c5b6a9f3e2d1c0b5a4f7e6d9c8b7a6f5e4d3c2b1a0";
-    private final long EXPIRATION_MS = 86400000;
+    private final String SECRET_KEY = "b3f8d9a7e5c2b1a0f4e7d8c5b6a9f3e2d1c0b5a4f7e6d9c8b7a6f5e4d3c2b1a0"; // dài >= 32
+                                                                                                          // bytes
+    private final long EXPIRATION_MS = 86400000; // 1 ngày
 
     private Key getSignKey() {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());

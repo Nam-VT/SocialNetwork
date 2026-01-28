@@ -1,11 +1,14 @@
+/* Main chat window - Full height flex container */
 .chat-window {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: 100vh;
+    max-height: 100vh;
     background-color: #f9fafb;
+    overflow: hidden;
 }
 
-/* Header placeholder (sẽ uncomment khi có ChatHeader) */
+/* Header - Fixed at top */
 .chat-header {
     flex-shrink: 0;
     border-bottom: 1px solid #e5e7eb;
@@ -13,15 +16,35 @@
     padding: 12px 16px;
 }
 
-/* Messages container */
-.chat-messages {
+/* Messages container - Takes remaining space and scrolls */
+.chat-messages-container {
     flex: 1;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 16px;
     display: flex;
     flex-direction: column;
 }
 
-/* Empty state khi không có room */
+/* Custom scrollbar for messages */
+.chat-messages-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.chat-messages-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.chat-messages-container::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.chat-messages-container::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Empty state when no room selected */
 .chat-window-empty {
     flex: 1;
     display: flex;
@@ -50,10 +73,22 @@
     line-height: 1.5;
 }
 
-/* Input form */
+/* Loading state */
+.chat-window.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-spinner {
+    font-size: 16px;
+    color: #6b7280;
+}
+
+/* Input form - Fixed at bottom */
 .chat-input-form {
     flex-shrink: 0;
-    padding: 10px 16px;
+    padding: 12px 16px;
     border-top: 1px solid #e5e7eb;
     background-color: white;
 }
@@ -67,48 +102,50 @@
 
 .message-input {
     flex: 1;
-    padding: 10px 12px;
+    padding: 10px 14px;
     border: 1px solid #d1d5db;
-    border-radius: 18px;
-    font-size: 14px;
+    border-radius: 20px;
+    font-size: 15px;
+    color: #000000;
     outline: none;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    box-sizing: border-box;
-    resize: none; /* Để không resize input */
+    background-color: #f0f2f5;
 }
 
 .message-input:focus {
     border-color: #0084ff;
+    background-color: white;
     box-shadow: 0 0 0 3px rgba(0, 132, 255, 0.1);
 }
 
 .message-input::placeholder {
-    color: #9ca3af;
+    color: #65676b;
 }
 
 .send-button {
-    padding: 10px 16px;
+    padding: 10px 20px;
     background-color: #0084ff;
     color: white;
     border: none;
-    border-radius: 18px;
-    font-size: 14px;
+    border-radius: 20px;
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.1s ease;
+    transition: all 0.2s ease;
     white-space: nowrap;
-    min-width: 60px;
 }
 
-.send-button:hover:not(:disabled),
-.send-button:focus:not(:disabled) {
+.send-button:hover:not(:disabled) {
     background-color: #0066cc;
-    transform: translateY(-1px);
-    outline: none;
+    transform: scale(1.05);
+}
+
+.send-button:active:not(:disabled) {
+    transform: scale(0.98);
 }
 
 .send-button:disabled {
-    background-color: #9ca3af;
+    background-color: #bcc0c4;
     cursor: not-allowed;
     transform: none;
 }
@@ -116,61 +153,43 @@
 .input-hint {
     display: block;
     font-size: 11px;
-    color: #6b7280;
+    color: #65676b;
     text-align: center;
     margin: 0;
-    font-style: italic;
-}
-
-/* Animations */
-@keyframes slideIn {
-    from { 
-        opacity: 0; 
-        transform: translateY(10px); 
-    }
-    to { 
-        opacity: 1; 
-        transform: translateY(0); 
-    }
-}
-
-.chat-input-form {
-    animation: slideIn 0.3s ease-out;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
     .chat-window {
-        height: 100vh; /* Full height trên mobile */
+        height: 100vh;
     }
-    
+
+    .chat-messages-container {
+        padding: 12px;
+    }
+
     .chat-input-form {
-        padding: 8px 12px;
+        padding: 10px 12px;
     }
-    
+
     .input-group {
         gap: 6px;
     }
-    
+
     .message-input {
-        padding: 8px 10px;
-        font-size: 16px; /* Tăng font cho mobile keyboard */
+        padding: 9px 12px;
+        font-size: 16px;
     }
-    
+
     .send-button {
-        padding: 8px 12px;
+        padding: 9px 16px;
         font-size: 14px;
-        min-width: 50px;
     }
-    
-    .chat-window-empty {
-        padding: 16px;
-    }
-    
+
     .empty-content h3 {
         font-size: 1.1rem;
     }
-    
+
     .empty-content p {
         font-size: 13px;
     }

@@ -69,62 +69,63 @@
     cursor: not-allowed;
 }
 
-.participant-list {
-    list-style: none;
-    padding: 0;
-    margin: 8px 0 0 0;
-    max-height: 200px;
+
+/* Scrollable Member List */
+.friends-selection-list {
+    margin-top: 10px;
+    max-height: 250px;
     overflow-y: auto;
     border: 1px solid #e5e7eb;
     border-radius: 6px;
     background-color: #f9fafb;
 }
 
-.participant-item {
+/* Individual Friend Item */
+.friend-selection-item {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 8px 12px;
+    padding: 10px 12px;
     border-bottom: 1px solid #e5e7eb;
-    font-size: 14px;
-    color: #374151;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
 }
 
-.participant-item:last-child {
+.friend-selection-item:last-child {
     border-bottom: none;
 }
 
-.participant-item.current-user {
+.friend-selection-item:hover {
+    background-color: #f3f4f6;
+}
+
+.friend-selection-item.selected {
     background-color: #e0f2fe;
-    font-weight: 600;
 }
 
-.user-role {
-    color: #6b7280;
-    font-weight: normal;
-    margin-left: 4px;
-}
-
-.remove-button {
-    background: none;
-    border: none;
-    font-size: 18px;
-    color: #ef4444;
-    cursor: pointer;
-    padding: 0 4px;
+/* Avatar Styling - Critical for visual fix */
+.friend-avatar-small {
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    transition: background-color 0.2s ease;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    margin-left: 12px;
+    margin-right: 12px;
+    object-fit: cover;
+    border: 1px solid #e5e7eb;
+    flex-shrink: 0;
 }
 
-.remove-button:hover,
-.remove-button:focus {
-    background-color: #fee2e2;
-    outline: none;
+/* Name Styling */
+.friend-name {
+    font-size: 14px;
+    color: #374151;
+    font-weight: 500;
+}
+
+/* Checkbox alignment */
+.friend-checkbox {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
 }
 
 .error-message {
@@ -181,8 +182,9 @@
 }
 
 .btn-primary {
-    background-color: #0084ff;
-    color: white;
+    background-color: #0084ff !important;
+    color: white !important;
+    opacity: 1 !important;
 }
 
 .btn-primary:hover:not(:disabled),
@@ -203,19 +205,19 @@
     .create-group-form {
         padding: 16px;
     }
-    
+
     .search-input-group {
         flex-direction: column;
     }
-    
+
     .add-button {
         align-self: stretch;
     }
-    
+
     .form-actions {
         flex-direction: column-reverse;
     }
-    
+
     .btn-primary,
     .btn-secondary {
         width: 100%;

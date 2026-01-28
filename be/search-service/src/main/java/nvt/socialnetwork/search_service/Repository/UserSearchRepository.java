@@ -2,17 +2,17 @@ package nvt.socialnetwork.search_service.Repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.elasticsearch.annotations.Query;
-import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import nvt.socialnetwork.search_service.Document.UserDocument;
 
-@Repository
-public interface UserSearchRepository extends ElasticsearchRepository<UserDocument, String> {
+public interface UserSearchRepository extends JpaRepository<UserDocument, String> {
 
-    //Page<UserDocument> findByDisplayNameContainingOrEmailContaining(String displayName, String email, Pageable pageable);
+    // Page<UserDocument> findByDisplayNameContainingOrEmailContaining(String
+    // displayName, String email, Pageable pageable);
 
-    @Query("{\"multi_match\": {\"query\": \"?0\", \"fields\": [\"display_name^2\", \"email\"], \"fuzziness\": \"AUTO\"}}")
-    Page<UserDocument> searchUsers(String query, Pageable pageable);
+    @Query("SELECT u FROM UserDocument u WHERE LOWER(u.displayName) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(u.email) LIKE LOWER(CONCAT('%', :query, '%'))")
+    Page<UserDocument> searchUsers(@Param("query") String query, Pageable pageable);
 }

@@ -1,0 +1,26 @@
+.chat-layout {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    height: calc(100vh - 80px);
+    background-color: var(--background-color);
+}
+
+.chat-layout>aside {
+    border-right: 1px solid var(--border-color);
+    overflow-y: auto;
+}
+
+.chat-layout>main {
+    overflow: hidden;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .chat-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .chat-layout>aside {
+        display: none;
+    }
+}

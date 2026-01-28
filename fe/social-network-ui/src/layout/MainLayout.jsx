@@ -7,20 +7,41 @@ import { selectCurrentUser, logOut } from '../features/auth/authSlice';
 // Import Components
 import NotificationsDropdown from '../features/notification/NotificationsDropdown';
 import SearchInput from '../features/search/SearchInput';
-import Modal from '../components/ui/Modal'; 
+import Modal from '../components/ui/Modal';
 import RightSidebar from '../features/friend/RightSidebar';
 
 // CHỈ IMPORT FILE CSS NÀY (Đã chứa toàn bộ style layout)
-import '../styles/Navbar.css'; 
+import '../styles/Navbar.css';
+
+// Import thêm
+import { useEffect } from 'react';
+import { websocketService } from '../service/websocketService';
 
 const Navbar = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const currentUser = useSelector(selectCurrentUser);
+    const token = useSelector(state => state.auth.token); // Retrieve token
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+    // KẾT NỐI WEBSOCKET TOÀN CỤC KHI NAV BAR MOUNT (USER ĐÃ LOGIN)
+    useEffect(() => {
+        if (currentUser && token) {
+            console.log("MainLayout: currentUser detected, requesting WebSocket connection...", currentUser.id);
+            websocketService.connect(
+                token,
+                () => console.log("WebSocket Connected globally via MainLayout"),
+                (err) => console.error("WebSocket Error:", err)
+            );
+        } else {
+            console.log("MainLayout: No currentUser or token, skipping WebSocket connection.");
+        }
+        // Cleanup khi logout hoặc unmount thì xử lý trong authSlice hoặc service
+    }, [currentUser, token]);
 
     const handleConfirmLogout = () => {
         dispatch(logOut());
+        websocketService.disconnect(); // Ngắt kết nối khi logout
         setShowLogoutConfirm(false);
         navigate('/login', { replace: true });
     };
@@ -36,10 +57,10 @@ const Navbar = () => {
                             <SearchInput />
                         </div>
                     )}
-                    
+
                     <div className="navbar-nav">
                         {currentUser && (
-                            <>  
+                            <>
                                 <NotificationsDropdown />
                                 <Link to={`/profile/${currentUser.id}`} className="nav-link profile-link">
                                     <span>My Profile</span>
@@ -54,8 +75,8 @@ const Navbar = () => {
             </nav>
 
             {showLogoutConfirm && (
-                 <Modal title="Confirm Logout" onClose={() => setShowLogoutConfirm(false)}>
-                    <p style={{color: '#333'}}>Are you sure you want to log out?</p>
+                <Modal title="Confirm Logout" onClose={() => setShowLogoutConfirm(false)}>
+                    <p style={{ color: '#333' }}>Are you sure you want to log out?</p>
                     <div className="modal-actions">
                         <button onClick={() => setShowLogoutConfirm(false)} className="btn-cancel">Cancel</button>
                         <button onClick={handleConfirmLogout} className="btn-logout">Logout</button>
@@ -73,24 +94,24 @@ const MainLayout = () => {
             <header className="app-header">
                 <Navbar />
             </header>
-            
+
             {/* Nội dung chính chia 3 cột */}
             <main className="main-content">
                 <div className="layout-grid">
-                    
+
                     {/* Cột 1: Sidebar Trái */}
                     <aside className="sidebar-left">
                         <nav className="side-menu">
                             <Link to="/" className="menu-item">
-                                <span className="icon">🏠</span> 
+                                <span className="icon">🏠</span>
                                 <span className="text">Bảng tin</span>
                             </Link>
                             <Link to="/friend-requests" className="menu-item">
-                                <span className="icon">👥</span> 
+                                <span className="icon">👥</span>
                                 <span className="text">Lời mời kết bạn</span>
                             </Link>
                             <Link to="/chat" className="menu-item">
-                                <span className="icon">💬</span> 
+                                <span className="icon">💬</span>
                                 <span className="text">Tin nhắn</span>
                             </Link>
                         </nav>
@@ -105,7 +126,7 @@ const MainLayout = () => {
                     <aside className="sidebar-right">
                         <RightSidebar />
                     </aside>
-                    
+
                 </div>
             </main>
         </div>

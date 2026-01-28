@@ -48,9 +48,20 @@ public class FollowController {
     }
 
     @GetMapping("/status/{targetUserId}")
-    public ResponseEntity<FollowStatusResponse> getFollowStatus(@PathVariable String targetUserId, Authentication authentication) {
+    public ResponseEntity<FollowStatusResponse> getFollowStatus(@PathVariable String targetUserId,
+            Authentication authentication) {
         FollowStatusResponse status = followService.getFollowStatus(targetUserId, authentication);
         return ResponseEntity.ok(status);
+    }
+
+    // Internal endpoint for system-level operations (e.g., auto-follow on friend
+    // accept)
+    @PostMapping("/internal/{followerId}/{followingId}")
+    public ResponseEntity<Void> createFollowRelationship(
+            @PathVariable String followerId,
+            @PathVariable String followingId) {
+        followService.createFollowRelationship(followerId, followingId);
+        return ResponseEntity.ok().build();
     }
 
 }

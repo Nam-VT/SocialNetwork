@@ -4,7 +4,7 @@ import CommentItem from './CommentItem';
 import CommentForm from './CommentForm';
 import '../../styles/CommentSection.css';
 
-const CommentSection = ({ postId }) => {
+const CommentSection = ({ postId, postOwnerId }) => {
     const [page, setPage] = useState(0);
 
     const {
@@ -30,10 +30,10 @@ const CommentSection = ({ postId }) => {
         listContent = (
             <>
                 <div className="comments-list">
-                    {comments.length > 0 
+                    {comments.length > 0
                         ? comments.map((comment) => (
                             <CommentItem key={comment.id} comment={comment} />
-                          ))
+                        ))
                         : <p className="comments-empty">Be the first to comment.</p>
                     }
                 </div>
@@ -51,14 +51,14 @@ const CommentSection = ({ postId }) => {
     return (
         <section className="comment-section">
             <h3 className="comment-section-title">Comments</h3>
-            
+
             {/* SỬA LẠI BỐ CỤC: Hiển thị danh sách comment TRƯỚC */}
             <div className="comment-section-content">
                 {listContent}
             </div>
 
             {/* SỬA LẠI BỐ CỤC: Form nhập comment nằm ở DƯỚI CÙNG */}
-            <CommentForm postId={postId} />
+            <CommentForm postId={postId} postOwnerId={postOwnerId} />
         </section>
     );
 };

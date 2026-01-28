@@ -1,11 +1,13 @@
-/* src/styles/CreatePostForm.css - Fixed Với Text Đen Cho Inputs (Light Form) + Khung Ảnh Responsive */
-
-/* Container Chính - Dark Outer Nếu App Dark, Nhưng Form Light */
 .create-post-container {
-    background-color: #000000; /* Đen cho outer nếu dark theme app */
-    padding: 1rem;
-    color: #FFFFFF; /* Text trắng cho header */
-    min-height: 100vh; /* Full height nếu standalone */
+    background-color: transparent;
+    /* Transparent để hòa vào nền dashboard */
+    padding: 0;
+    /* Xóa padding thừa */
+    color: #FFFFFF;
+    width: 100%;
+    /* Full width của parent column */
+    margin-bottom: 20px;
+    /* Cách bài viết bên dưới */
 }
 
 .post-header {
@@ -16,36 +18,46 @@
 .form-title {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #FFFFFF; /* Trắng cho title */
+    color: #FFFFFF;
+    /* Trắng cho title */
     margin: 0 0 0.5rem 0;
 }
 
 .form-subtitle {
-    color: #A0A0A0; /* Xám nhạt cho subtitle */
+    color: #A0A0A0;
+    /* Xám nhạt cho subtitle */
     margin: 0;
 }
 
-/* Post Card - Light Background Cho Form */
+/* Post Card - Dark Background */
 .post-card {
-    background-color: #FFFFFF; /* Trắng cho card - Contrast với outer dark */
+    background-color: #242526;
+    /* Dark card background */
     border-radius: 0.5rem;
     padding: 1.5rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Shadow nhẹ */
-    max-width: 600px;
-    margin: 0 auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+    /* Darker shadow */
+    width: 100%;
+    /* Full width of container */
+    margin: 0;
+    color: #e4e6eb;
+    /* Default text color */
+    box-sizing: border-box;
 }
 
-/* Error Alert - Giữ Đỏ Trên Light */
+/* Error Alert - Giữ Đỏ Trên Dark (Overlay) */
 .error-alert {
-    background-color: #fef2f2;
-    border: 1px solid #fecaca;
+    background-color: rgba(254, 242, 242, 0.1);
+    /* Transparent red */
+    border: 1px solid #7f1d1d;
     border-radius: 0.375rem;
     padding: 1rem;
     display: flex;
     align-items: flex-start;
     gap: 0.75rem;
     margin-bottom: 1rem;
-    color: #991b1b;
+    color: #fca5a5;
+    /* Lighter red text */
 }
 
 .error-icon {
@@ -81,43 +93,49 @@
 .form-label {
     font-size: 0.875rem;
     font-weight: 500;
-    color: #374151; /* Xám đậm cho label - Light theme */
+    color: #b0b3b8;
+    /* Lighter gray for dark mode */
     margin-bottom: 0.5rem;
 }
 
-/* Textarea - Fix Chính: Text Đen Khi Điền */
+/* Textarea - Light background with dark text */
 .form-textarea {
     width: 100%;
     min-height: 120px;
-    padding: 0.75rem;
-    border: 1px solid #d1d5db; /* Border xám nhạt */
-    border-radius: 0.5rem;
-    background-color: #FFFFFF; /* Bg trắng - Light */
-    color: #000000 !important; /* Text đen rõ nét khi điền - Fix "không nhìn được" */
+    padding: 16px;
+    border: 1px solid #d1d5db;
+    /* Light border */
+    border-radius: 8px;
     font-size: 1rem;
-    font-family: inherit;
+    line-height: 1.5;
     resize: vertical;
-    transition: border-color 0.2s ease;
+    background-color: #ffffff;
+    /* White background */
+    color: #1c1e21;
+    /* Black text */
     box-sizing: border-box;
 }
 
 .form-textarea:focus {
     outline: none;
-    border-color: #3b82f6; /* Focus blue */
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    border-color: #3b82f6;
+    /* Focus blue */
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
 .form-textarea::placeholder {
-    color: #6B7280 !important; /* Placeholder xám - Dễ thấy, không trắng */
+    color: #b0b3b8 !important;
+    /* Lighter gray placeholder */
 }
 
 .form-textarea.warning {
-    border-color: #f59e0b; /* Warning border vàng */
+    border-color: #f59e0b;
+    /* Warning border vàng */
 }
 
 .form-textarea:disabled {
     opacity: 0.5;
-    background-color: #f3f4f6;
+    background-color: #242526;
     cursor: not-allowed;
 }
 
@@ -129,11 +147,13 @@
 
 .char-counter span {
     font-size: 0.75rem;
-    color: #6B7280; /* Xám mặc định */
+    color: #b0b3b8;
+    /* Xám nhạt */
 }
 
 .char-counter span.warning {
-    color: #f59e0b; /* Vàng warning */
+    color: #f59e0b;
+    /* Vàng warning */
 }
 
 /* Checkbox Private */
@@ -147,18 +167,21 @@
     gap: 0.5rem;
     cursor: pointer;
     font-size: 0.875rem;
-    color: #374151; /* Label xám đậm */
+    color: #e4e6eb;
+    /* Light text for label */
 }
 
 .checkbox-label input[type="checkbox"] {
     width: 1rem;
     height: 1rem;
-    accent-color: #3b82f6; /* Blue cho checkbox */
+    accent-color: #3b82f6;
+    /* Blue cho checkbox */
     cursor: pointer;
 }
 
 .checkbox-icon {
-    font-size: 1.2rem; /* Icon 🔒 size */
+    font-size: 1.2rem;
+    /* Icon 🔒 size */
 }
 
 .checkbox-text {
@@ -172,42 +195,60 @@
 
 /* Media Preview - FIXED: Grid Responsive, Toàn Màn Hình */
 .media-preview {
-    display: grid !important; /* Grid thay flex cho responsive tốt hơn */
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important; /* Auto columns: 1 mobile (full width), 2-4 desktop */
-    gap: 0.75rem !important; /* Gap lớn hơn cho multiple ảnh */
+    display: grid !important;
+    /* Grid thay flex cho responsive tốt hơn */
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+    /* Auto columns: 1 mobile (full width), 2-4 desktop */
+    gap: 0.75rem !important;
+    /* Gap lớn hơn cho multiple ảnh */
     margin: 1rem 0 !important;
-    max-height: none !important; /* Không limit height - Toàn màn nếu nhiều ảnh */
-    overflow: visible !important; /* Không scroll - Fit tự nhiên */
-    padding: 0.5rem !important; /* Padding nhẹ cho grid */
-    border: 1px solid #d1d5db !important; /* Border xám nhạt - Khung rõ */
+    max-height: none !important;
+    /* Không limit height - Toàn màn nếu nhiều ảnh */
+    overflow: visible !important;
+    /* Không scroll - Fit tự nhiên */
+    padding: 0.5rem !important;
+    /* Padding nhẹ cho grid */
+    border: 1px solid #3e4142 !important;
+    /* Border dark */
     border-radius: 0.5rem !important;
-    background-color: #f9fafb !important; /* Nền xám nhạt light - Match form */
+    background-color: #242526 !important;
+    /* Nền dark */
 }
 
 /* Media Item - FIXED: Size Flex, Toàn Khung */
 .media-item {
     position: relative !important;
-    width: 100% !important; /* Full width của grid cell */
-    aspect-ratio: 1 / 1 !important; /* Square default (1:1) cho ảnh vuông */
-    min-width: 150px !important; /* Min size mobile/desktop */
-    height: auto !important; /* Auto height theo aspect */
+    width: 100% !important;
+    /* Full width của grid cell */
+    aspect-ratio: 1 / 1 !important;
+    /* Square default (1:1) cho ảnh vuông */
+    min-width: 150px !important;
+    /* Min size mobile/desktop */
+    height: auto !important;
+    /* Auto height theo aspect */
     border-radius: 0.5rem !important;
     overflow: hidden !important;
-    background-color: #f3f4f6 !important; /* Bg xám nhạt nếu load chậm */
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important; /* Shadow nhẹ - Nổi trong light form */
-    transition: transform 0.2s ease !important; /* Hover effect */
+    background-color: #18191a !important;
+    /* Bg rất tối nếu load chậm */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+    /* Shadow */
+    transition: transform 0.2s ease !important;
+    /* Hover effect */
 }
 
 .media-item:hover {
-    transform: scale(1.02) !important; /* Zoom nhẹ khi hover - UX tốt */
+    transform: scale(1.02) !important;
+    /* Zoom nhẹ khi hover - UX tốt */
 }
 
 /* Ảnh/Video - FIXED: Cover Toàn Khung */
 .media-img {
     width: 100% !important;
     height: 100% !important;
-    object-fit: cover !important; /* Fit toàn khung, crop center nếu cần - Không méo */
-    object-position: center !important; /* Center crop để "toàn" đẹp */
+    object-fit: cover !important;
+    /* Fit toàn khung, crop center nếu cần - Không méo */
+    object-position: center !important;
+    /* Center crop để "toàn" đẹp */
     display: block !important;
 }
 
@@ -215,7 +256,8 @@
 .media-item video {
     width: 100% !important;
     height: 100% !important;
-    object-fit: cover !important; /* Tương tự ảnh */
+    object-fit: cover !important;
+    /* Tương tự ảnh */
 }
 
 /* Remove Button - FIXED: Không Che Ảnh, Lớn Hơn */
@@ -223,9 +265,11 @@
     position: absolute !important;
     top: 0.5rem !important;
     right: 0.5rem !important;
-    width: 2rem !important; /* Lớn hơn cho dễ click */
+    width: 2rem !important;
+    /* Lớn hơn cho dễ click */
     height: 2rem !important;
-    background-color: rgba(0, 0, 0, 0.7) !important; /* Đen semi-transparent */
+    background-color: rgba(0, 0, 0, 0.7) !important;
+    /* Đen semi-transparent */
     color: #FFFFFF !important;
     border: none !important;
     border-radius: 50% !important;
@@ -233,10 +277,12 @@
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    font-size: 1.25rem !important; /* Icon × lớn hơn */
+    font-size: 1.25rem !important;
+    /* Icon × lớn hơn */
     opacity: 0 !important;
     transition: opacity 0.2s ease !important;
-    z-index: 10 !important; /* Trên ảnh */
+    z-index: 10 !important;
+    /* Trên ảnh */
 }
 
 .media-item:hover .remove-media {
@@ -262,19 +308,22 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1rem;
-    background-color: #f3f4f6; /* Xám nhạt light */
-    border: 1px solid #d1d5db;
+    background-color: #3a3b3c;
+    /* Dark button background */
+    border: 1px solid #3e4142;
     border-radius: 0.5rem;
     cursor: pointer;
     font-size: 0.875rem;
-    color: #374151;
+    color: #e4e6eb;
+    /* Light text */
     transition: background-color 0.2s ease;
     flex: 1;
     justify-content: center;
 }
 
 .file-label:hover:not(:disabled) {
-    background-color: #e5e7eb;
+    background-color: #4e4f50;
+    /* Lighter hover */
 }
 
 .file-label:disabled {
@@ -297,13 +346,15 @@
 }
 
 .file-input {
-    display: none; /* Hidden, dùng label trigger */
+    display: none;
+    /* Hidden, dùng label trigger */
 }
 
 /* Submit Button */
 .submit-button {
     padding: 0.75rem 1.5rem;
-    background-color: #3b82f6; /* Blue light */
+    background-color: #3b82f6;
+    /* Blue light */
     color: #FFFFFF;
     border: none;
     border-radius: 0.5rem;
@@ -353,8 +404,13 @@
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* Responsive - FIXED: Toàn Màn Hình Mobile/Desktop Cho Media */
@@ -375,43 +431,55 @@
 
     /* Media Preview Mobile - 1 Column Full Width (Toàn Màn Hình) */
     .media-preview {
-        grid-template-columns: 1fr !important; /* 1 full column - Toàn mh */
+        grid-template-columns: 1fr !important;
+        /* 1 full column - Toàn mh */
         gap: 0.5rem !important;
         padding: 0.25rem !important;
-        border: none !important; /* Không border mobile để full */
+        border: none !important;
+        /* Không border mobile để full */
     }
 
     .media-item {
-        min-width: 100% !important; /* Full width mobile */
-        aspect-ratio: 16 / 9 !important; /* Wide hơn (ảnh ngang/video) */
+        min-width: 100% !important;
+        /* Full width mobile */
+        aspect-ratio: 16 / 9 !important;
+        /* Wide hơn (ảnh ngang/video) */
         max-width: 100% !important;
     }
 
-    .media-img, .media-item video {
-        aspect-ratio: 16 / 9 !important; /* Fit wide mobile */
+    .media-img,
+    .media-item video {
+        aspect-ratio: 16 / 9 !important;
+        /* Fit wide mobile */
     }
 
     .remove-media {
-        width: 2.5rem !important; /* Lớn hơn mobile */
+        width: 2.5rem !important;
+        /* Lớn hơn mobile */
         height: 2.5rem !important;
         font-size: 1.5rem !important;
     }
 }
 
 @media (min-width: 1024px) {
+
     /* Desktop - 3-4 Columns Fit Container (Toàn Grid) */
     .media-preview {
-        grid-template-columns: repeat(3, 1fr) !important; /* 3 columns lớn */
+        grid-template-columns: repeat(3, 1fr) !important;
+        /* 3 columns lớn */
         gap: 1rem !important;
     }
 
     .media-item {
-        min-width: 200px !important; /* Lớn hơn desktop */
-        aspect-ratio: 1 / 1 !important; /* Square cho gallery */
+        min-width: 200px !important;
+        /* Lớn hơn desktop */
+        aspect-ratio: 1 / 1 !important;
+        /* Square cho gallery */
     }
 }
 
 /* Fallback Nếu Không Có Media */
 .media-preview:empty {
-    display: none !important; /* Ẩn nếu empty - Không space thừa */
+    display: none !important;
+    /* Ẩn nếu empty - Không space thừa */
 }

@@ -16,6 +16,7 @@ import lombok.Builder;
 @Builder
 public class Follow {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "follower_id")

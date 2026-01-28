@@ -32,7 +32,6 @@ import nvt.socialnetwork.chat.Repository.ChatRoomRepo;
 import nvt.socialnetwork.common.dto.NotificationEvent;
 import nvt.socialnetwork.common.dto.NotificationType;
 
-
 @Service
 @RequiredArgsConstructor
 public class ChatService {
@@ -55,7 +54,8 @@ public class ChatService {
         }
 
         try {
-            if (userClient.checkUserExists(user2Id).getBody() == null || !userClient.checkUserExists(user2Id).getBody()) {
+            if (userClient.checkUserExists(user2Id).getBody() == null
+                    || !userClient.checkUserExists(user2Id).getBody()) {
                 throw new RuntimeException("User not found with id: " + user2Id);
             }
         } catch (RuntimeException e) {
@@ -86,7 +86,8 @@ public class ChatService {
         participantIds.add(creatorId); // Thêm người tạo vào danh sách thành viên
 
         try {
-            if(userClient.validateUserIds(participantIds).getBody() == null || !userClient.validateUserIds(participantIds).getBody()) {
+            if (userClient.validateUserIds(participantIds).getBody() == null
+                    || !userClient.validateUserIds(participantIds).getBody()) {
                 throw new RuntimeException("One or more participant IDs are invalid.");
             }
         } catch (RuntimeException e) {
@@ -97,10 +98,74 @@ public class ChatService {
                 .type(RoomType.GROUP)
                 .name(request.getName())
                 .participantIds(participantIds)
+                .creatorId(creatorId) // Assuming ChatRoom entity has a creatorId field
                 .build();
-        
+
         ChatRoom savedRoom = chatRoomRepository.save(newGroupRoom);
 
+        return mapChatRoomToResponse(savedRoom);
+    }
+
+    @Transactional
+    public ChatRoomResponse updateGroupName(UUID chatRoomId, String newName, String requesterId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new RuntimeException("Chat room not found"));
+
+        if (chatRoom.getType() != RoomType.GROUP) { // Changed from getIsGroup() to getType()
+            throw new IllegalStateException("Cannot rename private chat");
+        }
+
+        if (!chatRoom.getCreatorId().equals(requesterId)) {
+            throw new SecurityException("Only group creator can rename the group");
+        }
+
+        chatRoom.setName(newName);
+        ChatRoom updated = chatRoomRepository.save(chatRoom);
+        return mapChatRoomToResponse(updated);
+    }
+
+    @Transactional
+    public void deleteGroup(UUID chatRoomId, String requesterId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new RuntimeException("Chat room not found"));
+
+        if (chatRoom.getType() != RoomType.GROUP) {
+            throw new IllegalStateException("Cannot delete private chat");
+        }
+
+        if (!chatRoom.getCreatorId().equals(requesterId)) {
+            throw new SecurityException("Only group creator can delete the group");
+        }
+
+        // Delete all messages in the group
+        chatMessageRepository.deleteByChatRoomId(chatRoomId);
+
+        // Delete the chat room
+        chatRoomRepository.delete(chatRoom);
+    }
+
+    @Transactional
+    public ChatRoomResponse leaveGroup(UUID chatRoomId, String requesterId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new RuntimeException("Chat room not found"));
+
+        if (chatRoom.getType() != RoomType.GROUP) {
+            throw new IllegalStateException("Cannot leave private chat");
+        }
+
+        if (chatRoom.getCreatorId().equals(requesterId)) {
+            throw new SecurityException("Group creator cannot leave the group. You must delete the group instead.");
+        }
+
+        if (!chatRoom.getParticipantIds().contains(requesterId)) {
+            throw new IllegalStateException("You are not a member of this group");
+        }
+
+        chatRoom.getParticipantIds().remove(requesterId);
+
+        // Notify other members (Optional: System message)
+        // For now, just save
+        ChatRoom savedRoom = chatRoomRepository.save(chatRoom);
         return mapChatRoomToResponse(savedRoom);
     }
 
@@ -114,7 +179,8 @@ public class ChatService {
             throw new SecurityException("User is not a participant of this chat room.");
         }
 
-        if (request.getType() == MessageType.IMAGE || request.getType() == MessageType.VIDEO || request.getType() == MessageType.FILE) {
+        if (request.getType() == MessageType.IMAGE || request.getType() == MessageType.VIDEO
+                || request.getType() == MessageType.FILE) {
             if (request.getMediaId() == null) {
                 throw new IllegalArgumentException("Media ID cannot be null for non-text messages.");
             }
@@ -125,7 +191,7 @@ public class ChatService {
                 throw new RuntimeException("Invalid media ID: " + request.getMediaId(), e);
             }
         }
-        
+
         // 3. Tạo và lưu tin nhắn mới
         ChatMessage message = ChatMessage.builder()
                 .chatRoomId(chatRoomId)
@@ -133,8 +199,9 @@ public class ChatService {
                 .content(request.getContent())
                 .type(request.getType())
                 .mediaId(request.getMediaId())
+                .timestamp(java.time.LocalDateTime.now())
                 .build();
-        
+
         ChatMessage savedMessage = chatMessageRepository.save(message);
 
         // 4. Cập nhật thông tin tin nhắn cuối cùng cho phòng chat
@@ -144,7 +211,7 @@ public class ChatService {
 
         // 5. Gửi sự kiện Kafka để thông báo cho người nhận
         sendNewMessageNotification(savedMessage, chatRoom.getParticipantIds());
-        
+
         // 6. Chuyển đổi và trả về
         return mapChatMessageToResponse(savedMessage);
     }
@@ -171,22 +238,38 @@ public class ChatService {
         List<String> receiverIds = allParticipantIds.stream()
                 .filter(id -> !id.equals(message.getSenderId()))
                 .collect(Collectors.toList());
-        
-        if (receiverIds.isEmpty()) return;
 
-        NotificationEvent event = NotificationEvent.builder()
-                .eventId(UUID.randomUUID().toString())
-                .eventTimestamp(Instant.now())
-                .type(NotificationType.NEW_MESSAGE) // Cần thêm type này vào Enum
-                .senderId(message.getSenderId())
-                .payload(Map.of(
-                    "chatRoomId", message.getChatRoomId().toString(),
-                    "receiverIds", receiverIds,
-                    "messageContent", message.getContent()
-                ))
-                .build();
+        if (receiverIds.isEmpty())
+            return;
 
-        kafkaTemplate.send(notificationTopic, event);
+        // Get sender name for notification content
+        String senderName = "Someone";
+        try {
+            var userResponse = userClient.getUserById(message.getSenderId());
+            if (userResponse != null && userResponse.getBody() != null) {
+                senderName = userResponse.getBody().getDisplayName();
+            }
+        } catch (Exception e) {
+            // Fallback to default if user service unavailable
+        }
+
+        // Send notification to each receiver
+        for (String receiverId : receiverIds) {
+            NotificationEvent event = NotificationEvent.builder()
+                    .eventId(UUID.randomUUID().toString())
+                    .eventTimestamp(Instant.now())
+                    .type(NotificationType.NEW_MESSAGE)
+                    .senderId(message.getSenderId())
+                    .receiverId(receiverId)
+                    .payload(Map.of(
+                            "chatRoomId", message.getChatRoomId().toString(),
+                            "conversationId", message.getChatRoomId().toString(), // For redirect URL
+                            "senderName", senderName,
+                            "messageContent", message.getContent() != null ? message.getContent() : ""))
+                    .build();
+
+            kafkaTemplate.send(notificationTopic, event);
+        }
     }
 
     // Phương thức private để chuyển đổi ChatRoom Entity sang ChatRoomResponse DTO
@@ -198,6 +281,7 @@ public class ChatService {
                 .participantIds(chatRoom.getParticipantIds())
                 .lastMessage(chatRoom.getLastMessage())
                 .lastMessageTimestamp(chatRoom.getLastMessageTimestamp())
+                .creatorId(chatRoom.getCreatorId())
                 .build();
     }
 
@@ -208,17 +292,18 @@ public class ChatService {
                 .orElseThrow(() -> new RuntimeException("Chat room not found"));
 
         if (!chatRoom.getParticipantIds().contains(requesterId)) {
-            throw new SecurityException("User is not a participant of this chat room.");
+            throw new SecurityException("You are not a participant of this chat room.");
         }
 
-        // 2. Lấy một trang tin nhắn từ database
-        Page<ChatMessage> messagePage = chatMessageRepository.findByChatRoomIdOrderByTimestampDesc(chatRoomId, pageable);
+        // Lấy tin nhắn từ DB, sắp xếp theo thời gian (mới nhất trước)
+        Page<ChatMessage> messagePage = chatMessageRepository.findByChatRoomIdOrderByTimestampDesc(chatRoomId,
+                pageable);
 
         // 3. Chuyển đổi Page<ChatMessage> thành Page<ChatMessageResponse>
         List<ChatMessageResponse> responses = messagePage.getContent().stream()
                 .map(this::mapChatMessageToResponse)
                 .collect(Collectors.toList());
-        
+
         return new PageImpl<>(responses, pageable, messagePage.getTotalElements());
     }
 
@@ -247,7 +332,7 @@ public class ChatService {
                 .filter(room -> room.getType() == RoomType.GROUP)
                 .filter(user2RoomsSet::contains)
                 .collect(Collectors.toList());
-        
+
         // 4. Chuyển đổi sang DTO
         return commonGroupRooms.stream()
                 .map(this::mapChatRoomToResponse)

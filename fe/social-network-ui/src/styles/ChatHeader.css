@@ -46,7 +46,8 @@
 
 .header-info {
     flex: 1;
-    min-width: 0; /* Để ellipsis hoạt động */
+    min-width: 0;
+    /* Để ellipsis hoạt động */
 }
 
 .chat-header-name {
@@ -137,11 +138,14 @@
 
 /* Animations */
 @keyframes pulse {
-    0%, 100% { 
-        opacity: 1; 
+
+    0%,
+    100% {
+        opacity: 1;
     }
-    50% { 
-        opacity: 0.5; 
+
+    50% {
+        opacity: 0.5;
     }
 }
 
@@ -151,29 +155,29 @@
         padding: 10px 12px;
         min-height: 50px;
     }
-    
+
     .header-link {
         gap: 8px;
     }
-    
+
     .chat-header-avatar {
         width: 36px;
         height: 36px;
     }
-    
+
     .chat-header-name {
         font-size: 15px;
     }
-    
+
     .chat-header-subtitle {
         font-size: 11px;
     }
-    
+
     .header-skeleton {
         gap: 8px;
         max-width: 250px;
     }
-    
+
     .skeleton-avatar {
         width: 36px;
         height: 36px;

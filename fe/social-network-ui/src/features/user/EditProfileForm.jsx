@@ -11,9 +11,15 @@ const EditProfileForm = ({ user, onClose }) => {
         displayName: '',
         bio: '',
         avatarUrl: '',
-        avatarId: '',  // <-- Thêm
+        avatarId: '',
         coverUrl: '',
-        coverId: ''    // <-- Thêm
+        coverId: '',
+        publicEmail: '',
+        phoneNumber: '',
+        gender: '',
+        birthday: '',
+        location: '',
+        interests: ''
     });
 
     const [errors, setErrors] = useState({}); // State cho errors
@@ -31,6 +37,12 @@ const EditProfileForm = ({ user, onClose }) => {
                 avatarId: user.avatarId || null,
                 coverUrl: user.coverUrl || '',
                 coverId: user.coverId || null,
+                publicEmail: user.publicEmail || '',
+                phoneNumber: user.phoneNumber || '',
+                gender: user.gender || '',
+                birthday: user.birthday || '',
+                location: user.location || '',
+                interests: user.interests ? user.interests.join(', ') : ''
             });
             setErrors({});
         }
@@ -64,8 +76,8 @@ const EditProfileForm = ({ user, onClose }) => {
 
         try {
             const mediaResponse = await uploadMedia(file).unwrap();
-            setFormData(prev => ({ 
-                ...prev, 
+            setFormData(prev => ({
+                ...prev,
                 [`${fieldPrefix}Url`]: mediaResponse.url,
                 [`${fieldPrefix}Id`]: mediaResponse.id
             }));
@@ -75,24 +87,23 @@ const EditProfileForm = ({ user, onClose }) => {
         }
     };
 
-    const handleRemoveMedia = (fieldPrefix) => {
-        setFormData(prev => ({
-            ...prev,
-            [`${fieldPrefix}Url`]: '',
-            [`${fieldPrefix}Id`]: ''
-        }));
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validateForm()) return;
 
-        const submitData = { 
+        const submitData = {
             id: user.id,
             displayName: formData.displayName.trim(),
             bio: formData.bio,
             avatarId: formData.avatarId,
             coverId: formData.coverId,
+            publicEmail: formData.publicEmail,
+            phoneNumber: formData.phoneNumber,
+            gender: formData.gender,
+            birthday: formData.birthday || null,
+            location: formData.location,
+            interests: formData.interests.split(',').map(i => i.trim()).filter(i => i),
+            privateProfile: user.privateProfile // Preserve existing privacy setting
         };
 
         try {
@@ -122,97 +133,181 @@ const EditProfileForm = ({ user, onClose }) => {
                     </div>
                 )}
 
-                {/* Display Name */}
-                <div className="form-group">
-                    <label htmlFor="displayName" className="form-label">
-                        <span className="label-icon">👤</span>
-                        Display Name <span className="required">*</span>
-                    </label>
-                    <input 
-                        type="text" 
-                        id="displayName"
-                        name="displayName"
-                        value={formData.displayName}
-                        onChange={handleInputChange}
-                        className={`form-input ${errors.displayName ? 'error' : ''}`}
-                        placeholder="Enter your display name"
-                        aria-required="true"
-                        aria-describedby={errors.displayName ? "displayName-error" : undefined}
-                        disabled={isLoading}
-                    />
-                    {errors.displayName && (
-                        <p id="displayName-error" className="field-error">{errors.displayName}</p>
-                    )}
-                </div>
-
-                {/* Bio */}
-                <div className="form-group">
-                    <label htmlFor="bio" className="form-label">
-                        <span className="label-icon">📝</span>
-                        Bio
-                    </label>
-                    <textarea 
-                        id="bio"
-                        name="bio"
-                        value={formData.bio}
-                        onChange={handleInputChange}
-                        className={`form-textarea ${errors.bio ? 'error' : ''} ${isBioWarning ? 'warning' : ''}`}
-                        placeholder="Tell us about yourself..."
-                        maxLength={maxBioLength}
-                        rows={3}
-                        disabled={isLoading}
-                        aria-describedby={errors.bio ? "bio-error" : undefined}
-                    />
-                    <div className="bio-counter">
-                        <span className={isBioWarning ? 'warning' : ''}>{bioCharCount}/{maxBioLength}</span>
+                {/* Header Section: Cover & Avatar */}
+                <div className="profile-edit-header">
+                    <div className="edit-cover-container">
+                        <img
+                            src={formData.coverUrl || 'https://via.placeholder.com/800x200?text=Cover+Photo'}
+                            alt="Cover"
+                            className="edit-cover-img"
+                        />
+                        <label htmlFor="cover-upload" className="edit-camera-btn cover-btn" title="Change Cover">
+                            📷
+                        </label>
+                        <input
+                            type="file"
+                            id="cover-upload"
+                            accept="image/*"
+                            onChange={(e) => handleFileUpload(e, 'cover')}
+                            disabled={isLoading}
+                            style={{ display: 'none' }}
+                        />
                     </div>
-                    {errors.bio && (
-                        <p id="bio-error" className="field-error">{errors.bio}</p>
-                    )}
+
+                    <div className="edit-avatar-container">
+                        <img
+                            src={formData.avatarUrl || `https://ui-avatars.com/api/?name=${formData.displayName}&background=random`}
+                            alt="Avatar"
+                            className="edit-avatar-img"
+                        />
+                        <label htmlFor="avatar-upload" className="edit-camera-btn avatar-btn" title="Change Avatar">
+                            📷
+                        </label>
+                        <input
+                            type="file"
+                            id="avatar-upload"
+                            accept="image/*"
+                            onChange={(e) => handleFileUpload(e, 'avatar')}
+                            disabled={isLoading}
+                            style={{ display: 'none' }}
+                        />
+                    </div>
                 </div>
 
-                <div className="form-group">
-                    <label htmlFor="avatar">Avatar</label>
-                    <input type="file" id="avatar" accept="image/*" onChange={(e) => handleFileUpload(e, 'avatar')} disabled={isLoading} />
-                    {formData.avatarUrl && (
-                        <div className="preview-container">
-                            <img src={formData.avatarUrl} alt="Avatar preview" />
-                            <button type="button" onClick={() => handleRemoveMedia('avatar')} disabled={isLoading}>×</button>
-                        </div>
-                    )}
-                </div>
+                {/* Form Content Grid */}
+                <div className="form-grid">
+                    {/* Left Column: Basic Info */}
+                    <div className="form-column">
+                        <h4 className="section-title">Basic Information</h4>
 
-                {/* Cover Photo */}
-                <div className="form-group">
-                    <label htmlFor="cover">Cover Photo</label>
-                    <input type="file" id="cover" accept="image/*" onChange={(e) => handleFileUpload(e, 'cover')} disabled={isLoading} />
-                    {formData.coverUrl && (
-                        <div className="preview-container">
-                            <img src={formData.coverUrl} alt="Cover preview" />
-                            <button type="button" onClick={() => handleRemoveMedia('cover')} disabled={isLoading}>×</button>
+                        <div className="form-group">
+                            <label htmlFor="displayName" className="form-label">Display Name <span className="required">*</span></label>
+                            <input
+                                type="text"
+                                id="displayName"
+                                name="displayName"
+                                value={formData.displayName}
+                                onChange={handleInputChange}
+                                className={`form-input ${errors.displayName ? 'error' : ''}`}
+                                placeholder="Your name"
+                            />
+                            {errors.displayName && <p className="field-error">{errors.displayName}</p>}
                         </div>
-                    )}
+
+                        <div className="form-group">
+                            <label htmlFor="bio" className="form-label">Bio</label>
+                            <textarea
+                                id="bio"
+                                name="bio"
+                                value={formData.bio}
+                                onChange={handleInputChange}
+                                className={`form-textarea ${errors.bio ? 'error' : ''}`}
+                                placeholder="Tell us about yourself..."
+                                maxLength={maxBioLength}
+                                rows={4}
+                            />
+                            <div className="bio-counter">
+                                <span>{bioCharCount}/{maxBioLength}</span>
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="location" className="form-label">Location</label>
+                            <input
+                                type="text"
+                                id="location"
+                                name="location"
+                                value={formData.location}
+                                onChange={handleInputChange}
+                                className="form-input"
+                                placeholder="City, Country"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Right Column: Details */}
+                    <div className="form-column">
+                        <h4 className="section-title">Personal Details</h4>
+
+                        <div className="form-group">
+                            <label htmlFor="publicEmail" className="form-label">Public Email</label>
+                            <input
+                                type="email"
+                                id="publicEmail"
+                                name="publicEmail"
+                                value={formData.publicEmail}
+                                onChange={handleInputChange}
+                                className="form-input"
+                                placeholder="contact@example.com"
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="phoneNumber" className="form-label">Phone Number</label>
+                            <input
+                                type="tel"
+                                id="phoneNumber"
+                                name="phoneNumber"
+                                value={formData.phoneNumber}
+                                onChange={handleInputChange}
+                                className="form-input"
+                                placeholder="+84 123 456 789"
+                            />
+                        </div>
+
+                        <div className="form-group-row">
+                            <div className="form-group half">
+                                <label htmlFor="gender" className="form-label">Gender</label>
+                                <select
+                                    id="gender"
+                                    name="gender"
+                                    value={formData.gender}
+                                    onChange={handleInputChange}
+                                    className="form-select"
+                                >
+                                    <option value="">Select</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <div className="form-group half">
+                                <label htmlFor="birthday" className="form-label">Birthday</label>
+                                <input
+                                    type="date"
+                                    id="birthday"
+                                    name="birthday"
+                                    value={formData.birthday}
+                                    onChange={handleInputChange}
+                                    className="form-input"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="interests" className="form-label">Interests</label>
+                            <input
+                                type="text"
+                                id="interests"
+                                name="interests"
+                                value={formData.interests}
+                                onChange={handleInputChange}
+                                className="form-input"
+                                placeholder="Coding, Reading, Travel (comma separated)"
+                            />
+                        </div>
+                    </div>
                 </div>
 
                 {/* Buttons */}
                 <div className="form-actions">
                     <button type="button" onClick={onClose} className="cancel-button" disabled={isLoading}>
-                        <span className="button-icon">✕</span>
                         Cancel
                     </button>
                     <button type="submit" className="save-button" disabled={isLoading || !formData.displayName.trim()}>
                         <span className="button-content">
-                            {isLoading ? (
-                                <>
-                                    <div className="spinner-small"></div>
-                                    <span>Saving...</span>
-                                </>
-                            ) : (
-                                <>
-                                    <span className="button-icon">💾</span>
-                                    <span>Save Changes</span>
-                                </>
-                            )}
+                            {isLoading ? <span>Saving...</span> : <span>Save Changes</span>}
                         </span>
                     </button>
                 </div>

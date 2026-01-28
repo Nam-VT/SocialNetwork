@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import nvt.socialnetwork.chat.Dto.Response.UserBasicResponse;
+
 @FeignClient(name = "user-service", path = "/users")
 public interface UserClient {
     @GetMapping("/internal/exists/{userId}")
@@ -16,4 +18,7 @@ public interface UserClient {
 
     @PostMapping("/internal/validate-ids")
     ResponseEntity<Boolean> validateUserIds(@RequestBody Set<String> userIds);
+
+    @GetMapping("/{userId}")
+    ResponseEntity<UserBasicResponse> getUserById(@PathVariable("userId") String userId);
 }

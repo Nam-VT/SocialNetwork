@@ -1,19 +1,19 @@
 import { useState, useRef, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../auth/authSlice';
-import { 
+import {
     useGetUserByIdQuery,
     useGetFriendshipStatusQuery,
     useSendFriendRequestMutation,
     useUnfriendMutation,
     useDeclineOrCancelRequestMutation,
     useAcceptFriendRequestMutation
-} from './userApiSlice'; 
+} from './userApiSlice';
 
-import { 
-    useGetFollowStatusQuery, 
-    useFollowUserMutation, 
-    useUnfollowUserMutation 
+import {
+    useGetFollowStatusQuery,
+    useFollowUserMutation,
+    useUnfollowUserMutation
 } from '../follow/followApiSlice';
 import { useClickOutside } from '../../hooks/useClickOutside';
 import '../../styles/UserProfileHeader.css';
@@ -28,12 +28,34 @@ const UserProfileHeader = ({ userId, onEditClick }) => {
     // 2. Trạng thái quan hệ (Chỉ gọi khi không phải profile cá nhân)
     const shouldSkipStatus = isOwnProfile || !currentUser;
 
-    const { data: followStatus, isLoading: isLoadingFollowStatus } = useGetFollowStatusQuery(userId, { 
-        skip: shouldSkipStatus 
+    console.log('🔍 UserProfileHeader Debug:', {
+        userId,
+        currentUserId: currentUser?.id,
+        isOwnProfile,
+        shouldSkipStatus,
+        currentUser
     });
-    
-    const { data: friendshipStatus, isLoading: isLoadingFriendStatus } = useGetFriendshipStatusQuery(userId, { 
-        skip: shouldSkipStatus 
+
+    const { data: followStatus, isLoading: isLoadingFollowStatus } = useGetFollowStatusQuery(userId, {
+        skip: shouldSkipStatus
+    });
+
+    const { data: friendshipStatus, isLoading: isLoadingFriendStatus } = useGetFriendshipStatusQuery(userId, {
+        skip: shouldSkipStatus
+    });
+
+    console.log('📊 Status Data:', {
+        followStatus,
+        friendshipStatus,
+        isFollowing: followStatus?.isFollowing,
+        isFriends: friendshipStatus?.isFriends,
+        isRequestSentByMe: friendshipStatus?.isRequestSentByMe,
+        isRequestReceivedByMe: friendshipStatus?.isRequestReceivedByMe
+    });
+
+    console.log('🔎 Raw Objects:', {
+        followStatusRaw: JSON.stringify(followStatus),
+        friendshipStatusRaw: JSON.stringify(friendshipStatus)
     });
 
     // 3. Các hàm hành động
@@ -76,9 +98,9 @@ const UserProfileHeader = ({ userId, onEditClick }) => {
 
             <div className="profile-details">
                 <div className="avatar-section">
-                    <img 
-                        src={avatarUrl || `https://ui-avatars.com/api/?name=${initial}&size=128`} 
-                        alt={displayName} 
+                    <img
+                        src={avatarUrl || `https://ui-avatars.com/api/?name=${initial}&size=128`}
+                        alt={displayName}
                         className="avatar-img"
                     />
                 </div>
@@ -87,12 +109,52 @@ const UserProfileHeader = ({ userId, onEditClick }) => {
                     <div className="name-and-bio">
                         <h1 className="profile-name">{displayName}</h1>
                         {bio && <p className="profile-bio">{bio}</p>}
+
+                        <div className="profile-about">
+                            {user.location && (
+                                <div className="about-item">
+                                    <span className="about-icon">📍</span>
+                                    <span>{user.location}</span>
+                                </div>
+                            )}
+                            {user.birthday && (
+                                <div className="about-item">
+                                    <span className="about-icon">🎂</span>
+                                    <span>{new Date(user.birthday).toLocaleDateString()}</span>
+                                </div>
+                            )}
+                            {user.gender && (
+                                <div className="about-item">
+                                    <span className="about-icon">👤</span>
+                                    <span>{user.gender}</span>
+                                </div>
+                            )}
+                            {user.publicEmail && (
+                                <div className="about-item">
+                                    <span className="about-icon">✉️</span>
+                                    <span>{user.publicEmail}</span>
+                                </div>
+                            )}
+                            {user.phoneNumber && (
+                                <div className="about-item">
+                                    <span className="about-icon">📞</span>
+                                    <span>{user.phoneNumber}</span>
+                                </div>
+                            )}
+                            {user.interests && user.interests.length > 0 && (
+                                <div className="about-interests">
+                                    {user.interests.map((interest, index) => (
+                                        <span key={index} className="interest-tag">{interest}</span>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     <div className="profile-actions">
                         {isOwnProfile ? (
-                            <button 
-                                className="btn-profile edit-profile" 
+                            <button
+                                className="btn-profile edit-profile"
                                 onClick={onEditClick} // Thêm dòng này
                             >
                                 Edit Profile
@@ -102,7 +164,7 @@ const UserProfileHeader = ({ userId, onEditClick }) => {
                                 <div className="friendship-button-container" ref={friendMenuRef}>
                                     {(() => {
                                         if (isLoadingFriendStatus) return <button className="btn-profile" disabled>...</button>;
-                                        
+
                                         if (friendshipStatus?.isFriends) {
                                             return (
                                                 <button onClick={() => setIsFriendMenuVisible(!isFriendMenuVisible)} className="btn-profile friends">
@@ -110,7 +172,7 @@ const UserProfileHeader = ({ userId, onEditClick }) => {
                                                 </button>
                                             );
                                         }
-                                        
+
                                         if (friendshipStatus?.isRequestSentByMe) {
                                             return (
                                                 <button onClick={() => cancelRequest(friendshipStatus.requestId)} disabled={isLoadingAction} className="btn-profile pending">
@@ -118,7 +180,7 @@ const UserProfileHeader = ({ userId, onEditClick }) => {
                                                 </button>
                                             );
                                         }
-                                        
+
                                         if (friendshipStatus?.isRequestReceivedByMe) {
                                             return (
                                                 <button onClick={() => acceptRequest(friendshipStatus.requestId)} disabled={isLoadingAction} className="btn-profile respond">
@@ -126,14 +188,14 @@ const UserProfileHeader = ({ userId, onEditClick }) => {
                                                 </button>
                                             );
                                         }
-                                        
+
                                         return (
                                             <button onClick={() => sendFriendRequest(userId)} disabled={isLoadingAction} className="btn-profile add-friend">
                                                 Add Friend
                                             </button>
                                         );
                                     })()}
-                                    
+
                                     {isFriendMenuVisible && friendshipStatus?.isFriends && (
                                         <div className="options-menu-profile">
                                             <button onClick={() => unfriend(userId)}>Unfriend</button>
@@ -141,8 +203,8 @@ const UserProfileHeader = ({ userId, onEditClick }) => {
                                     )}
                                 </div>
 
-                                <button 
-                                    onClick={handleFollowToggle} 
+                                <button
+                                    onClick={handleFollowToggle}
                                     className={`btn-profile follow-button ${followStatus?.isFollowing ? 'following' : ''}`}
                                 >
                                     {followStatus?.isFollowing ? 'Following' : 'Follow'}

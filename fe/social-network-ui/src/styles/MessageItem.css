@@ -21,7 +21,7 @@
     margin-top: 2px;
 }
 
-.avatar-img {
+.chat-avatar-img {
     width: 32px;
     height: 32px;
     border-radius: 50%;
@@ -47,15 +47,17 @@
     background-color: #0084ff;
     color: white;
     padding: 8px 12px;
-    border-radius: 18px 18px 4px 18px; /* Bubble effect cho own message */
+    border-radius: 18px 18px 4px 18px;
+    /* Bubble effect cho own message */
     margin-left: auto;
 }
 
 .other-content {
     background-color: #f3f4f6;
-    color: #111827;
+    color: #000000;
     padding: 8px 12px;
-    border-radius: 18px 18px 18px 4px; /* Bubble effect cho other message */
+    border-radius: 18px 18px 18px 4px;
+    /* Bubble effect cho other message */
 }
 
 .sender-info {
@@ -88,6 +90,13 @@
     margin: 0 0 4px 0;
     font-size: 14px;
     line-height: 1.4;
+    color: inherit;
+}
+
+/* Ensure other messages have dark text */
+.other-content .message-text {
+    color: #000000;
+    font-weight: 500;
 }
 
 .message-time {
@@ -98,22 +107,26 @@
 
 /* Animations */
 @keyframes fadeIn {
-    from { 
-        opacity: 0; 
-        transform: translateY(10px); 
+    from {
+        opacity: 0;
+        transform: translateY(10px);
     }
-    to { 
-        opacity: 1; 
-        transform: translateY(0); 
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
 @keyframes pulse {
-    0%, 100% { 
-        opacity: 1; 
+
+    0%,
+    100% {
+        opacity: 1;
     }
-    50% { 
-        opacity: 0.5; 
+
+    50% {
+        opacity: 0.5;
     }
 }
 
@@ -123,21 +136,21 @@
         gap: 6px;
         margin-bottom: 10px;
     }
-    
+
     .message-content {
         max-width: 85%;
     }
-    
-    .avatar-img {
+
+    .chat-avatar-img {
         width: 28px;
         height: 28px;
     }
-    
+
     .skeleton-avatar {
         width: 28px;
         height: 28px;
     }
-    
+
     .message-text {
         font-size: 13px;
     }

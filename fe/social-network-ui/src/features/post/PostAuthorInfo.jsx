@@ -5,13 +5,13 @@ import '../../styles/PostAuthorInfo.css'; // Import từ folder styles tập tru
 
 const PostAuthorInfo = ({ userId }) => {
     // Gọi API để lấy chi tiết user từ userId
-    const { 
-        data: user, 
-        isLoading, 
-        isError 
+    const {
+        data: user,
+        isLoading,
+        isError
     } = useGetUserByIdQuery(userId, {
         // Không gọi lại API nếu userId đã có trong cache
-        skip: !userId 
+        skip: !userId
     });
 
     if (isLoading) {
@@ -42,12 +42,12 @@ const PostAuthorInfo = ({ userId }) => {
     return (
         <div className="author-info">
             <div className="author-avatar">
-                <img 
-                    src={avatarUrl || `https://ui-avatars.com/api/?name=${displayName?.charAt(0) || 'U'}&size=48&background=6B7280&color=fff`} 
+                <img
+                    src={avatarUrl || `https://ui-avatars.com/api/?name=${displayName?.charAt(0) || 'U'}&size=48&background=6B7280&color=fff`}
                     alt={displayName || 'User '}
-                    className="avatar-img"
-                    onError={(e) => { 
-                        e.target.src = `https://ui-avatars.com/api/?name=${displayName?.charAt(0) || 'U'}&size=48&background=6B7280&color=fff`;
+                    className="author-avatar-img"
+                    onError={(e) => {
+                        e.target.src = `https://ui-avatars.com/api/?name=${displayName?.charAt(0) || 'U'}&size=48&background=6B7280&color=fff`; // Fallback lại nếu cả link chính lỗi
                     }}
                 />
             </div>

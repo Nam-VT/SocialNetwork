@@ -15,13 +15,16 @@ import nvt.socialnetwork.chat.Entity.Enum.RoomType;
 @Repository
 public interface ChatRoomRepo extends JpaRepository<ChatRoom, UUID> {
 
-    // Tìm các phòng chat mà một user là thành viên
-    List<ChatRoom> findByParticipantIdsContaining(String userId);
+       // Tìm các phòng chat mà một user là thành viên
+       List<ChatRoom> findByParticipantIdsContaining(String userId);
 
-    // Query phức tạp để tìm phòng chat 1-1 giữa hai người
-    @Query("SELECT cr FROM ChatRoom cr JOIN cr.participantIds p1 JOIN cr.participantIds p2 " +
-           "WHERE cr.type = :type AND p1 = :userId1 AND p2 = :userId2 AND SIZE(cr.participantIds) = 2")
-    Optional<ChatRoom> findPrivateChatRoomByParticipants(@Param("userId1") String userId1, 
-                                                         @Param("userId2") String userId2,
-                                                         @Param("type") RoomType type);
+       // Query để tìm phòng chat 1-1 giữa hai người (fixed to avoid duplicates)
+       @Query("SELECT cr FROM ChatRoom cr " +
+                     "WHERE cr.type = :type " +
+                     "AND :userId1 MEMBER OF cr.participantIds " +
+                     "AND :userId2 MEMBER OF cr.participantIds " +
+                     "AND SIZE(cr.participantIds) = 2")
+       Optional<ChatRoom> findPrivateChatRoomByParticipants(@Param("userId1") String userId1,
+                     @Param("userId2") String userId2,
+                     @Param("type") RoomType type);
 }

@@ -1,24 +1,25 @@
 package nvt.socialnetwork.search_service.Document;
 
 import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 
 @Data
-@Document(indexName = "users") // Tên của index trong Elasticsearch
+@Entity
+@Table(name = "search_users")
 public class UserDocument {
 
     @Id
     private String id; // Chính là userId
 
-    @Field(type = FieldType.Text, name = "display_name")
+    @Column(name = "display_name")
     private String displayName;
 
-    @Field(type = FieldType.Text, name = "email")
+    @Column(name = "email")
     private String email;
 
-    @Field(type = FieldType.Keyword, name = "avatar_url")
-    private String avatarUrl; // Dùng để hiển thị kết quả, không dùng để tìm kiếm text
+    @Column(name = "avatar_url")
+    private String avatarUrl;
 }

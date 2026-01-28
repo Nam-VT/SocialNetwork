@@ -1,14 +1,15 @@
 import { useState, useRef, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { 
-    useGetCommentRepliesQuery, 
+import {
+    useGetCommentRepliesQuery,
     useToggleCommentLikeMutation,
     useDeleteCommentMutation,
     useUpdateCommentMutation,
 } from './commentApiSlice';
 import { selectCurrentUser } from '../auth/authSlice';
 import ReplyForm from './ReplyForm';
-import CommentAuthorInfo from './CommentAuthorInfo';
+import { useGetUserByIdQuery } from '../user/userApiSlice';
+import { Link } from 'react-router-dom';
 import { useClickOutside } from '../../hooks/useClickOutside';
 import '../../styles/CommentItem.css';
 
@@ -17,11 +18,13 @@ const CommentItem = ({ comment }) => {
     const { id, content, userId, postId, createdAt, likeCount, isLiked, parentCommentId } = comment;
     const currentUser = useSelector(selectCurrentUser);
     const isOwner = currentUser?.id === userId;
+    const { data: author } = useGetUserByIdQuery(userId);
+    const initial = author?.displayName?.charAt(0).toUpperCase() || 'U';
 
     const [isReplyFormVisible, setIsReplyFormVisible] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editedContent, setEditedContent] = useState(content);
-    
+
     const [isOptionsVisible, setIsOptionsVisible] = useState(false);
     const optionsRef = useRef(null);
     useClickOutside(optionsRef, () => setIsOptionsVisible(false));
@@ -42,10 +45,11 @@ const CommentItem = ({ comment }) => {
     const handleDelete = async () => {
         if (window.confirm('Bạn có chắc muốn xóa bình luận này?')) {
             try {
-        
                 await deleteComment({ id, postId, parentCommentId }).unwrap();
             } catch (err) {
                 console.error('Failed to delete comment:', err);
+                const errorMessage = err?.data?.message || err?.error || "Xóa bình luận thất bại.";
+                alert(errorMessage);
             }
         }
     };
@@ -66,6 +70,8 @@ const CommentItem = ({ comment }) => {
                 setIsEditing(false);
             } catch (err) {
                 console.error("Failed to update comment", err);
+                const errorMessage = err?.data?.message || err?.error || "Cập nhật bình luận thất bại.";
+                alert(errorMessage); // Notify user
             }
         } else {
             setIsEditing(false); // Hủy nếu không thay đổi
@@ -75,51 +81,77 @@ const CommentItem = ({ comment }) => {
     return (
         <div className="comment-item">
             <div className="comment-main">
-                <CommentAuthorInfo userId={userId} />
-                <div className="comment-content-wrapper">
-                    {isEditing ? (
-                        <div className="comment-edit-form">
-                            <textarea
-                                value={editedContent}
-                                onChange={(e) => setEditedContent(e.target.value)}
-                                autoFocus
-                            />
-                            <div className="edit-actions">
-                                <button onClick={handleUpdate} disabled={isUpdating}>{isUpdating ? 'Saving...' : 'Save'}</button>
-                                <button onClick={() => setIsEditing(false)}>Cancel</button>
-                            </div>
+                {/* 1. Avatar Column */}
+                <div className="comment-avatar-container">
+                    <Link to={`/profile/${userId}`}>
+                        <img
+                            src={author?.avatarUrl || `https://ui-avatars.com/api/?name=${initial}&size=32&background=random`}
+                            alt="Avatar"
+                            className="comment-avatar"
+                            width={32}
+                            height={32}
+                            loading="lazy"
+                        />
+                    </Link>
+                </div>
+
+                {/* 2. Content Column */}
+                <div className="comment-body">
+                    <div className="comment-bubble-wrapper">
+                        <div className="comment-bubble">
+                            <Link to={`/profile/${userId}`} className="comment-author-name">
+                                {author?.displayName || 'Unknown User'}
+                            </Link>
+
+                            {isEditing ? (
+                                <div className="comment-edit-form">
+                                    <textarea
+                                        value={editedContent}
+                                        onChange={(e) => setEditedContent(e.target.value)}
+                                        autoFocus
+                                        rows={2}
+                                    />
+                                    <div className="edit-actions">
+                                        <button onClick={handleUpdate} disabled={isUpdating}>{isUpdating ? 'Lưu' : 'Lưu'}</button>
+                                        <button onClick={() => setIsEditing(false)}>Hủy</button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <p className="comment-content-text">{content}</p>
+                            )}
                         </div>
-                    ) : (
-                        <p className="comment-content-text">{content}</p>
-                    )}
 
-                    <div className="comment-actions">
-                        <button onClick={handleLike} className={`btn-like ${isLiked ? 'liked' : ''}`}>
-                            {isLiked ? 'Liked' : 'Like'} ({likeCount})
-                        </button>
-                        <button onClick={() => setIsReplyFormVisible(prev => !prev)} className="btn-reply">
-                            Reply
-                        </button>
-                        <span className="comment-time">{new Date(createdAt).toLocaleString()}</span>
-
+                        {/* Options Menu (Three dots) - Positioned relative to bubble or row */}
                         {isOwner && !isEditing && (
-                            <div className="owner-actions-container" ref={optionsRef}>
-                                <button 
-                                    className="options-button" 
+                            <div className="comment-options" ref={optionsRef}>
+                                <button
+                                    className="options-btn"
                                     onClick={() => setIsOptionsVisible(prev => !prev)}
-                                    aria-label="More options"
-                                    title="More"
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
-                                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                                    </svg>
+                                    •••
                                 </button>
                                 {isOptionsVisible && (
                                     <div className="options-menu">
-                                        <button onClick={() => { setIsEditing(true); setIsOptionsVisible(false); }}>Edit</button>
-                                        <button onClick={handleDelete}>Delete</button>
+                                        <button onClick={() => { setIsEditing(true); setIsOptionsVisible(false); }}>Chỉnh sửa</button>
+                                        <button onClick={handleDelete}>Xóa</button>
                                     </div>
                                 )}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* 3. Actions Row (Below Bubble) */}
+                    <div className="comment-actions">
+                        <span className="comment-time">{new Date(createdAt).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'numeric' })}</span>
+                        <button onClick={handleLike} className={`btn-action ${isLiked ? 'liked' : ''}`}>
+                            Thích
+                        </button>
+                        <button onClick={() => setIsReplyFormVisible(prev => !prev)} className="btn-action">
+                            Trả lời
+                        </button>
+                        {likeCount > 0 && (
+                            <div className="comment-like-count">
+                                <span className="like-icon-small">❤️</span> {likeCount}
                             </div>
                         )}
                     </div>
@@ -141,8 +173,8 @@ const CommentItem = ({ comment }) => {
                         <CommentItem key={reply.id} comment={reply} />
                     ))}
                     {!repliesData.last && (
-                         <button 
-                            onClick={() => setPage(p => p + 1)} 
+                        <button
+                            onClick={() => setPage(p => p + 1)}
                             disabled={isFetchingReplies}
                             className="btn-view-more"
                         >

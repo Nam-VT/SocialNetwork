@@ -19,4 +19,7 @@ public class PostResponse {
     private int likeCount;
     private int commentCount;
     private boolean isPrivate;
+    private boolean hidden;
+    private String userName;
+    private String userAvatar;
 }

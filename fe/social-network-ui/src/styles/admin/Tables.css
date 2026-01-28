@@ -1,0 +1,187 @@
+/* src/styles/admin/Tables.css */
+
+.table-container {
+    background-color: white;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+    margin-top: 16px;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table th {
+    background-color: #f9fafb;
+    padding: 12px 24px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 600;
+    color: #4b5563;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.admin-table td {
+    padding: 16px 24px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #111827;
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.admin-table tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+/* Cell Types */
+.user-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-avatar-small {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    font-weight: 500;
+    color: #000000 !important;
+}
+
+.user-email {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status-badge.active {
+    background-color: #d1fae5;
+    color: #047857;
+}
+
+.status-badge.banned {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+
+/* Action Buttons */
+/* Action Buttons */
+.action-cell {
+    width: 140px;
+    /* Wider to fit 3 buttons */
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* View Button - Blue */
+.btn-view {
+    background-color: #eff6ff;
+    color: #3b82f6;
+    border: 1px solid #dbeafe;
+}
+
+.btn-view:hover {
+    background-color: #dbeafe;
+    transform: translateY(-1px);
+}
+
+/* Ban Button - Orange */
+.btn-ban {
+    background-color: #fff7ed;
+    color: #ea580c;
+    border: 1px solid #ffedd5;
+}
+
+.btn-ban:hover {
+    background-color: #ffedd5;
+    transform: translateY(-1px);
+}
+
+/* Unban Button - Green */
+.btn-unban {
+    background-color: #f0fdf4;
+    color: #16a34a;
+    border: 1px solid #dcfce7;
+}
+
+.btn-unban:hover {
+    background-color: #dcfce7;
+    transform: translateY(-1px);
+}
+
+/* Delete Button - Red */
+.btn-delete {
+    background-color: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fee2e2;
+}
+
+.btn-delete:hover {
+    background-color: #fee2e2;
+    transform: translateY(-1px);
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 16px 24px;
+    gap: 12px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.pagination button {
+    padding: 6px 12px;
+    border: 1px solid #d1d5db;
+    background-color: white;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination span {
+    font-size: 14px;
+    color: #6b7280;
+}

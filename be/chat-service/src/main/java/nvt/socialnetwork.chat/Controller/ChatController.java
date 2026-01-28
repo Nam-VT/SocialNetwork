@@ -8,15 +8,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import nvt.socialnetwork.chat.Dto.Request.ChatRoomRequest;
+import nvt.socialnetwork.chat.Dto.Request.UpdateGroupNameRequest;
 import nvt.socialnetwork.chat.Dto.Response.ChatMessageResponse;
 import nvt.socialnetwork.chat.Dto.Response.ChatRoomResponse;
 import nvt.socialnetwork.chat.Service.ChatService;
@@ -38,15 +41,17 @@ public class ChatController {
 
     // API để mở box chat 1-1 với người dùng khác
     @PostMapping("/private/{otherUserId}")
-    public ResponseEntity<ChatRoomResponse> findOrCreatePrivateRoom(@PathVariable String otherUserId, Authentication authentication) {
+    public ResponseEntity<ChatRoomResponse> findOrCreatePrivateRoom(@PathVariable String otherUserId,
+            Authentication authentication) {
         String currentUserId = authentication.getName();
         ChatRoomResponse room = chatService.findOrCreatePrivateRoom(currentUserId, otherUserId);
         return ResponseEntity.ok(room);
     }
-    
+
     // API để tạo nhóm chat
     @PostMapping("/group")
-    public ResponseEntity<ChatRoomResponse> createGroupRoom(@RequestBody ChatRoomRequest request, Authentication authentication) {
+    public ResponseEntity<ChatRoomResponse> createGroupRoom(@RequestBody ChatRoomRequest request,
+            Authentication authentication) {
         String creatorId = authentication.getName();
         ChatRoomResponse room = chatService.createGroupRoom(creatorId, request);
         return new ResponseEntity<>(room, HttpStatus.CREATED);
@@ -54,7 +59,8 @@ public class ChatController {
 
     // API để lấy lịch sử tin nhắn của một phòng chat
     @GetMapping("/{chatRoomId}/messages")
-    public ResponseEntity<Page<ChatMessageResponse>> getMessageHistory(@PathVariable UUID chatRoomId, Pageable pageable, Authentication authentication) {
+    public ResponseEntity<Page<ChatMessageResponse>> getMessageHistory(@PathVariable UUID chatRoomId, Pageable pageable,
+            Authentication authentication) {
         String requesterId = authentication.getName();
         Page<ChatMessageResponse> messages = chatService.getMessageHistory(chatRoomId, requesterId, pageable);
         return ResponseEntity.ok(messages);
@@ -62,9 +68,37 @@ public class ChatController {
 
     // API để tìm nhóm chat chung giữa 2 người
     @GetMapping("/common-groups/{otherUserId}")
-    public ResponseEntity<List<ChatRoomResponse>> findCommonGroupRooms(@PathVariable String otherUserId, Authentication authentication) {
+    public ResponseEntity<List<ChatRoomResponse>> findCommonGroupRooms(@PathVariable String otherUserId,
+            Authentication authentication) {
         String currentUserId = authentication.getName();
         List<ChatRoomResponse> commonRooms = chatService.findCommonGroupRooms(currentUserId, otherUserId);
         return ResponseEntity.ok(commonRooms);
+    }
+
+    // API để cập nhật tên nhóm
+    @PutMapping("/group/{chatRoomId}/name")
+    public ResponseEntity<ChatRoomResponse> updateGroupName(
+            @PathVariable UUID chatRoomId,
+            @RequestBody UpdateGroupNameRequest request,
+            Authentication authentication) {
+        String requesterId = authentication.getName();
+        ChatRoomResponse updated = chatService.updateGroupName(chatRoomId, request.getName(), requesterId);
+        return ResponseEntity.ok(updated);
+    }
+
+    // API để xóa nhóm
+    @DeleteMapping("/group/{chatRoomId}")
+    public ResponseEntity<Void> deleteGroup(@PathVariable UUID chatRoomId, Authentication authentication) {
+        String requesterId = authentication.getName();
+        chatService.deleteGroup(chatRoomId, requesterId);
+        return ResponseEntity.noContent().build();
+    }
+
+    // API để rời nhóm
+    @PostMapping("/group/{chatRoomId}/leave")
+    public ResponseEntity<ChatRoomResponse> leaveGroup(@PathVariable UUID chatRoomId, Authentication authentication) {
+        String requesterId = authentication.getName();
+        ChatRoomResponse response = chatService.leaveGroup(chatRoomId, requesterId);
+        return ResponseEntity.ok(response);
     }
 }

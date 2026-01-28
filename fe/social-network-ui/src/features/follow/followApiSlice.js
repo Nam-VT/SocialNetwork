@@ -18,7 +18,8 @@ export const followApiSlice = apiSlice.injectEndpoints({
             }),
             invalidatesTags: (result, error, targetId) => [
                 { type: 'Follow', id: targetId },
-                { type: 'Follow', id: 'LIST' }
+                { type: 'Follow', id: 'LIST' },
+                { type: 'Post', id: 'FEED' }, // Refresh feed to show new posts
             ],
         }),
 
@@ -30,7 +31,8 @@ export const followApiSlice = apiSlice.injectEndpoints({
             }),
             invalidatesTags: (result, error, targetId) => [
                 { type: 'Follow', id: targetId },
-                { type: 'Follow', id: 'LIST' }
+                { type: 'Follow', id: 'LIST' },
+                { type: 'Post', id: 'FEED' }, // Refresh feed to remove posts
             ],
         }),
 

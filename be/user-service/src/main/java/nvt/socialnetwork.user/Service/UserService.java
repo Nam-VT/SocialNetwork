@@ -24,10 +24,16 @@ import nvt.socialnetwork.user.DTO.Response.UserResponse;
 import nvt.socialnetwork.user.Entity.User;
 import nvt.socialnetwork.user.Repository.UserRepo;
 
-
 @Service
 @RequiredArgsConstructor
 public class UserService {
+    public Map<String, Object> getAdminStats() {
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("totalUsers", userRepo.count());
+        stats.put("newUsersToday", userRepo.countByCreatedAt(LocalDate.now()));
+        return stats;
+    }
+
     private final UserRepo userRepo;
     private final MediaClient mediaClient;
 
@@ -159,8 +165,9 @@ public class UserService {
     }
 
     public boolean validateUserIds(Set<String> userIds) {
-    if (userIds == null || userIds.isEmpty()) return false;
-    return userRepo.countByIdIn(userIds) == userIds.size();
+        if (userIds == null || userIds.isEmpty())
+            return false;
+        return userRepo.countByIdIn(userIds) == userIds.size();
     }
 
     @Transactional
@@ -195,16 +202,16 @@ public class UserService {
 
     private void sendUserEvent(User user, NotificationType type) {
         // 1. Xử lý logic lấy Avatar URL
-        String avatarUrl = (user.getAvatarId() != null) 
-                ? GATEWAY_URL + "/media/" + user.getAvatarId().toString() 
+        String avatarUrl = (user.getAvatarId() != null)
+                ? GATEWAY_URL + "/media/" + user.getAvatarId().toString()
                 : null;
 
         // 2. Sử dụng HashMap thay cho Map.of để cho phép giá trị null
         Map<String, Object> payload = new HashMap<>();
         payload.put("userId", user.getId());
-        
+
         // HashMap chấp nhận null, nên không lo bị crash
-        payload.put("displayName", user.getDisplayName()); 
+        payload.put("displayName", user.getDisplayName());
         payload.put("email", user.getPublicEmail() != null ? user.getPublicEmail() : user.getPublicEmail());
         payload.put("avatarUrl", avatarUrl);
 
@@ -250,6 +257,23 @@ public class UserService {
                 .privateProfile(user.isPrivateProfile())
                 .avatarUrl(finalAvatarUrl)
                 .coverUrl(finalCoverUrl)
+                .role(user.getRole())
+                .banned(user.isBanned())
                 .build();
+    }
+
+    @Transactional
+    public void banUser(String userId) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        // Toggle banned status
+        user.setBanned(!user.isBanned());
+        userRepo.save(user);
+    }
+
+    public org.springframework.data.domain.Page<UserResponse> searchUsers(String keyword,
+            org.springframework.data.domain.Pageable pageable) {
+        return userRepo.findByDisplayNameContainingIgnoreCase(keyword, pageable)
+                .map(this::mapUserToUserResponse);
     }
 }

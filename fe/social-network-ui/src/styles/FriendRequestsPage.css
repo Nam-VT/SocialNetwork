@@ -10,7 +10,7 @@
 .page-title {
     font-size: 24px;
     font-weight: bold;
-    color: var(--text-primary);
+    color: #ffffff !important;
     margin-bottom: 24px;
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 16px;
@@ -22,6 +22,7 @@
     padding: 32px;
     font-style: italic;
 }
+
 .page-status.error {
     color: #ef4444;
 }
@@ -57,7 +58,7 @@
 
 .requester-name {
     font-weight: 600;
-    color: var(--text-primary);
+    color: #ffffff !important;
 }
 
 .request-actions {
@@ -79,15 +80,17 @@
     background-color: var(--text-link);
     color: white;
 }
+
 .btn-accept:hover:not(:disabled) {
     background-color: var(--text-link-hover);
 }
 
 .btn-decline {
     background-color: var(--comment-background);
-    color: var(--text-primary);
+    color: #ffffff !important;
     border: 1px solid var(--border-color);
 }
+
 .btn-decline:hover:not(:disabled) {
     background-color: var(--border-color);
 }

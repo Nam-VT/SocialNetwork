@@ -11,16 +11,19 @@ const UserSearchResultItem = ({ user }) => {
     };
 
     return (
-        <Link 
-            to={`/profile/${id}`} 
+        <Link
+            to={`/profile/${id}`}
             className="user-search-item"
             aria-label={`View profile of ${displayName || 'user'}`}
         >
             <div className="item-avatar">
-                <img 
-                    src={avatarUrl || defaultAvatar} 
+                <img
+                    src={avatarUrl || `https://ui-avatars.com/api/?name=${displayName?.charAt(0) || 'U'}&size=64&background=random&color=fff`}
                     alt={`${displayName || 'User '} avatar`}
-                    onError={handleAvatarError}
+                    onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = `https://ui-avatars.com/api/?name=${displayName?.charAt(0) || 'U'}&size=64&background=random&color=fff`;
+                    }}
                     width={64}
                     height={64}
                 />

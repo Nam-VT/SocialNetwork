@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../features/auth/authSlice';
+import { useGetUserByIdQuery } from '../features/user/userApiSlice'; // Import thêm useGetUserByIdQuery
 import UserProfileHeader from '../features/user/UserProfileHeader';
 import UserPostList from '../features/post/UserPostList';
 import EditProfileForm from '../features/user/EditProfileForm';
@@ -15,6 +16,9 @@ const ProfilePage = () => {
 
     const currentUser = useSelector(selectCurrentUser);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+    // Fetch dữ liệu user mới nhất từ API để đảm bảo Edit Form luôn có data mới
+    const { data: userProfile } = useGetUserByIdQuery(userId, { skip: !userId });
 
     // So sánh trực tiếp String với String, giờ đã chính xác
     const isOwner = currentUser?.id === userId;
@@ -59,14 +63,14 @@ const ProfilePage = () => {
 
                 {/* --- HỆ THỐNG TAB MỚI --- */}
                 <div className="profile-tabs">
-                    <button 
+                    <button
                         className={`tab-button ${activeTab === 'posts' ? 'active' : ''}`}
                         onClick={() => setActiveTab('posts')}
                         aria-selected={activeTab === 'posts'}
                     >
                         Posts
                     </button>
-                    <button 
+                    <button
                         className={`tab-button ${activeTab === 'friends' ? 'active' : ''}`}
                         onClick={() => setActiveTab('friends')}
                         aria-selected={activeTab === 'friends'}
@@ -84,7 +88,7 @@ const ProfilePage = () => {
 
             {isEditModalOpen && (
                 <EditProfileForm
-                    user={currentUser}
+                    user={userProfile || currentUser}
                     onClose={() => setIsEditModalOpen(false)}
                 />
             )}

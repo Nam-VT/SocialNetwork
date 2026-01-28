@@ -32,25 +32,31 @@ export const userApiSlice = apiSlice.injectEndpoints({
             ],
         }),
 
-        // Lấy danh sách bạn bè
+        // Lấy danh sách bạn bè của current user (từ authentication)
         getFriends: builder.query({
-            query: ({ userId, page = 0, size = 10 }) => 
-                `${VITE_USER_SERVICE_URL}/api/friendships/friends/${userId}?page=${page}&size=${size}`,
-            // Tag này giúp tự động làm mới khi Unfriend hoặc Accept Friend
+            query: ({ page = 0, size = 10 } = {}) =>
+                `/api/friendships/friends?page=${page}&size=${size}`,
+            providesTags: ['Friends'],
+        }),
+
+        // Lấy danh sách bạn bè của user cụ thể (by userId)
+        getFriendsByUserId: builder.query({
+            query: ({ userId, page = 0, size = 10 }) =>
+                `/api/friendships/friends/${userId}?page=${page}&size=${size}`,
             providesTags: (result, error, { userId }) => [
                 { type: 'Friend', id: `LIST-${userId}` },
-                { type: 'Friend', id: 'LIST' }
+                'Friends'
             ],
         }),
-        
+
         getFriendshipStatus: builder.query({
-            query: (otherUserId) => `${VITE_USER_SERVICE_URL}/api/friendships/status/${otherUserId}`,
+            query: (otherUserId) => `/api/friendships/status/${otherUserId}`,
             providesTags: (result, error, otherUserId) => [{ type: 'FriendStatus', id: otherUserId }],
         }),
 
         sendFriendRequest: builder.mutation({
             query: (addresseeId) => ({
-                url: `${VITE_USER_SERVICE_URL}/api/friendships/requests/${addresseeId}`,
+                url: `/api/friendships/requests/${addresseeId}`,
                 method: 'POST',
             }),
             invalidatesTags: (result, error, addresseeId) => [{ type: 'FriendStatus', id: addresseeId }],
@@ -58,19 +64,19 @@ export const userApiSlice = apiSlice.injectEndpoints({
 
         acceptFriendRequest: builder.mutation({
             query: (requestId) => ({
-                url: `${VITE_USER_SERVICE_URL}/api/friendships/requests/${requestId}/accept`,
+                url: `/api/friendships/requests/${requestId}/accept`,
                 method: 'POST',
             }),
             invalidatesTags: (result, error, requestId) => [
                 'PendingRequest',
                 'FriendStatus',
-                { type: 'Friend', id: 'LIST' }
+                'Friends'
             ],
         }),
 
         declineOrCancelRequest: builder.mutation({
             query: (requestId) => ({
-                url: `${VITE_USER_SERVICE_URL}/api/friendships/requests/${requestId}`,
+                url: `/api/friendships/requests/${requestId}`,
                 method: 'DELETE',
             }),
             invalidatesTags: ['FriendStatus', 'PendingRequest'],
@@ -78,43 +84,44 @@ export const userApiSlice = apiSlice.injectEndpoints({
 
         unfriend: builder.mutation({
             query: (friendId) => ({
-                url: `${VITE_USER_SERVICE_URL}/api/friendships/friends/${friendId}`,
+                url: `/api/friendships/friends/${friendId}`,
                 method: 'DELETE',
             }),
             invalidatesTags: (result, error, friendId) => [
                 { type: 'FriendStatus', id: friendId },
-                { type: 'Friend', id: 'LIST' }
+                'Friends'
             ],
         }),
 
         getPendingRequests: builder.query({
-            query: ({ page = 0, size = 15 }) => 
-                `${VITE_USER_SERVICE_URL}/api/friendships/requests/pending?page=${page}&size=${size}`,
+            query: ({ page = 0, size = 15 } = {}) =>
+                `/api/friendships/requests/pending?page=${page}&size=${size}`,
             providesTags: ['PendingRequest'],
         }),
         getFriendSuggestions: builder.query({
-        query: (params) => ({
-            url: `${VITE_USER_SERVICE_URL}/api/friendships/suggestions`,
-            params: { page: params?.page || 0, size: params?.size || 5 }
+            query: (params) => ({
+                url: `/api/friendships/suggestions`,
+                params: { page: params?.page || 0, size: params?.size || 5 }
+            }),
+            providesTags: ['Friend'],
         }),
-        providesTags: ['Friend'],
     }),
-    }),
-    
+
 });
 
 export const {
     useGetCurrentUserProfileQuery,
     useGetUserByIdQuery,
     useGetUserByDisplayNameQuery,
-    useLazyGetUserByDisplayNameQuery, 
+    useLazyGetUserByDisplayNameQuery,
     useUpdateUserProfileMutation,
+    useGetFriendsQuery,
+    useGetFriendsByUserIdQuery,
     useGetFriendshipStatusQuery,
     useSendFriendRequestMutation,
     useAcceptFriendRequestMutation,
     useDeclineOrCancelRequestMutation,
     useUnfriendMutation,
-    useGetFriendsQuery,
     useGetPendingRequestsQuery,
     useGetFriendSuggestionsQuery,
 } = userApiSlice;

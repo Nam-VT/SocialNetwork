@@ -41,4 +41,10 @@ public class User {
     private String location;
     private LocalDate createdAt;
     private boolean privateProfile;
+
+    @Builder.Default
+    private String role = "USER"; // "USER" or "ADMIN"
+
+    @Builder.Default
+    private boolean banned = false;
 }

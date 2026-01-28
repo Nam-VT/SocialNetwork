@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +26,12 @@ import nvt.socialnetwork.post.service.PostService;
 @RequiredArgsConstructor
 public class PostController {
 
+    @GetMapping("/admin/stats")
+    @PreAuthorize("hasRole('ADMIN')")
+    public java.util.Map<String, Object> getAdminStats() {
+        return postService.getAdminStats();
+    }
+
     private final PostService postService;
 
     @PostMapping
@@ -35,8 +42,7 @@ public class PostController {
     @GetMapping
     public Page<PostResponse> getAllPosts(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
+            @RequestParam(defaultValue = "10") int size) {
         return postService.getAllPosts(page, size);
     }
 
@@ -44,8 +50,7 @@ public class PostController {
     public Page<PostResponse> getPostsByUserId(
             @PathVariable String userId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
+            @RequestParam(defaultValue = "10") int size) {
         return postService.getPostsByUserId(userId, page, size);
     }
 
@@ -67,14 +72,30 @@ public class PostController {
 
     @GetMapping("/{id}/owner")
     public ResponseEntity<String> getPostOwnerId(@PathVariable UUID id) {
-        String ownerId = postService.getPostOwnerId(id); 
+        String ownerId = postService.getPostOwnerId(id);
         return ResponseEntity.ok(ownerId);
     }
 
     @GetMapping("/feed")
-    public Page<PostResponse> getNewFeeds (Authentication authentication,
+    public Page<PostResponse> getNewFeeds(Authentication authentication,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         return postService.getNewFeeds(authentication, page, size);
+    }
+
+    // Admin Endpoints
+    @PutMapping("/{id}/hide")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void hidePost(@PathVariable UUID id, @RequestBody java.util.Map<String, Boolean> body) {
+        boolean hidden = body.getOrDefault("hidden", true);
+        postService.hidePost(id, hidden);
+    }
+
+    @GetMapping("/search")
+    public Page<PostResponse> searchPosts(
+            @RequestParam(defaultValue = "") String content,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return postService.searchPosts(content, page, size);
     }
 }

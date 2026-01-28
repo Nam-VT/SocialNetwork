@@ -16,13 +16,13 @@ const ConversationListItem = ({ room }) => {
     });
 
     const displayName = type === 'GROUP' ? name : (otherUser?.displayName || '...');
-    const avatarUrl = type === 'GROUP' 
-        ? 'https://ui-avatars.com/api/?name=U&size=48&background=6B7280&color=fff' // Avatar nhóm mặc định
-        : (otherUser?.avatarUrl || 'https://via.placeholder.com/48');
+    const avatarUrl = room.type === 'GROUP'
+        ? `https://ui-avatars.com/api/?name=${encodeURIComponent(room.name?.charAt(0) || 'G')}&background=6b7280&color=fff&size=32`
+        : (otherUser?.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(otherUser?.displayName || 'U')}&background=6b7280&color=fff&size=32`);
 
     return (
-        <NavLink 
-            to={`/chat/${id}`} 
+        <NavLink
+            to={`/chat/${id}`}
             className={({ isActive }) => `conversation-item ${isActive ? 'active' : ''}`}
         >
             <img src={avatarUrl} alt="Avatar" className="conversation-avatar" />

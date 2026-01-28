@@ -74,6 +74,31 @@ public class FollowService {
         followRepository.deleteByFollowerIdAndFollowingId(followerId, followingId);
     }
 
+    // Internal method for system-level operations (no authentication required)
+    @Transactional
+    public void createFollowRelationship(String followerId, String followingId) {
+        if (followerId.equals(followingId)) {
+            throw new IllegalArgumentException("Cannot follow yourself.");
+        }
+
+        if (followRepository.existsByFollowerIdAndFollowingId(followerId, followingId)) {
+            return; // Already following
+        }
+
+        Follow followRelationship = Follow.builder()
+                .followerId(followerId)
+                .followingId(followingId)
+                .build();
+
+        followRepository.save(followRelationship);
+    }
+
+    // Internal method for system-level unfollow (no authentication required)
+    @Transactional
+    public void deleteFollowRelationship(String followerId, String followingId) {
+        followRepository.deleteByFollowerIdAndFollowingId(followerId, followingId);
+    }
+
     @Transactional(readOnly = true)
     public FollowStatusResponse getFollowStatus(String targetUserId, Authentication authentication) {
         // Lấy ID của người dùng đang đăng nhập từ context bảo mật

@@ -3,26 +3,29 @@ package nvt.socialnetwork.search_service.Document;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Lob;
 
 import lombok.Data;
 
 @Data
-@Document(indexName = "posts")
+@Entity
+@Table(name = "search_posts")
 public class PostDocument {
 
     @Id
     private UUID id; // Chính là postId
 
-    @Field(type = FieldType.Text, name = "content")
+    @Lob
+    @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
-    @Field(type = FieldType.Keyword, name = "user_id")
+    @Column(name = "user_id")
     private String userId; // ID của người đăng
 
-    @Field(type = FieldType.Date, name = "created_at")
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 }

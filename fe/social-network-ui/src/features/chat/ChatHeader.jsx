@@ -1,95 +1,60 @@
-import { useSelector } from 'react-redux';
+import { useState } from 'react';
 import { useGetChatRoomsQuery } from './chatApiSlice';
-import { useGetUserByIdQuery } from '../user/userApiSlice';
-import { selectCurrentUser  } from '../auth/authSlice';
-import { Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import GroupSettingsModal from './GroupSettingsModal';
 import '../../styles/ChatHeader.css';
 
-const ChatHeader = ({ chatRoomId }) => {
-    const currentUser  = useSelector(selectCurrentUser );
+const ChatHeader = () => {
+    const { chatRoomId } = useParams();
+    const { data: chatRooms = [] } = useGetChatRoomsQuery();
+    const [showSettings, setShowSettings] = useState(false);
 
-    // Sử dụng selectFromResult để tìm phòng chat tương ứng trong cache
-    const { room, isLoading: isLoadingRooms, isError: isRoomsError } = useGetChatRoomsQuery(undefined, {
-        selectFromResult: ({ data: rooms }) => ({
-            room: rooms?.find((r) => r.id === chatRoomId),
-        }),
-    });
+    const currentRoom = chatRooms.find(room => room.id === chatRoomId);
 
-    // Lấy thông tin của người kia nếu là chat private
-    const otherUserId = room?.type === 'PRIVATE' ? room.participantIds.find(id => id !== currentUser .id) : null;
-    const { data: otherUser , isLoading: isLoadingUser , isError: isUserError } = useGetUserByIdQuery(otherUserId, {
-        skip: !otherUserId || !room, // Chỉ gọi khi có otherUser Id và room
-    });
-
-    // Loading state
-    if (isLoadingRooms || (room && room.type === 'PRIVATE' && isLoadingUser )) {
+    if (!currentRoom) {
         return (
-            <div className="chat-header loading">
-                <div className="header-skeleton">
-                    <div className="skeleton-avatar"></div>
-                    <div className="skeleton-name"></div>
-                </div>
+            <div className="chat-header">
+                <h2 className="chat-room-name">Select a conversation</h2>
             </div>
         );
     }
 
-    // Error state
-    if (isRoomsError || (room && room.type === 'PRIVATE' && isUserError)) {
-        return (
-            <div className="chat-header error">
-                <p>Unable to load chat info</p>
-            </div>
-        );
-    }
-
-    if (!room) {
-        return (
-            <div className="chat-header empty">
-                <p>Select a conversation</p>
-            </div>
-        );
-    }
-    
-    // Logic hiển thị name/subtitle/avatar
-    const displayName = room.type === 'GROUP' ? room.name : (otherUser ?.displayName || 'Unknown User');
-    const avatarUrl = room.type === 'GROUP' 
-        ? 'https://ui-avatars.com/api/?name=U&size=48&background=6B7280&color=fff'
-        : (otherUser ?.avatarUrl || 'https://ui-avatars.com/api/?name=U&size=48&background=6B7280&color=fff');
-    
-    const subtitle = room.type === 'GROUP' 
-        ? `${room.participantIds?.length || 0} members` 
-        : 'Online'; // Placeholder, có thể fetch status sau
-
-    // Link để xem profile của người kia (nếu là chat private)
-    const profileLink = room.type === 'PRIVATE' && otherUser  ? `/profile/${otherUser .id}` : '#';
-    const isProfileLink = room.type === 'PRIVATE' && otherUser ;
+    const isGroupChat = currentRoom.type === 'GROUP';
 
     return (
-        <div className="chat-header" role="banner">
-            <Link 
-                to={profileLink} 
-                className={`header-link ${isProfileLink ? 'profile-link' : 'group-link'}`}
-                aria-label={isProfileLink ? `View ${displayName}'s profile` : 'Group chat info'}
-                title={displayName}
-            >
-                <img 
-                    src={avatarUrl} 
-                    alt={`${displayName}'s avatar`} 
-                    className="chat-header-avatar"
-                    width={40}
-                    height={40}
-                />
-                <div className="header-info">
-                    <h2 className="chat-header-name">{displayName}</h2>
-                    <p className="chat-header-subtitle">{subtitle}</p>
+        <>
+            <div className="chat-header">
+                <div className="chat-header-info">
+                    <h2 className="chat-room-name">{currentRoom.name || 'Chat'}</h2>
+                    {isGroupChat && currentRoom.participantIds && (
+                        <span className="member-count">
+                            {currentRoom.participantIds.length} members
+                        </span>
+                    )}
                 </div>
-            </Link>
-            {/* Có thể thêm các nút hành động ở đây (vd: video call, add members...) */}
-            {/* <div className="header-actions">
-                <button className="action-button" aria-label="Video call">📹</button>
-                <button className="action-button" aria-label="Add members">+</button>
-            </div> */}
-        </div>
+                {isGroupChat && (
+                    <button
+                        className="settings-button"
+                        onClick={() => setShowSettings(true)}
+                        aria-label="Group settings"
+                        title="Group settings"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M12 1v6m0 6v6m-6-6h6m6 0h6"></path>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                        </svg>
+                    </button>
+                )}
+            </div>
+
+            {showSettings && isGroupChat && (
+                <GroupSettingsModal
+                    chatRoom={currentRoom}
+                    onClose={() => setShowSettings(false)}
+                />
+            )}
+        </>
     );
 };
 

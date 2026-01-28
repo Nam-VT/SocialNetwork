@@ -1,7 +1,8 @@
 .author-info {
     display: flex;
     align-items: center;
-    gap: 0.75rem; /* space-x-3 */
+    gap: 0.75rem;
+    /* space-x-3 */
     transition: all 0.2s ease;
 }
 
@@ -15,51 +16,65 @@
     flex-shrink: 0;
 }
 
-.avatar-img {
-    width: 3rem; /* w-12 */
-    height: 3rem; /* h-12 */
-    border-radius: 50%; /* rounded-full */
+.author-avatar-img {
+    width: 3rem;
+    /* w-12 */
+    height: 3rem;
+    /* h-12 */
+    border-radius: 50%;
+    /* rounded-full */
     object-fit: cover;
-    border: 2px solid #e5e7eb; /* border border-gray-200 */
+    border: 2px solid #e5e7eb;
+    /* border border-gray-200 */
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.avatar-img:hover {
-    border-color: #3b82f6; /* hover:border-blue-500 */
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); /* ring nhẹ khi hover */
+.author-avatar-img:hover {
+    border-color: #3b82f6;
+    /* hover:border-blue-500 */
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    /* ring nhẹ khi hover */
 }
 
 /* Details */
 .author-details {
     flex: 1;
-    min-width: 0; /* Để text wrap nếu tên dài */
+    min-width: 0;
+    /* Để text wrap nếu tên dài */
 }
 
 .author-link {
-    text-decoration: none; /* Không underline mặc định */
+    text-decoration: none;
+    /* Không underline mặc định */
     color: inherit;
     display: block;
     transition: color 0.2s ease;
 }
 
 .author-link:hover {
-    color: #3b82f6; /* hover:text-blue-600 */
+    color: #3b82f6;
+    /* hover:text-blue-600 */
 }
 
 .author-link:focus {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); /* focus:ring-2 focus:ring-blue-500/20 cho accessibility */
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    /* focus:ring-2 focus:ring-blue-500/20 cho accessibility */
 }
 
 .author-name {
-    font-weight: 600; /* font-semibold */
-    color: #111827; /* text-gray-900 */
-    font-size: 0.875rem; /* text-sm */
+    font-weight: 600;
+    /* font-semibold */
+    color: var(--text-primary);
+    /* text-gray-900 -> switched to var for Dark Mode */
+    font-size: 0.875rem;
+    /* text-sm */
     margin: 0;
     line-height: 1.25;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap; /* Không wrap tên dài */
+    white-space: nowrap;
+    /* Không wrap tên dài */
 }
 
 /* Loading state */
@@ -68,15 +83,20 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem;
-    color: #6b7280; /* text-gray-500 */
-    font-size: 0.875rem; /* text-sm */
+    color: #6b7280;
+    /* text-gray-500 */
+    font-size: 0.875rem;
+    /* text-sm */
 }
 
 .spinner-small {
-    width: 1rem; /* h-4 w-4 nhỏ */
+    width: 1rem;
+    /* h-4 w-4 nhỏ */
     height: 1rem;
-    border: 2px solid #e5e7eb; /* border border-gray-300 */
-    border-top: 2px solid #3b82f6; /* border-t-blue-500 */
+    border: 2px solid #e5e7eb;
+    /* border border-gray-300 */
+    border-top: 2px solid #3b82f6;
+    /* border-t-blue-500 */
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -91,11 +111,16 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem;
-    color: #991b1b; /* text-red-800 */
-    font-size: 0.875rem; /* text-sm */
-    background-color: #fef2f2; /* bg-red-50 nhẹ */
-    border-radius: 0.25rem; /* rounded nhỏ */
-    border: 1px solid #fecaca; /* border border-red-200 */
+    color: #991b1b;
+    /* text-red-800 */
+    font-size: 0.875rem;
+    /* text-sm */
+    background-color: #fef2f2;
+    /* bg-red-50 nhẹ */
+    border-radius: 0.25rem;
+    /* rounded nhỏ */
+    border: 1px solid #fecaca;
+    /* border border-red-200 */
 }
 
 .error-icon {
@@ -105,9 +130,12 @@
 }
 
 .error-svg {
-    height: 1rem; /* h-4 nhỏ */
-    width: 1rem; /* w-4 */
-    color: #f87171; /* text-red-400 */
+    height: 1rem;
+    /* h-4 nhỏ */
+    width: 1rem;
+    /* w-4 */
+    color: #f87171;
+    /* text-red-400 */
 }
 
 .error-text {
@@ -119,6 +147,7 @@
     from {
         transform: rotate(0deg);
     }
+
     to {
         transform: rotate(360deg);
     }
@@ -127,21 +156,26 @@
 /* Responsive: Giảm kích thước avatar trên mobile */
 @media (max-width: 640px) {
     .author-info {
-        gap: 0.5rem; /* Giảm space-x */
+        gap: 0.5rem;
+        /* Giảm space-x */
     }
 
     .avatar-img {
-        width: 2.5rem; /* w-10 nhỏ hơn */
-        height: 2.5rem; /* h-10 */
+        width: 2.5rem;
+        /* w-10 nhỏ hơn */
+        height: 2.5rem;
+        /* h-10 */
     }
 
     .author-name {
-        font-size: 0.8125rem; /* text-xs nhỏ hơn */
+        font-size: 0.8125rem;
+        /* text-xs nhỏ hơn */
     }
 
     .author-loading,
     .author-error {
         padding: 0.25rem;
-        font-size: 0.75rem; /* text-xs */
+        font-size: 0.75rem;
+        /* text-xs */
     }
 }

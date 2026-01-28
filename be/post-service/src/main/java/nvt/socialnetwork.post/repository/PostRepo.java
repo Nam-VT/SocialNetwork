@@ -17,8 +17,17 @@ public interface PostRepo extends JpaRepository<Post, UUID> {
 
     Page<Post> findByUserIdAndIsDeletedFalse(String userId, Pageable pageable);
 
+    // Filter hidden posts for Profile Page
+    Page<Post> findByUserIdAndIsDeletedFalseAndHiddenFalse(String userId, Pageable pageable);
+
     Page<Post> findByIsDeletedFalse(Pageable pageable);
 
-    Page<Post> findByUserIdIn(List<String> followerIds, Pageable pageable);
+    // For News Feed: Users I follow + Myself, excluding hidden posts
+    Page<Post> findByUserIdInAndHiddenFalse(List<String> userIds, Pageable pageable);
 
+    Page<Post> findByContentContainingIgnoreCase(String content, Pageable pageable);
+
+    long countByHiddenTrue();
+
+    long countByIsDeletedFalse();
 }

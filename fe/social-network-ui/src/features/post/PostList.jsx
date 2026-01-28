@@ -6,6 +6,8 @@ import '../../styles/PostList.css';
 const PostList = () => {
     const [page, setPage] = useState(0);
 
+    console.log('🔍 PostList component mounted, calling useGetFeedPostsQuery...');
+
     const {
         data: postsData,
         isLoading,
@@ -13,6 +15,8 @@ const PostList = () => {
         isSuccess,
         isError,
     } = useGetFeedPostsQuery({ page, size: 10 });
+
+    console.log('📊 Feed Query Status:', { isLoading, isFetching, isSuccess, isError, postsData });
 
     const handleLoadMore = () => {
         if (postsData && !postsData.last && !isFetching) {

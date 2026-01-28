@@ -1,100 +1,65 @@
-import { useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useGetMessageHistoryQuery } from './chatApiSlice';
-import { chatApiSlice } from './chatApiSlice';
+import { useEffect, useState, useRef } from 'react';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '../auth/authSlice';
 import { websocketService } from '../../service/websocketService';
-import { selectCurrentUser  } from '../auth/authSlice';
 import MessageItem from './MessageItem';
-import '../../styles/MessageList.css'; // Import CSS từ src/styles/
+import '../../styles/MessageList.css';
 
-const MessageList = ({ chatRoomId }) => {
-    const dispatch = useDispatch();
-    const currentUser  = useSelector(selectCurrentUser );
-    const messagesEndRef = useRef(null);
+const MessageList = ({ chatRoomId, messages: initialMessages, onNewMessage }) => {
+    const currentUser = useSelector(selectCurrentUser);
+    const [messages, setMessages] = useState(initialMessages || []);
 
-    const [page, setPage] = useState(0);
-
-    const { data: messageData, isLoading, isError, isFetching } = useGetMessageHistoryQuery({ chatRoomId, page }, {
-        skip: !chatRoomId
-    });
-
-    // Tự động cuộn xuống tin nhắn mới nhất khi data thay đổi (bao gồm WebSocket updates)
+    // Store onNewMessage in ref to avoid triggering re-subscription
+    const onNewMessageRef = useRef(onNewMessage);
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messageData]);
+        onNewMessageRef.current = onNewMessage;
+    }, [onNewMessage]);
+
+    useEffect(() => {
+        // Update messages when initialMessages change
+        setMessages(initialMessages || []);
+    }, [initialMessages]);
 
     useEffect(() => {
         if (!chatRoomId) return;
 
-        const onMessageReceived = (newMessage) => {
-            dispatch(
-                chatApiSlice.util.updateQueryData('getMessageHistory', { chatRoomId }, (draft) => {
-                    draft.content.push(newMessage);
-                })
-            );
-        };
+        // Subscribe to chat room for realtime messages
+        const subscription = websocketService.subscribeToChatRoom(chatRoomId, (newMessage) => {
+            console.log('Received new message:', newMessage);
+            setMessages(prev => [...prev, newMessage]);
 
-        websocketService.subscribeToChatRoom(chatRoomId, onMessageReceived);
+            // Notify parent to scroll (use ref to avoid stale closure)
+            if (onNewMessageRef.current) {
+                onNewMessageRef.current();
+            }
+        });
 
+        // Cleanup subscription when component unmounts or chatRoomId changes
         return () => {
             websocketService.unsubscribeFromChatRoom(chatRoomId);
         };
-    }, [chatRoomId, dispatch]);
+    }, [chatRoomId]); // Only depend on chatRoomId, not onNewMessage
 
-    const handleLoadMore = () => {
-        if (messageData && !messageData.first && !isFetching) {
-            setPage(prev => prev + 1);
-        }
-    };
-
-    if (!chatRoomId) {
-        return <div className="message-list-empty">Select a conversation to start chatting.</div>;
-    }
-
-    if (isError) {
-        return <div className="message-list-error">Error loading messages. Please try again.</div>;
-    }
-
-    if (isLoading && !messageData) {
+    if (!messages || messages.length === 0) {
         return (
-            <div className="message-list loading">
-                <div className="messages-loading">
-                    {[...Array(5)].map((_, index) => (
-                        <div key={index} className="message-skeleton">
-                            <div className="skeleton-avatar"></div>
-                            <div className="skeleton-bubble"></div>
-                        </div>
-                    ))}
+            <div className="message-list empty">
+                <div className="empty-state">
+                    <p>No messages yet</p>
+                    <p className="empty-hint">Start the conversation!</p>
                 </div>
             </div>
         );
     }
 
-    const messages = messageData?.content || [];
-
     return (
-        <div className="message-list" role="log" aria-live="polite">
-            {/* Nút Load More */}
-            {messageData && !messageData.first && (
-                <div className="load-more-container">
-                    <button onClick={handleLoadMore} disabled={isFetching}>
-                        {isFetching ? 'Loading...' : 'Load older messages'}
-                    </button>
-                </div>
-            )}
-
-            {messages.length === 0 ? (
-                <div className="messages-empty">No messages yet. Start the conversation!</div>
-            ) : (
-                messages.map(msg => (
-                    <MessageItem 
-                        key={msg.id} 
-                        message={msg}
-                        isOwnMessage={msg.senderId === currentUser.id}
-                    />
-                ))
-            )}
-            <div ref={messagesEndRef} />
+        <div className="message-list">
+            {messages.map((msg) => (
+                <MessageItem
+                    key={msg.id}
+                    message={msg}
+                    isOwnMessage={msg.senderId === currentUser?.id}
+                />
+            ))}
         </div>
     );
 };

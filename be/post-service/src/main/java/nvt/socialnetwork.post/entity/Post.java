@@ -37,4 +37,7 @@ public class Post {
 
     private boolean isDeleted;
     private boolean isPrivate;
+
+    @Builder.Default
+    private boolean hidden = false;
 }

@@ -12,13 +12,14 @@
   -moz-osx-font-smoothing: grayscale;
 
   /* === BỘ BIẾN MÀU (Giữ nguyên của bạn) === */
-  --background-color: #18191a; /* Màu nền chuẩn Facebook Dark Mode */
+  --background-color: #19181a95;
+  /* Màu nền chuẩn Facebook Dark Mode */
   --text-primary: #e4e6eb;
   --text-secondary: #b0b3b8;
   --text-link: #4599ff;
   --text-link-hover: #535bf2;
   --comment-background: #242526;
-  --border-color: #3e4042;
+  --border-color: #3e4142;
 }
 
 body {
@@ -26,13 +27,14 @@ body {
   padding: 0;
   width: 100%;
   min-height: 100vh;
-  
+
   /* QUAN TRỌNG: Xóa display: flex và place-items: center cũ đi */
-  display: block; 
-  
+  display: block;
+
   background-color: var(--background-color);
   color: var(--text-primary);
-  overflow-x: hidden; /* Ngăn thanh cuộn ngang ko mong muốn */
+  overflow-x: hidden;
+  /* Ngăn thanh cuộn ngang ko mong muốn */
 }
 
 a {
@@ -40,6 +42,7 @@ a {
   color: var(--text-link);
   text-decoration: inherit;
 }
+
 a:hover {
   color: var(--text-link-hover);
 }
@@ -56,10 +59,31 @@ button {
   background-color: var(--comment-background);
   color: var(--text-primary);
 }
+
 button:hover {
   border-color: var(--text-link);
 }
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+}
+
+/* FIX: Global Input Styles for Dark Mode */
+input,
+textarea,
+select {
+  color: var(--text-primary);
+  background-color: var(--comment-background);
+  border-color: var(--border-color);
+}
+
+/* FIX: Override Browser Autofill styles to match Dark Mode */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px var(--comment-background) inset !important;
+  -webkit-text-fill-color: var(--text-primary) !important;
+  transition: background-color 5000s ease-in-out 0s;
 }

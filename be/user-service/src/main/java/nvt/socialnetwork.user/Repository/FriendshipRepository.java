@@ -23,15 +23,16 @@ public interface FriendshipRepository extends JpaRepository<Friendship, UUID> {
     Page<Friendship> findByAddresseeIdAndStatus(String addresseeId, FriendshipStatus status, Pageable pageable);
 
     // Tìm tất cả bạn bè của một user
-    @Query("SELECT f FROM Friendship f WHERE (f.requesterId = :userId OR f.addresseeId = :userId) AND f.status = 'ACCEPTED'")
-    Page<Friendship> findFriendsByUserId(@Param("userId") String userId, Pageable pageable);
+    @Query("SELECT f FROM Friendship f WHERE (f.requesterId = :userId OR f.addresseeId = :userId) AND f.status = :status")
+    Page<Friendship> findFriendsByUserId(@Param("userId") String userId, @Param("status") FriendshipStatus status,
+            Pageable pageable);
 
     // Tìm tất cả các quan hệ bạn bè đã chấp nhận của một người
-    @Query("SELECT f FROM Friendship f WHERE (f.requesterId = :userId OR f.addresseeId = :userId) AND f.status = 'ACCEPTED'")
+    @Query("SELECT f FROM Friendship f WHERE (f.requesterId = :userId OR f.addresseeId = :userId) AND f.status = nvt.socialnetwork.user.Entity.Enum.FriendshipStatus.ACCEPTED")
     Page<Friendship> findAllAcceptedFriends(String userId, Pageable pageable);
 
     @Query("SELECT u FROM User u WHERE u.id != :currentUserId " +
-        "AND u.id NOT IN (SELECT f.addresseeId FROM Friendship f WHERE f.requesterId = :currentUserId) " +
-        "AND u.id NOT IN (SELECT f.requesterId FROM Friendship f WHERE f.addresseeId = :currentUserId)")
+            "AND u.id NOT IN (SELECT f.addresseeId FROM Friendship f WHERE f.requesterId = :currentUserId) " +
+            "AND u.id NOT IN (SELECT f.requesterId FROM Friendship f WHERE f.addresseeId = :currentUserId)")
     Page<User> findFriendSuggestions(@Param("currentUserId") String currentUserId, Pageable pageable);
 }

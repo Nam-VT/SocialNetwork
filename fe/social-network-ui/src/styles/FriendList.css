@@ -2,10 +2,39 @@
     padding-top: 20px;
 }
 
+/* Match Sidebar Section Style */
 .friend-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 16px;
+}
+
+/* Override Item Styles for Dark Theme Match */
+.friend-grid .user-search-item {
+    background-color: #1a1a1a !important;
+    border: 1px solid #333 !important;
+    border-radius: 12px;
+    color: #e4e6eb !important;
+    margin: 0;
+    transition: all 0.2s ease;
+}
+
+.friend-grid .user-search-item:hover {
+    background-color: #252525 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.friend-grid .user-name {
+    color: #e4e6eb !important;
+}
+
+.friend-grid .item-avatar img {
+    border-color: #444 !important;
+}
+
+.friend-grid .user-bio {
+    color: #b0b3b8 !important;
 }
 
 .friend-list-status {
@@ -15,7 +44,7 @@
 }
 
 .friend-list-status.error {
-    color: #ef4444; /* Màu đỏ cho lỗi */
+    color: #ef4444;
 }
 
 .load-more-container {
@@ -24,11 +53,20 @@
 }
 
 .load-more-button {
-    /* Tái sử dụng style từ các nút khác nếu có hoặc định nghĩa mới */
     padding: 8px 24px;
     border-radius: 6px;
-    border: 1px solid var(--border-color);
-    background-color: var(--comment-background);
-    color: var(--text-primary);
+    border: 1px solid #333;
+    background-color: #1a1a1a;
+    color: #e4e6eb;
     cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.load-more-button:hover:not(:disabled) {
+    background-color: #252525;
+}
+
+.load-more-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }

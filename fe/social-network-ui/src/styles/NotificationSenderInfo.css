@@ -3,7 +3,7 @@
     align-items: center;
 }
 
-.avatar-image {
+.notification-avatar-img {
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -12,7 +12,7 @@
     transition: filter 0.3s ease;
 }
 
-.avatar-image:hover {
+.notification-avatar-img:hover {
     filter: brightness(0.9);
 }
 
@@ -31,6 +31,7 @@
     0% {
         background-position: 200% 0;
     }
+
     100% {
         background-position: -200% 0;
     }
@@ -43,10 +44,6 @@
     justify-content: center;
 }
 
-.avatar-fallback .avatar-image {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
+.avatar-fallback .notification-avatar-img {
     opacity: 0.6;
 }

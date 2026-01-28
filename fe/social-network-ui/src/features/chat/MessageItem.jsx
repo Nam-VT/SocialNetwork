@@ -2,21 +2,48 @@ import { useGetUserByIdQuery } from '../user/userApiSlice';
 import '../../styles/MessageItem.css'; // Import CSS từ src/styles/
 
 const MessageItem = ({ message, isOwnMessage }) => {
-    const { senderId, content, createdAt } = message;
-    
+    const { senderId, content, createdAt, type, mediaUrl } = message;
+
     // Skip query nếu là tin nhắn của chính mình (không cần fetch sender)
     const { data: sender, isLoading: isSenderLoading, isError: isSenderError } = useGetUserByIdQuery(senderId, {
         skip: isOwnMessage || !senderId
     });
 
     const displayName = sender?.displayName || 'Unknown User';
-    const avatarUrl = sender?.avatarUrl || 'https://via.placeholder.com/32x32/6b7280/ffffff?text=U';
+    const avatarUrl = sender?.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(sender?.displayName || 'U')}&background=6b7280&color=fff&size=32`;
+
+    const renderContent = () => {
+        if (type === 'IMAGE' && mediaUrl) {
+            return (
+                <div className="message-media">
+                    <img
+                        src={mediaUrl}
+                        alt="Shared image"
+                        loading="lazy"
+                        className="media-image"
+                        onClick={() => window.open(mediaUrl, '_blank')}
+                    />
+                </div>
+            );
+        } else if (type === 'VIDEO' && mediaUrl) {
+            return (
+                <div className="message-media">
+                    <video controls className="media-video">
+                        <source src={mediaUrl} />
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            );
+        } else {
+            return <p className="message-text">{content}</p>;
+        }
+    };
 
     if (isOwnMessage) {
         return (
             <div className="message-item own" role="log" aria-live="polite">
                 <div className="message-content own-content">
-                    <p className="message-text">{content}</p>
+                    {renderContent()}
                     {createdAt && (
                         <small className="message-time">{formatTime(createdAt)}</small>
                     )}
@@ -31,12 +58,16 @@ const MessageItem = ({ message, isOwnMessage }) => {
                 {isSenderLoading ? (
                     <div className="skeleton-avatar"></div>
                 ) : (
-                    <img 
-                        src={avatarUrl} 
-                        alt={`${displayName}'s avatar`} 
-                        className="avatar-img"
+                    <img
+                        src={avatarUrl}
+                        alt={`${displayName}'s avatar`}
+                        className="chat-avatar-img"
                         width={32}
                         height={32}
+                        onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(sender?.displayName || 'U')}&background=6b7280&color=fff&size=32`;
+                        }}
                     />
                 )}
             </div>
@@ -53,7 +84,7 @@ const MessageItem = ({ message, isOwnMessage }) => {
                         <small className="message-time">{formatTime(createdAt)}</small>
                     )}
                 </div>
-                <p className="message-text">{content}</p>
+                {renderContent()}
             </div>
         </div>
     );
@@ -61,9 +92,9 @@ const MessageItem = ({ message, isOwnMessage }) => {
 
 // Helper function để format thời gian (có thể di chuyển ra utils nếu dùng chung)
 const formatTime = (timestamp) => {
-    return new Date(timestamp).toLocaleTimeString([], { 
-        hour: '2-digit', 
-        minute: '2-digit' 
+    return new Date(timestamp).toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit'
     });
 };
 

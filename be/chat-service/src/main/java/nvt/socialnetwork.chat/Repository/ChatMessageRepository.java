@@ -10,7 +10,10 @@ import java.util.UUID;
 
 @Repository
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, UUID> {
-    
-    // Lấy tin nhắn của một phòng chat, có phân trang, sắp xếp theo thời gian mới nhất
+
+    // Lấy tin nhắn theo chatRoomId, sắp xếp theo thời gian gửi (mới nhất đầu tiên)
     Page<ChatMessage> findByChatRoomIdOrderByTimestampDesc(UUID chatRoomId, Pageable pageable);
+
+    // Xóa tất cả tin nhắn trong một phòng chat
+    void deleteByChatRoomId(UUID chatRoomId);
 }

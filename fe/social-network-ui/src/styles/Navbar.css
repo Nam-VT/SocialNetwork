@@ -6,7 +6,8 @@
     flex-direction: column;
     min-height: 100vh;
     width: 100%;
-    background-color: #18191a; /* Màu nền Facebook Dark Mode */
+    background-color: #18191a;
+    /* Màu nền Facebook Dark Mode */
     color: #e4e6eb;
 }
 
@@ -24,7 +25,8 @@
     top: 0;
     z-index: 1000;
     width: 100%;
-    height: 60px; /* Chiều cao cố định để tính toán sticky bên dưới */
+    height: 60px;
+    /* Chiều cao cố định để tính toán sticky bên dưới */
     display: flex;
     align-items: center;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -32,7 +34,8 @@
 
 .navbar-container {
     width: 100%;
-    max-width: 1920px; /* Full màn hình nhưng có giới hạn */
+    max-width: 1920px;
+    /* Full màn hình nhưng có giới hạn */
     padding: 0 16px;
     margin: 0 auto;
     display: flex;
@@ -43,7 +46,8 @@
 .navbar-logo {
     font-size: 1.75rem;
     font-weight: 800;
-    color: #2E89FF; /* Màu xanh thương hiệu */
+    color: #2E89FF;
+    /* Màu xanh thương hiệu */
     text-decoration: none;
     letter-spacing: -0.5px;
 }
@@ -61,11 +65,13 @@
 }
 
 /* Link & Button trên Navbar */
-.nav-link, .nav-button {
+.nav-link,
+.nav-button {
     display: flex;
     align-items: center;
     padding: 8px 12px;
-    border-radius: 20px; /* Bo tròn kiểu chip */
+    border-radius: 20px;
+    /* Bo tròn kiểu chip */
     background-color: #3a3b3c;
     color: #e4e6eb;
     text-decoration: none;
@@ -76,7 +82,8 @@
     transition: background 0.2s;
 }
 
-.nav-link:hover, .nav-button:hover {
+.nav-link:hover,
+.nav-button:hover {
     background-color: #4e4f50;
 }
 
@@ -96,28 +103,31 @@
     grid-template-columns: 280px minmax(500px, 1fr) 320px;
     gap: 32px;
 
-    max-width: 1920px; /* Hoặc để 100% nếu muốn tràn viền hoàn toàn */
+    max-width: 1920px;
+    /* Hoặc để 100% nếu muốn tràn viền hoàn toàn */
     width: 100%;
 
-    margin: 0 auto;    /* Căn giữa màn hình */
+    margin: 0 auto;
+    /* Căn giữa màn hình */
     padding: 0 20px;
 }
 
 /* --- 4. Thiết lập Sidebar (Sticky - Dính khi cuộn) --- */
-.sidebar-left, .sidebar-right {
+.sidebar-left,
+.sidebar-right {
     position: sticky;
     /* Top = Chiều cao Navbar (60px) + Padding (20px) */
-    top: 80px; 
+    top: 80px;
     height: fit-content;
     /* Max height để sidebar có thể scroll độc lập nếu quá dài */
-    max-height: calc(100vh - 100px); 
+    max-height: calc(100vh - 100px);
     overflow-y: auto;
-    
+
     /* Ẩn thanh cuộn cho đẹp */
-    scrollbar-width: none; 
+    scrollbar-width: none;
 }
 
-.sidebar-left::-webkit-scrollbar, 
+.sidebar-left::-webkit-scrollbar,
 .sidebar-right::-webkit-scrollbar {
     display: none;
 }
@@ -126,19 +136,21 @@
 .side-menu {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
 }
 
 .menu-item {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px;
-    border-radius: 8px;
+    padding: 12px 16px;
+    border-radius: 12px;
     color: #e4e6eb;
     text-decoration: none;
     font-weight: 500;
     transition: background 0.2s;
+    background-color: #242526;
+    border: 1px solid #3e4042;
 }
 
 .menu-item:hover {
@@ -151,7 +163,8 @@
 
 /* --- 5. Cột giữa (Feed) --- */
 .feed-column {
-    min-width: 0; /* Ngăn vỡ layout flex/grid con */
+    min-width: 0;
+    /* Ngăn vỡ layout flex/grid con */
     margin-bottom: 40px;
 }
 
@@ -159,6 +172,7 @@
     .layout-grid {
         grid-template-columns: 280px 1fr;
     }
+
     .sidebar-right {
         display: none;
     }
@@ -168,6 +182,7 @@
     .layout-grid {
         grid-template-columns: 1fr;
     }
+
     .sidebar-left {
         display: none;
     }

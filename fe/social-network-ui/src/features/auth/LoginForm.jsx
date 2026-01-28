@@ -21,13 +21,13 @@ const LoginForm = () => {
 
         try {
             const userData = await login({ email, password }).unwrap();
-            dispatch(setCredentials({ 
-                user: { 
-                    id: userData.userId, 
-                    email: userData.email, 
-                    role: userData.role 
-                }, 
-                token: userData.token 
+            dispatch(setCredentials({
+                user: {
+                    id: userData.userId,
+                    email: userData.email,
+                    role: userData.role
+                },
+                token: userData.token
             }));
             navigate('/');
         } catch (err) {
@@ -44,7 +44,7 @@ const LoginForm = () => {
     return (
         <div className="login-page-wrapper">
             <div className="login-content-container">
-                
+
                 {/* Logo Section */}
                 <div className="login-branding">
                     <h1 className="brand-logo">Social Network</h1>
@@ -57,21 +57,23 @@ const LoginForm = () => {
                 <div className="login-form-card">
                     <form onSubmit={handleSubmit} className="login-form">
                         {errMsg && <div className="error-message">{errMsg}</div>}
-                        
+
                         <div className="form-group">
                             <input
+                                id="login-email"
                                 type="text"
                                 className="form-input"
                                 placeholder="Email hoặc số điện thoại"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
-                                autoFocus // Thêm autoFocus cho tiện
+                                autoFocus
                             />
                         </div>
 
                         <div className="form-group">
                             <input
+                                id="login-password"
                                 type="password"
                                 className="form-input"
                                 placeholder="Mật khẩu"
@@ -92,9 +94,9 @@ const LoginForm = () => {
                         <div className="divider"></div>
 
                         <div className="create-account-wrapper">
-                            <button 
-                                type="button" 
-                                onClick={() => navigate('/register')} 
+                            <button
+                                type="button"
+                                onClick={() => navigate('/register')}
                                 className="btn-create-new"
                             >
                                 Tạo tài khoản mới

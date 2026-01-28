@@ -9,7 +9,8 @@
     width: 100%;
     background-color: #18191a;
     font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
-    padding: 40px; /* Tăng padding để không bị sát lề */
+    padding: 40px;
+    /* Tăng padding để không bị sát lề */
     box-sizing: border-box;
 }
 
@@ -18,28 +19,35 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    max-width: 1200px; /* Tăng từ 980px lên 1200px */
+    max-width: 1200px;
+    /* Tăng từ 980px lên 1200px */
     width: 100%;
-    gap: 60px; /* Tăng khoảng cách giữa 2 cột */
+    gap: 60px;
+    /* Tăng khoảng cách giữa 2 cột */
 }
 
 /* --- Phần Logo/Branding (Bên trái) --- */
 .login-branding {
     flex: 1;
-    max-width: 600px; /* Tăng vùng chứa logo */
+    max-width: 600px;
+    /* Tăng vùng chứa logo */
 }
 
 .brand-logo {
     color: #1877f2;
-    font-size: 5rem; /* Tăng từ 3.5rem lên 5rem (Rất to) */
-    font-weight: 800; /* Đậm hơn */
-    margin-bottom: 10px; /* Giảm margin bottom để gắn kết với slogan */
+    font-size: 5rem;
+    /* Tăng từ 3.5rem lên 5rem (Rất to) */
+    font-weight: 800;
+    /* Đậm hơn */
+    margin-bottom: 10px;
+    /* Giảm margin bottom để gắn kết với slogan */
     letter-spacing: -2px;
     line-height: 1;
 }
 
 .brand-slogan {
-    font-size: 1.8rem; /* Tăng từ 1.5rem lên 1.8rem */
+    font-size: 1.8rem;
+    /* Tăng từ 1.5rem lên 1.8rem */
     color: #e4e6eb;
     line-height: 1.4;
     font-weight: 400;
@@ -49,25 +57,32 @@
 /* --- Phần Form (Bên phải) --- */
 .login-form-card {
     background-color: #242526;
-    border-radius: 10px; /* Bo góc mềm mại hơn */
-    padding: 28px; /* Tăng padding trong card */
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4); /* Bóng đổ sâu hơn */
-    width: 420px; /* Tăng độ rộng form từ 380px lên 420px */
+    border-radius: 10px;
+    /* Bo góc mềm mại hơn */
+    padding: 28px;
+    /* Tăng padding trong card */
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    /* Bóng đổ sâu hơn */
+    width: 420px;
+    /* Tăng độ rộng form từ 380px lên 420px */
     flex-shrink: 0;
 }
 
 .login-form {
     display: flex;
     flex-direction: column;
-    gap: 18px; /* Tăng khoảng cách giữa các ô input */
+    gap: 18px;
+    /* Tăng khoảng cách giữa các ô input */
 }
 
 .form-input {
     width: 100%;
-    padding: 16px 18px; /* Input cao hơn, thoáng hơn */
+    padding: 16px 18px;
+    /* Input cao hơn, thoáng hơn */
     border: 1px solid #3a3b3c;
     border-radius: 8px;
-    font-size: 1.1rem; /* Chữ to hơn */
+    font-size: 1.1rem;
+    /* Chữ to hơn */
     background-color: #18191a;
     color: white;
     outline: none;
@@ -77,15 +92,42 @@
 
 .form-input:focus {
     border-color: #1877f2;
+    border-color: #1877f2;
     box-shadow: 0 0 0 3px rgba(24, 119, 242, 0.25);
+}
+
+/* FIX: Override Browser Autofill Styles specifically for Login Form */
+/* FIX: Override Browser Autofill Styles using Animation (Nuclear Option) */
+@keyframes autofill {
+
+    0%,
+    100% {
+        color: white;
+        background: transparent;
+    }
+}
+
+.form-input:-webkit-autofill,
+.form-input:-webkit-autofill:hover,
+.form-input:-webkit-autofill:focus,
+.form-input:-webkit-autofill:active {
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: white !important;
+    transition: background-color 5000s ease-in-out 0s;
+    box-shadow: inset 0 0 20px 20px #18191a29;
+    /* Adds a transparent dark overlay just in case */
+    animation-name: autofill;
+    animation-fill-mode: both;
 }
 
 .btn-login {
     background-color: #1877f2;
     color: white;
-    font-size: 1.4rem; /* Nút to, chữ rõ ràng */
+    font-size: 1.4rem;
+    /* Nút to, chữ rõ ràng */
     font-weight: 700;
-    padding: 14px; /* Nút cao hơn */
+    padding: 14px;
+    /* Nút cao hơn */
     border-radius: 8px;
     border: none;
     cursor: pointer;
@@ -115,7 +157,8 @@
 .forgot-link {
     color: #1877f2;
     text-decoration: none;
-    font-size: 1rem; /* Tăng size link */
+    font-size: 1rem;
+    /* Tăng size link */
 }
 
 .forgot-link:hover {
@@ -135,7 +178,8 @@
 .btn-create-new {
     background-color: #42b72a;
     color: white;
-    font-size: 1.1rem; /* Tăng size nút tạo tài khoản */
+    font-size: 1.1rem;
+    /* Tăng size nút tạo tài khoản */
     font-weight: 700;
     padding: 14px 24px;
     border-radius: 8px;
@@ -165,7 +209,8 @@
         flex-direction: column;
         text-align: center;
         gap: 30px;
-        max-width: 500px; /* Giới hạn chiều rộng khi ở mobile */
+        max-width: 500px;
+        /* Giới hạn chiều rộng khi ở mobile */
     }
 
     .login-branding {
@@ -174,7 +219,8 @@
     }
 
     .brand-logo {
-        font-size: 3.5rem; /* Giảm size logo trên mobile cho vừa */
+        font-size: 3.5rem;
+        /* Giảm size logo trên mobile cho vừa */
         margin: 0 auto 10px auto;
     }
 
@@ -184,6 +230,7 @@
 
     .login-form-card {
         width: 100%;
-        max-width: 450px; /* Form full chiều ngang thiết bị */
+        max-width: 450px;
+        /* Form full chiều ngang thiết bị */
     }
 }

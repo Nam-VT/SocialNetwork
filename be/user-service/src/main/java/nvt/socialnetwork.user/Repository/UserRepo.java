@@ -24,6 +24,8 @@ public interface UserRepo extends JpaRepository<User, String> {
 
     List<User> findByIdIn(Set<String> ids);
 
+    org.springframework.data.domain.Page<User> findByDisplayNameContainingIgnoreCase(String displayName,
+            org.springframework.data.domain.Pageable pageable);
 
-
+    long countByCreatedAt(java.time.LocalDate createdAt);
 }

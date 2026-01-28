@@ -1,16 +1,15 @@
 .comment-section {
-    margin-top: 16px;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 0 16px;
+    margin-top: 12px;
+    width: 100%;
+    padding: 0;
 }
 
 .comment-section-title {
     font-size: 1.5rem;
     font-weight: 700;
     margin-bottom: 12px;
-    color: var(--text-link); /* SỬA LẠI */
+    color: var(--text-link);
+    /* SỬA LẠI */
     user-select: none;
 }
 
@@ -22,7 +21,8 @@
 .comments-error,
 .comments-empty {
     font-style: italic;
-    color: var(--text-secondary); /* SỬA LẠI */
+    color: var(--text-secondary);
+    /* SỬA LẠI */
     text-align: center;
     padding: 12px 0;
 }

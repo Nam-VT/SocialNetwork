@@ -4,18 +4,14 @@ import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.elasticsearch.annotations.Query;
-import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import nvt.socialnetwork.search_service.Document.PostDocument;
 
-@Repository
-public interface PostSearchRepository extends ElasticsearchRepository<PostDocument, UUID> {
+public interface PostSearchRepository extends JpaRepository<PostDocument, UUID> {
 
-    //Page<PostDocument> findByContentContaining(String content, Pageable pageable);
-
-    @Query("{\"match\": {\"content\": {\"query\": \"?0\", \"fuzziness\": \"AUTO\"}}}")
-    Page<PostDocument> searchByContent(String query, Pageable pageable);
-
+    @Query("SELECT p FROM PostDocument p WHERE p.content LIKE CONCAT('%', :query, '%')")
+    Page<PostDocument> searchByContent(@Param("query") String query, Pageable pageable);
 }

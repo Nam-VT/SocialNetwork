@@ -28,7 +28,7 @@ public class EventConsumer {
     @KafkaListener(topics = "${app.kafka.user-topic}", groupId = "search-group-user")
     public void consumeUserEvents(@Payload NotificationEvent event) {
         log.info("Received user event: type={}, eventId={}", event.getType(), event.getEventId());
-        
+
         Map<String, Object> payload = event.getPayload();
         String userId = (String) payload.get("userId");
 
@@ -52,7 +52,7 @@ public class EventConsumer {
                 userSearchRepository.deleteById(userId);
                 log.info("Deleted user document for userId: {}", userId);
                 break;
-                
+
             default:
                 log.warn("Unhandled user event type: {}", event.getType());
         }
@@ -62,12 +62,17 @@ public class EventConsumer {
     @KafkaListener(topics = "${app.kafka.post-topic}", groupId = "search-group-post")
     public void consumePostEvents(@Payload NotificationEvent event) {
         try {
-            log.info("Received post event: type={}, eventId={}", event.getType(), event.getEventId()); // Sửa event.getType() thành event.getEventId() cho đúng log
+            log.info("Received post event: type={}, eventId={}", event.getType(), event.getEventId()); // Sửa
+                                                                                                       // event.getType()
+                                                                                                       // thành
+                                                                                                       // event.getEventId()
+                                                                                                       // cho đúng log
             Map<String, Object> payload = event.getPayload();
-            
+
             // SỬA LỖI: Parse String sang UUID an toàn
             String postIdStr = (String) payload.get("postId");
-            if (postIdStr == null) return;
+            if (postIdStr == null)
+                return;
             UUID postId = UUID.fromString(postIdStr);
 
             switch (event.getType()) {
@@ -76,14 +81,14 @@ public class EventConsumer {
                     post.setId(postId);
                     post.setContent((String) payload.get("content"));
                     post.setUserId((String) payload.get("userId"));
-                    
+
                     // SỬA LỖI: Parse String sang LocalDateTime an toàn
                     Object createdAtObj = payload.get("createdAt");
                     if (createdAtObj != null) {
                         // Xử lý trường hợp JSON gửi dạng String ISO-8601
-                        post.setCreatedAt(LocalDateTime.parse(createdAtObj.toString())); 
+                        post.setCreatedAt(LocalDateTime.parse(createdAtObj.toString()));
                     }
-                    
+
                     postSearchRepository.save(post);
                     log.info("Indexed post document for postId: {}", postId);
                 }

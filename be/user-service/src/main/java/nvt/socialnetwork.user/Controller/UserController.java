@@ -27,6 +27,12 @@ import nvt.socialnetwork.user.Service.UserService;
 @RequestMapping("/users")
 public class UserController {
 
+    @GetMapping("/admin/stats")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<java.util.Map<String, Object>> getAdminStats() {
+        return ResponseEntity.ok(userService.getAdminStats());
+    }
+
     private final UserService userService;
 
     @PostMapping
@@ -63,7 +69,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    // @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteUserProfile(@PathVariable String id) {
         userService.deleteUserProfile(id);
         return ResponseEntity.noContent().build();
@@ -90,5 +96,22 @@ public class UserController {
     public ResponseEntity<UserResponse> createUser(@RequestParam String id, @RequestParam String imageUrl) {
         UserResponse user = userService.createUser(id, imageUrl);
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
+    }
+
+    // Admin Endpoints
+    @PutMapping("/{id}/ban")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> banUser(@PathVariable String id) {
+        userService.banUser(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<org.springframework.data.domain.Page<UserResponse>> searchUsers(
+            @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity
+                .ok(userService.searchUsers(keyword, org.springframework.data.domain.PageRequest.of(page, size)));
     }
 }

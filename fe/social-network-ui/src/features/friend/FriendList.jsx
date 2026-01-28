@@ -1,23 +1,23 @@
 import { useState } from 'react';
 // Sửa 1: Import đúng tên hook từ userApiSlice
-import { useGetFriendsQuery } from '../user/userApiSlice'; 
-import UserSearchResultItem from '../user/UserSearchResultItem'; 
-import '../../styles/FriendList.css'; 
+import { useGetFriendsByUserIdQuery } from '../user/userApiSlice';
+import UserSearchResultItem from '../user/UserSearchResultItem';
+import '../../styles/FriendList.css';
 
 const FriendList = ({ userId }) => {
     const [page, setPage] = useState(0);
     const pageSize = 12;
-    
-    // Sửa 2: Sử dụng useGetFriendsQuery khớp với tên hàm trong userApiSlice.js
-    const { 
-        data: friendsData, 
-        isLoading, 
-        isFetching, 
-        isError 
-    } = useGetFriendsQuery({ 
-        userId, 
-        page, 
-        size: pageSize 
+
+    // Sửa 2: Sử dụng useGetFriendsByUserIdQuery để xem friends của user cụ thể
+    const {
+        data: friendsData,
+        isLoading,
+        isFetching,
+        isError
+    } = useGetFriendsByUserIdQuery({
+        userId,
+        page,
+        size: pageSize
     });
 
     if (isLoading && page === 0) {
@@ -46,9 +46,9 @@ const FriendList = ({ userId }) => {
             {/* Logic hiển thị nút Load More dựa trên trường 'last' của Spring Boot Page */}
             {friendsData && !friendsData.last && (
                 <div className="load-more-container">
-                    <button 
-                        onClick={() => setPage(p => p + 1)} 
-                        disabled={isFetching} 
+                    <button
+                        onClick={() => setPage(p => p + 1)}
+                        disabled={isFetching}
                         className="load-more-button"
                     >
                         {isFetching ? 'Loading...' : 'Load More'}

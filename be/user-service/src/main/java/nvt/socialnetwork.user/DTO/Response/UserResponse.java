@@ -23,4 +23,6 @@ public class UserResponse {
     private String location;
     private LocalDate createdAt;
     private boolean privateProfile;
+    private String role;
+    private boolean banned;
 }

@@ -34,10 +34,17 @@ import nvt.socialnetwork.post.repository.PostRepo;
 @Service
 @RequiredArgsConstructor
 public class PostService {
+        public Map<String, Object> getAdminStats() {
+                Map<String, Object> stats = new java.util.HashMap<>();
+                stats.put("totalPosts", postRepo.countByIsDeletedFalse());
+                stats.put("hiddenPosts", postRepo.countByHiddenTrue());
+                return stats;
+        }
 
         private final PostRepo postRepo;
         private final MediaClient mediaClient;
         private final FollowClient followClient;
+        private final nvt.socialnetwork.post.client.UserClient userClient;
         private final KafkaTemplate<String, NotificationEvent> kafkaTemplate;
 
         @Value("${app.kafka.post-topic}")
@@ -47,18 +54,19 @@ public class PostService {
         @Transactional
         public void handleCommentEvent(Map<String, Object> payload) {
                 try {
-                UUID postId = UUID.fromString((String) payload.get("postId"));
-                String action = (String) payload.get("action");
+                        UUID postId = UUID.fromString((String) payload.get("postId"));
+                        String action = (String) payload.get("action");
 
-                Post post = postRepo.findById(postId).orElse(null);
-                if (post == null) return;
+                        Post post = postRepo.findById(postId).orElse(null);
+                        if (post == null)
+                                return;
 
-                if ("CREATED".equals(action)) {
-                        post.setCommentCount(post.getCommentCount() + 1);
-                } else if ("DELETED".equals(action)) {
-                        post.setCommentCount(Math.max(0, post.getCommentCount() - 1));
-                }
-                postRepo.save(post);
+                        if ("CREATED".equals(action)) {
+                                post.setCommentCount(post.getCommentCount() + 1);
+                        } else if ("DELETED".equals(action)) {
+                                post.setCommentCount(Math.max(0, post.getCommentCount() - 1));
+                        }
+                        postRepo.save(post);
                 } catch (Exception e) {
                         System.err.println("Failed to handle comment event: " + e.getMessage());
                 }
@@ -115,17 +123,20 @@ public class PostService {
                 Post post = postRepo.findById(id)
                                 .orElseThrow(() -> new RuntimeException("Post not found with id: " + id));
 
-                if (!post.getUserId().equals(currentUserId)) {
+                boolean isAdmin = authentication.getAuthorities().stream()
+                                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+                if (!post.getUserId().equals(currentUserId) && !isAdmin) {
                         throw new RuntimeException("User does not have permission to delete this post.");
                 }
-                
+
                 postRepo.deleteById(id);
                 NotificationEvent event = NotificationEvent.builder()
-                        .eventId(UUID.randomUUID().toString())
-                        .eventTimestamp(Instant.now())
-                        .type(NotificationType.POST_DELETED)
-                        .payload(Map.of("postId", id))
-                        .build();
+                                .eventId(UUID.randomUUID().toString())
+                                .eventTimestamp(Instant.now())
+                                .type(NotificationType.POST_DELETED)
+                                .payload(Map.of("postId", id))
+                                .build();
                 kafkaTemplate.send(postTopic, event);
         }
 
@@ -139,7 +150,8 @@ public class PostService {
         @Transactional(readOnly = true)
         public Page<PostResponse> getPostsByUserId(String userId, int page, int size) {
                 Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-                Page<Post> posts = postRepo.findByUserIdAndIsDeletedFalse(userId, pageable);
+                // EXCLUDE hidden posts from profile view
+                Page<Post> posts = postRepo.findByUserIdAndIsDeletedFalseAndHiddenFalse(userId, pageable);
                 return posts.map(this::mapPostToPostResponse);
         }
 
@@ -153,23 +165,28 @@ public class PostService {
         public Page<PostResponse> getNewFeeds(Authentication authentication, int page, int size) {
                 String userId = authentication.getName();
 
-                Pageable followingPageable = PageRequest.of(page, size);
-                // Sửa lại để gọi đúng client method lấy danh sách người MÌNH THEO DÕI
-                Page<UserResponse> followingPage = followClient.getFollowing(userId, followingPageable).getBody();
+                // 1. Get list of users the current user is FOLLOWING
+                Pageable followingRequest = PageRequest.of(0, 100);
+                Page<UserResponse> followingPage = followClient.getFollowing(userId, followingRequest).getBody();
 
-                if (followingPage == null || followingPage.getContent().isEmpty()) {
-                        return Page.empty();
+                // 2. Initialize list of IDs to query posts from, ALWAYS including the current
+                // user
+                java.util.List<String> targetIds = new java.util.ArrayList<>();
+                targetIds.add(userId);
+
+                if (followingPage != null && followingPage.hasContent()) {
+                        List<String> followingIds = followingPage.getContent().stream()
+                                        .map(UserResponse::getId)
+                                        .collect(Collectors.toList());
+                        targetIds.addAll(followingIds);
                 }
-                List<String> followingIds = followingPage.getContent().stream() // Đây là followingIds
-                        .map(UserResponse::getId)
-                        .collect(Collectors.toList());
 
+                // 3. Query posts for ALL target IDs (Self + Following), excluding HIDDEN posts
                 Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-                Page<Post> posts = postRepo.findByUserIdIn(followingIds, pageable); // -> Tìm bài viết của người mình theo dõi
+                Page<Post> posts = postRepo.findByUserIdInAndHiddenFalse(targetIds, pageable);
 
                 return posts.map(this::mapPostToPostResponse);
         }
-
 
         private void validateMedia(List<UUID> mediaIds) {
                 if (mediaIds != null && !mediaIds.isEmpty()) {
@@ -186,26 +203,51 @@ public class PostService {
         }
 
         private void sendPostEvent(Post post, NotificationType type) {
-        NotificationEvent event = NotificationEvent.builder()
-                .eventId(UUID.randomUUID().toString())
-                .eventTimestamp(Instant.now())
-                .type(type)
-                .payload(Map.of(
-                    "postId", post.getId(),
-                    "content", post.getContent(),
-                    "userId", post.getUserId(),
-                    "createdAt", post.getCreatedAt()
-                ))
-                .build();
-        kafkaTemplate.send(postTopic, event);
+                NotificationEvent event = NotificationEvent.builder()
+                                .eventId(UUID.randomUUID().toString())
+                                .eventTimestamp(Instant.now())
+                                .type(type)
+                                .payload(Map.of(
+                                                "postId", post.getId(),
+                                                "content", post.getContent(),
+                                                "userId", post.getUserId(),
+                                                "createdAt", post.getCreatedAt()))
+                                .build();
+                kafkaTemplate.send(postTopic, event);
         }
 
-        private PostResponse mapPostToPostResponse(Post post) {
+        public Page<PostResponse> searchPosts(String content, int page, int size) {
+                Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+                return postRepo.findByContentContainingIgnoreCase(content, pageable)
+                                .map(this::mapPostToPostResponse);
+        }
+
+        @Transactional
+        public void hidePost(UUID id, boolean hidden) {
+                Post post = postRepo.findById(id)
+                                .orElseThrow(() -> new RuntimeException("Post not found with id: " + id));
+                post.setHidden(hidden);
+                postRepo.save(post);
+        }
+
+        public PostResponse mapPostToPostResponse(Post post) {
                 List<String> mediaUrls = Collections.emptyList();
                 if (post.getMediaIds() != null && !post.getMediaIds().isEmpty()) {
                         mediaUrls = post.getMediaIds().stream()
                                         .map(mediaId -> "http://localhost:8080/media/" + mediaId.toString())
                                         .collect(Collectors.toList());
+                }
+
+                String userName = "Unknown";
+                String userAvatar = null;
+                try {
+                        UserResponse user = userClient.getUserProfile(post.getUserId()).getBody();
+                        if (user != null) {
+                                userName = user.getDisplayName();
+                                userAvatar = user.getAvatarUrl();
+                        }
+                } catch (Exception e) {
+                        // Ignore error fetching user
                 }
 
                 return PostResponse.builder()
@@ -218,6 +260,9 @@ public class PostService {
                                 .likeCount(post.getLikeCount())
                                 .commentCount(post.getCommentCount())
                                 .isPrivate(post.isPrivate())
+                                .hidden(post.isHidden())
+                                .userName(userName)
+                                .userAvatar(userAvatar)
                                 .build();
         }
 

@@ -20,13 +20,19 @@ public class SecurityConfig {
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
-    
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET, "/follows/**").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // CORS preflight
+                        .requestMatchers(HttpMethod.POST, "/follows/internal/**").permitAll() // Internal system calls
+                        .requestMatchers(HttpMethod.DELETE, "/follows/internal/**").permitAll() // Internal system calls
+                        .requestMatchers(HttpMethod.GET, "/follows/**").permitAll() // Allow GET for internal service
+                                                                                    // calls
+                        .requestMatchers(HttpMethod.POST, "/follows/**").authenticated() // Follow requires auth
+                        .requestMatchers(HttpMethod.DELETE, "/follows/**").authenticated() // Unfollow requires auth
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

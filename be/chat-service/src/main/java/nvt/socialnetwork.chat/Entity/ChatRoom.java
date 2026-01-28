@@ -11,6 +11,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
@@ -29,6 +31,7 @@ import nvt.socialnetwork.chat.Entity.Enum.RoomType;
 public class ChatRoom {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     private String name;
@@ -37,11 +40,14 @@ public class ChatRoom {
     @Column(length = 20)
     private RoomType type;
 
+    @Column(name = "creator_id")
+    private String creatorId; // ID of the user who created the group
+
     @Column(columnDefinition = "TEXT")
     private String lastMessage;
 
     private LocalDateTime lastMessageTimestamp;
-    
+
     // Dùng @ElementCollection để tự động tạo bảng chat_room_participants
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "chat_room_participants", joinColumns = @JoinColumn(name = "chat_room_id"))

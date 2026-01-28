@@ -6,6 +6,10 @@ server:
 spring:
   application:
     name: media-service
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
   datasource:
     url: jdbc:mysql://localhost:3306/media_db?createDatabaseIfNotExist=true
     username: root
